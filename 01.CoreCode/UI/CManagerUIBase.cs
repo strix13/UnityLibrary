@@ -37,33 +37,6 @@ abstract public class CManagerUIBase<Class_Instance, ENUM_FRAME_Name, ENUM_POPUP
 
 		OnDefaultFrameShow();
     }
-	
-	private IEnumerator CoProcShowHide_FrameDelayed(ENUM_FRAME_Name eFrame, bool bShow, float fDelay)
-	{
-		yield return new WaitForSeconds(fDelay);
-
-		DoShowHide_Frame(eFrame, bShow);
-	}
-
-	private IEnumerator CoProcShowHide_FrameDelayed_FadeInOut(ENUM_FRAME_Name eFrame, bool bShow, float fDelay, float fFadeTime = 1f)
-	{
-		yield return new WaitForSeconds(fDelay);
-
-		if (bShow)
-			DoShowFrame_FadeIn(eFrame);
-		else
-			DoHideFrame_FadeOut(eFrame);
-	}
-
-	public void DoShowHideFrame_FadeInOutDelayed(ENUM_FRAME_Name eFrame, float fDelay, bool bShow, float fFadeTime = 1f)
-	{
-		StartCoroutine(CoProcShowHide_FrameDelayed_FadeInOut(eFrame, bShow, fDelay, fFadeTime));
-	}
-
-	public void DoShowHide_FrameDelayed(ENUM_FRAME_Name eFrame, bool bShow, float fDelay)
-	{
-		StartCoroutine(CoProcShowHide_FrameDelayed(eFrame, bShow, fDelay));
-	}
 
 	/// <summary>
 	/// 지정된 Frame을 열거나 끕니다.
@@ -129,11 +102,19 @@ abstract public class CManagerUIBase<Class_Instance, ENUM_FRAME_Name, ENUM_POPUP
 		AutoFade.DoStartFade(fFadeTime, Color.black, pFrameShow.DoHide);
 	}
 
-	public void DoShowHideFramePanel_FadeInOut_Delayed(ENUM_FRAME_Name eFrame, bool bShow, float fDelay, float fFadeTime = 1f)
+	public void DoShowHideFrame_Delayed(ENUM_FRAME_Name eFrame, bool bShow, float fDelay)
 	{
-		CUIFrameBase pFrameShow = _mapFrameInstance[eFrame];
+		CUIFrameBase pFrame = _mapFrameInstance[eFrame];
+		pFrame.DoEnableFrameButtons(bShow);
 
-		pFrameShow.DoStartFadeInOutPanel_Delayed(bShow, fDelay, fFadeTime);
+		StartCoroutine(CoProcShowHideFrame_Delayed(pFrame, bShow, fDelay));
+	}
+
+	private IEnumerator CoProcShowHideFrame_Delayed(CUIFrameBase pFrame, bool bShow, float fDelay)
+	{
+		yield return new WaitForSecondsRealtime(fDelay);
+
+		pFrame.DoShowHideFrame(bShow);
 	}
 
 	/// <summary>

@@ -260,7 +260,7 @@ public class CManagerNetworkDB_Base<CLASS> : CSingletonBase_Not_UnityComponent<C
         //Debug.Log(strPHPName + " result : " + www.text);
 
         if (bSuccess == false)
-            Debug.LogWarning("DBParser Error " + www.text + " php : " + strPHPName + " TableName : " + strTableName);
+			Strix.Debug.Log_ForCore(Strix.EDebugLevel.Error_Core, "DBParser Error " + www.text + " php : " + strPHPName + " TableName : " + strTableName);
 
         if (OnFinishLoad != null)
             OnFinishLoad(bSuccess);
@@ -279,7 +279,7 @@ public class CManagerNetworkDB_Base<CLASS> : CSingletonBase_Not_UnityComponent<C
         //Debug.Log(strPHPName + " result : " + www.text);
 
         if (bSuccess == false)
-            Debug.LogWarning("DBParser Error " + www.text + " php : " + strPHPName + " TableName : " + strTableName);
+			Strix.Debug.Log_ForCore(Strix.EDebugLevel.Error_Core, "DBParser Error " + www.text + " php : " + strPHPName + " TableName : " + strTableName);
 
         if (OnFinishLoad != null)
             OnFinishLoad(bSuccess, www.text);
@@ -311,7 +311,7 @@ public class CManagerNetworkDB_Base<CLASS> : CSingletonBase_Not_UnityComponent<C
         }
 
         if (bSuccess == false)
-            Debug.LogWarning("DBParser Error " + www.text + " php : " + strPHPName + " TableName : " + strTypeName);
+            Strix.Debug.Log_ForCore(Strix.EDebugLevel.Error_Core, "DBParser Error " + www.text + " php : " + strPHPName + " TableName : " + strTypeName);
 
         if (OnFinishLoad != null)
             OnFinishLoad(bSuccess, pData);
@@ -338,7 +338,7 @@ public class CManagerNetworkDB_Base<CLASS> : CSingletonBase_Not_UnityComponent<C
         }
 
         if (bSuccess == false)
-            Debug.LogWarning("DBParser Error " + www.text + " php : " + strPHPName + " TableName : " + strTypeName);
+			Strix.Debug.Log_ForCore(Strix.EDebugLevel.Error_Core, "DBParser Error " + www.text + " php : " + strPHPName + " TableName : " + strTypeName);
 
 		if (arrOutData == null)
 			arrOutData = new T[0];
@@ -369,12 +369,12 @@ public class CManagerNetworkDB_Base<CLASS> : CSingletonBase_Not_UnityComponent<C
         for (int i = 0; i < arrParameter.Length; i++)
         {
 			if (arrParameter[i].strKey == null)
-				Debug.LogWarning(string.Format("Error key {0} is null PHP : {1} Table : {2}", i, strPHPName, strTableName));
+				Strix.Debug.Log_ForCore(Strix.EDebugLevel.Error_Core, string.Format("Error key {0} is null PHP : {1} Table : {2}", i, strPHPName, strTableName));
 			else
 				form.AddField("key" + i, arrParameter[i].strKey);
 
 			if (arrParameter[i].strValue == null)
-				Debug.LogWarning(string.Format("Error value {0} is null PHP : {1} Table : {2}", i, strPHPName, strTableName));
+				Strix.Debug.Log_ForCore(Strix.EDebugLevel.Error_Core, string.Format("Error value {0} is null PHP : {1} Table : {2}", i, strPHPName, strTableName));
 			else
 				form.AddField("value" + i, arrParameter[i].strValue);
         }

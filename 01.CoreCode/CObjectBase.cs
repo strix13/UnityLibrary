@@ -91,6 +91,12 @@ public class CObjectBase : MonoBehaviour
 			OnAwake();
 	}
 
+	public void EventShowAnd_AutoDisable(GameObject pObjectDisable, float fDelaySec)
+	{
+		pObjectDisable.SetActive( true );
+		StartCoroutine( CoDisableObject( pObjectDisable, fDelaySec ) );
+	}
+
 	public bool GetComponent<COMPONENT>( out COMPONENT pComponent )
 		where COMPONENT : UnityEngine.Component
 	{
@@ -147,4 +153,22 @@ public class CObjectBase : MonoBehaviour
         return arrCompoChildren;
     }
 
+	protected void EventDelayExcuteCallBack(System.Action OnAfterDelayAction, float fDelaySec)
+	{
+		StartCoroutine( CoDelayAction( OnAfterDelayAction, fDelaySec ));
+	}
+
+	protected IEnumerator CoDelayAction( System.Action OnAfterDelayAction, float fDelaySec )
+	{
+		yield return new WaitForSeconds( fDelaySec );
+
+		OnAfterDelayAction();
+	}
+
+	protected IEnumerator CoDisableObject( GameObject pObjectDisable, float fDelaySec )
+	{
+		yield return new WaitForSeconds( fDelaySec );
+
+		pObjectDisable.SetActive( false );
+	}
 }

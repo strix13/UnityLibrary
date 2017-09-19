@@ -27,9 +27,7 @@ public static class CGameObjectExtends
 [System.Serializable]
 abstract public class STweenInfoBase
 {
-	public bool bStartOnEnable = true;
 	public bool bAutoDisableThis = false;
-	public bool bAutoDisableFrame = false;
 	public float fDuration = 1f;
 	public float fStartDelay;
 	public UITweener.Style eStyle;
@@ -46,8 +44,7 @@ abstract public class CNGUITweenExtendBase<TEMPLATE> : UITweener
 {
     public List<TEMPLATE> listTweenInfo = new List<TEMPLATE>(2);
     protected TEMPLATE m_pCurrentTweenInfo;
-
-	private CNGUITweenExtendListener _pListener = null;
+	
 	private event System.Action _EVENT_OnFinish = null;
 
 	[HideInInspector]
@@ -70,39 +67,29 @@ abstract public class CNGUITweenExtendBase<TEMPLATE> : UITweener
 	}
 
 	public bool _bCheckTweenAmount = true;
+	public bool _bPlayOnEnable = true;
+	public int _iDefaultPlayIndex = 0;
 
 	[HideInInspector]
 	public float p_fTweenAmount;
 
 	private float _fTweenSpeed;
+	private int _iLastPlayIndex = 0;
+	private float _fLastFactor = 0f;
+	private bool _bFactorIsIncrease = false;
 
 	//=============================== [1. Start Public] ===============================//
 	#region Public
-
+		
 	protected override void Start()
 	{
-		ProcSettingBeforePlay(0);
-
-		_pListener = GetComponent<CNGUITweenExtendListener>();
-		if (_pListener == null)
-			_pListener = gameObject.AddComponent<CNGUITweenExtendListener>();
-
-		if (m_pCurrentTweenInfo.bStartOnEnable)
-			_pListener.p_EVENT_OnEnabled += EventOnEnable;
-
-		if (m_pCurrentTweenInfo.bAutoDisableFrame)
-		{
-			CUIFrameBase[] arrFrames = GetComponentsInParent<CUIFrameBase>();
-			if (arrFrames.Length != 0)
-				_EVENT_OnFinish += arrFrames[0].DoHide;
-			else
-				Debug.LogWarning("부모 프레임 스크립트를 등록해주세요.");
-		}
-
-		if (m_pCurrentTweenInfo.bAutoDisableThis)
-			_EVENT_OnFinish += gameObject.DoDisable;
-
 		ResetToBeginning();
+		_iLastPlayIndex = _iDefaultPlayIndex;
+	}
+
+	private void OnEnable()
+	{
+		DoPlayTween_Forward( _iLastPlayIndex );
 	}
 
 	private void OnDisable()
@@ -143,6 +130,7 @@ abstract public class CNGUITweenExtendBase<TEMPLATE> : UITweener
 
 	public void DoPlayTween_Reverse(int iGroupNumber)
 	{
+		ResetToFactor( 1f );
 		ProcSettingBeforePlay(iGroupNumber);
 		Play(false);
 	}
@@ -179,10 +167,62 @@ abstract public class CNGUITweenExtendBase<TEMPLATE> : UITweener
             ProcSettingBeforePlay(0);
         }
 
-        if (m_pCurrentTweenInfo != null)
+        else
         {
             UpdateTweenValue(factor, isFinished);
-        }
+
+			if (factor == 0f) return;
+			if (ignoreTimeScale == false && Time.timeScale == 0)
+				return;
+
+			// 스타일이 원스일 경우 기존의 Tween이 OnFinish를 호출하기 때문에,
+			// 루프일 경우 팩터가 1이면 OnFinish를 호출하도록 기능 확장
+			if (style == Style.Loop)
+			{
+				// 마지막 Factor가 현재 Factor보다 크면 갱신
+				if (_fLastFactor <= factor)
+					_fLastFactor = factor;
+				else
+				{
+					// 마지막 Factor가 현재 Factor보다 작다는것은 이미 한바퀴 돌았다는 것으로 그때 호출
+					_fLastFactor = 0f;
+					EventDelegate.Execute( onFinished );
+					ProcSettingEventDelegate();
+				}
+			}
+			else if(style == Style.PingPong)
+			{
+				bool bIsExcute = false;
+				//Debug.Log( "_bFactorIsIncrease : " + _bFactorIsIncrease + " factor : " + factor + " _fLastFactor : " + _fLastFactor );
+				if (_bFactorIsIncrease)
+				{
+					if (_fLastFactor >= factor || _fLastFactor == 0f)
+						_fLastFactor = factor;
+					else
+					{
+						bIsExcute = true;
+						_fLastFactor = 0f;
+					}
+				}
+				else
+				{
+					if (_fLastFactor < factor || _fLastFactor == 1f)
+						_fLastFactor = factor;
+					else
+					{
+						bIsExcute = true;
+						_fLastFactor = 1f;
+					}
+				}
+
+				if(bIsExcute)
+				{
+					_bFactorIsIncrease = !_bFactorIsIncrease;
+					EventDelegate.Execute( onFinished );
+					ProcSettingEventDelegate();
+				}
+			}
+		}
     }
 
     #endregion
@@ -203,14 +243,11 @@ abstract public class CNGUITweenExtendBase<TEMPLATE> : UITweener
             animationCurve = m_pCurrentTweenInfo.pAnimationCurve;
 			style = m_pCurrentTweenInfo.eStyle;
 
-			for (int i = 0; i < m_pCurrentTweenInfo.listOnFinished.Count; i++)
-            {
-                EventDelegate.Add(onFinished, m_pCurrentTweenInfo.listOnFinished[i], true);
-                if (m_pCurrentTweenInfo.listOnFinished[i].oneShot)
-                    EventDelegate.Remove(m_pCurrentTweenInfo.listOnFinished, m_pCurrentTweenInfo.listOnFinished[i]);
-            }
-        }
-        else
+			_iLastPlayIndex = iGroupID;
+			_fLastFactor = 0f;
+			ProcSettingEventDelegate();
+		}
+		else
         {
             Debug.Log("Error! Not Found Group ID : " + iGroupID, this);
         }
@@ -236,5 +273,24 @@ abstract public class CNGUITweenExtendBase<TEMPLATE> : UITweener
         }
     }
 
-    #endregion
+	private void ProcSettingEventDelegate()
+	{
+		for (int i = 0; i < m_pCurrentTweenInfo.listOnFinished.Count; i++)
+		{
+			EventDelegate.Add( onFinished, m_pCurrentTweenInfo.listOnFinished[i], true );
+			if (m_pCurrentTweenInfo.listOnFinished[i].oneShot)
+				EventDelegate.Remove( m_pCurrentTweenInfo.listOnFinished, m_pCurrentTweenInfo.listOnFinished[i] );
+		}
+
+		if(m_pCurrentTweenInfo.bAutoDisableThis)
+		{
+			CUIFrameBase pUIFrameOwner = GetComponentInParent<CUIFrameBase>();
+			if (pUIFrameOwner != null)
+				EventDelegate.Add( onFinished, pUIFrameOwner.DoHide, true );
+			else
+				EventDelegate.Add( onFinished, DoObjectActiveFalse, true );
+		}
+	}
+
+	#endregion
 }

@@ -10,32 +10,18 @@ using System.Collections.Generic;
 // Edit Log    : 
 // ============================================ 
 
+public enum ELogWriter
+{
+	Strix,
+	KJH,
+}
+
 [System.Flags]
 public enum EVolumeOff
 {
     None = 0,
     SoundEffect = 1,
     BGM = 2
-}
-
-[System.Flags]
-public enum EDebugLevel
-{
-    Debug = 1,
-    Warning = 2,
-    Error = 4,
-    Developer_1 = 8,
-    Developer_2 = 16,
-    Developer_3 = 32,
-    ALL = 63,
-}
-
-public enum EBuildType
-{
-    Editor,
-    Develop,
-    QA,
-    Release
 }
 
 [System.Serializable]
@@ -52,9 +38,9 @@ public class SINI_UserSetting
 [System.Serializable]
 public class SINI_DevelopSetting
 {
-    public bool bDebugMode = true;
-    public EDebugLevel eDebugFilter = EDebugLevel.ALL;
-	public string strTestID;
+	public string strDeveloperName;
+	public string[] arrLogIgnore_Level;
+	public string[] arrLogIgnore_Writer;
 }
 
 public interface IDB_Insert
@@ -111,7 +97,11 @@ public class CManagerFrameWorkBase<CLASS, ENUM_SOUND_NAME, ENUM_EFFECT_NAME, ENU
     static public SCSceneLoader<ENUM_SCENE_NAME> p_pManagerScene { get {  return _pManagerScene; } }
     static public SCManagerParserJson p_pManagerJsonINI { get { return _pJsonParser_Persistent; } }
 
-	public static System.Action p_EVENT_OnFirstChangeLocalize;
+	public static event System.Action<float> p_Event_OnLoadSceneProgress;
+	public static event System.Action p_Event_OnStartLoadScene;
+	public static event System.Action p_Event_OnFinishLoadScene;
+
+	public static System.Action p_EVENT_OnLoadFinish_Localizing;
 
 	// ===================================== //
 	// protected - Variable declaration      //
@@ -295,15 +285,98 @@ public class CManagerFrameWorkBase<CLASS, ENUM_SOUND_NAME, ENUM_EFFECT_NAME, ENU
         }
     }
 
-    static public void DoLoadSceneAsync(ENUM_SCENE_NAME eSceneName, LoadSceneMode eLoadSceneMode, System.Action OnFinishLoading = null)
+    public void DoLoadSceneAsync(params ENUM_SCENE_NAME[] arrSceneName)
     {
-        SceneManager.LoadSceneAsync(eSceneName.ToString(), eLoadSceneMode);
-        if (_OnFinishLoad_Scene == null && OnFinishLoading != null)
-        {
-            _OnFinishLoad_Scene = OnFinishLoading;
-            _strCallBackRequest_SceneName = eSceneName.ToString();
-        }
-    }
+		StartCoroutine(CoProcLoadSceneAsync(arrSceneName));
+	}
+
+	private IEnumerator CoProcLoadSceneAsync(ENUM_SCENE_NAME[] arrSceneName)
+	{
+		// 씬 로딩전 기본 대기시간 1초
+		yield return new WaitForSeconds(1f);
+
+		if (p_Event_OnStartLoadScene != null)
+			p_Event_OnStartLoadScene();
+
+		Scene pLastScene = SceneManager.GetActiveScene();
+
+		// 로딩하기전에 이전 씬의 게임오브젝트를 모두 꺼준다.
+		GameObject[] arrGameObjects = pLastScene.GetRootGameObjects();
+		int iLenObj = arrGameObjects.Length;
+		for (int i = 0; i < iLenObj; i++)
+			arrGameObjects[i].SetActive(false);
+
+		List<AsyncOperation> listAsyncLoadScene = new List<AsyncOperation>();
+
+		// 이전씬을 비활성화 시켜줄라면 필요함
+		//AsyncOperation pAsyncOperation_LastScene = SceneManager.UnloadSceneAsync(pLastScene);
+		//while (pAsyncOperation_LastScene.isDone == false) yield return new WaitForEndOfFrame();
+
+		LoadSceneMode eLoadSceneMode = LoadSceneMode.Single; // 처음 로딩하는 씬은 무조건 Single 로
+
+		int iMaxLoadScene = arrSceneName.Length;
+		for (int i = 0; i < iMaxLoadScene; i++)
+		{
+			AsyncOperation pAsyncOperation = SceneManager.LoadSceneAsync(arrSceneName[i].ToString(), eLoadSceneMode);
+			pAsyncOperation.allowSceneActivation = false; // 이제 작동됨 (씬 로딩후에 바로 활성화 되는것을 막아줌)
+			pAsyncOperation.priority = i; // 우선순위를 지정해줌으로써 로딩속도 향상?..
+
+			listAsyncLoadScene.Add(pAsyncOperation);
+			eLoadSceneMode = LoadSceneMode.Additive;
+		}
+
+		float fStackProgress = 0f;
+		while (fStackProgress < 0.9f * iMaxLoadScene)
+		{
+			float fTotalProgress = 0f;
+			for (int i = 0; i < iMaxLoadScene; i++)
+				fTotalProgress += listAsyncLoadScene[i].progress;
+
+			if (fStackProgress < fTotalProgress)
+				fStackProgress += Time.unscaledDeltaTime * iMaxLoadScene;
+
+			if (p_Event_OnLoadSceneProgress != null)
+				p_Event_OnLoadSceneProgress(fStackProgress / iMaxLoadScene);
+
+			yield return null;
+		}
+
+		print("씬 미리 로딩 끝");
+
+		float iElapsedTime = 0f;
+
+		// 미리 로딩한 후에 씬을 활성화 시킨다. (Awake 실행에도 대기시간 있음)
+		for (int i = 0; i < iMaxLoadScene; i++)
+		{
+			AsyncOperation pAsyncOperation = listAsyncLoadScene[i];
+			pAsyncOperation.allowSceneActivation = true;
+
+			// 활성화 시키고 2차 로딩이 끝날때까지 기다린다.
+			while (pAsyncOperation.isDone == false)
+			{
+				iElapsedTime += Time.unscaledDeltaTime;
+				if (iElapsedTime > 5f)
+					print("무한로딩 버그 발생 " + i + " IsDone " + pAsyncOperation.isDone + " Progress " + pAsyncOperation.progress);
+
+				yield return null;
+			}
+
+			fStackProgress += 0.1f;
+
+			if (p_Event_OnLoadSceneProgress != null)
+				p_Event_OnLoadSceneProgress(fStackProgress / iMaxLoadScene);
+		}
+		print("씬 2차 로딩 끝");
+		// 로딩끝. 
+		yield return new WaitForSeconds(1f);
+
+		if (p_Event_OnFinishLoadScene != null)
+			p_Event_OnFinishLoadScene();
+
+		p_Event_OnLoadSceneProgress = null;
+		p_Event_OnFinishLoadScene = null;
+		p_Event_OnStartLoadScene = null;
+	}
 
 	static public void DoLoadScene_FadeInOut( ENUM_SCENE_NAME eSceneName, float fFadeDuration, Color pColor, System.Action OnFinishLoading = null )
 	{
@@ -354,12 +427,16 @@ public class CManagerFrameWorkBase<CLASS, ENUM_SOUND_NAME, ENUM_EFFECT_NAME, ENU
 		bool bParsingResult = _pJsonParser_Persistent.DoReadJson( EINI_JSON_FileName.UserSetting, out _sSetting_User );
 		if (bParsingResult)
         {
-            _pManagerSound.DoSetVolume(_sSetting_User.fMainVolume);
+			Strix.Debug.Log_ForCore(Strix.EDebugLevel.System, "UserInfo - bParsingResult Is Success " + _sSetting_User.ID);
+
+			_pManagerSound.DoSetVolume(_sSetting_User.fMainVolume);
             _pJsonParser_StreammingAssets.DoStartCo_GetStreammingAssetResource_Array<SINI_Sound>(EINI_JSON_FileName.Sound.ToString(), OnParseComplete_SoundSetting);
-        }
-        else
+		}
+		else
         {
-            _sSetting_User = new SINI_UserSetting();
+			Strix.Debug.Log_ForCore(Strix.EDebugLevel.System, "UserInfo - bParsingResult Is Fail");
+
+			_sSetting_User = new SINI_UserSetting();
             _pJsonParser_Persistent.DoWriteJson(EINI_JSON_FileName.UserSetting, _sSetting_User);
             if(Application.isEditor)
                 _pJsonParser_StreammingAssets.DoWriteJsonArray(EINI_JSON_FileName.Sound, new SINI_Sound[] { new SINI_Sound(), new SINI_Sound() });
@@ -395,11 +472,11 @@ public class CManagerFrameWorkBase<CLASS, ENUM_SOUND_NAME, ENUM_EFFECT_NAME, ENU
             _pJsonParser_Persistent.DoWriteJson(EINI_JSON_FileName.UserSetting, _sSetting_User);
         }
 
-		Debug.LogWarning("언어 설정 " + eCurLanguage);
+		Strix.Debug.Log_ForCore( Strix.EDebugLevel.System, "언어 설정 " + eCurLanguage, 0 );
 
         CManagerUILocalize.instance.DoSet_Localize(eCurLanguage);
-		if (p_EVENT_OnFirstChangeLocalize != null)
-			p_EVENT_OnFirstChangeLocalize();
+		if (p_EVENT_OnLoadFinish_Localizing != null)
+			p_EVENT_OnLoadFinish_Localizing();
 	}
 
     private void ProcOnSceneLoaded(UnityEngine.SceneManagement.Scene arg0, UnityEngine.SceneManagement.LoadSceneMode arg1)
@@ -441,25 +518,67 @@ public class CManagerFrameWorkBase<CLASS, ENUM_SOUND_NAME, ENUM_EFFECT_NAME, ENU
     private void OnParseComplete_SoundSetting(bool bSuccess, SINI_Sound[] arrSound)
     {
         if (bSuccess)
-            _pManagerSound.EventSetINI(arrSound, _sSetting_User.fMainVolume, (EVolumeOff)_sSetting_User.eVolumeOff);
-    }
-    private void OnParseComplete_DevelopSetting(bool bSuccess, SINI_DevelopSetting sDeveloperSetting)
+			_pManagerSound.EventSetINI( arrSound, _sSetting_User.fMainVolume, _sSetting_User.eVolumeOff );
+
+		ENUM_SOUND_NAME[] arrSoundName = PrimitiveHelper.DoGetEnumType<ENUM_SOUND_NAME>();
+		if (Application.isEditor && arrSound.Length < arrSoundName.Length)
+		{
+			Strix.Debug.Log_ForCore( Strix.EDebugLevel.Warning_Core, "Sound INI의 내용과 Enum SoundName과 길이가 맞지 않아 재조정" );
+
+			List<SINI_Sound> listINISound = arrSound.ToList();
+			Dictionary<string, SINI_Sound> mapINISound = new Dictionary<string, SINI_Sound>();
+			mapINISound.DoAddItem( arrSound );
+
+			for (int i = 0; i < arrSoundName.Length; i++)
+			{
+				if (mapINISound.ContainsKey( arrSoundName[i].ToString() ) == false)
+					listINISound.Add( new SINI_Sound( arrSoundName[i].ToString(), 0.5f) );
+			}
+
+			_pJsonParser_StreammingAssets.DoWriteJsonArray( EINI_JSON_FileName.Sound, listINISound.ToArray() );
+	}
+}
+
+	private void OnParseComplete_DevelopSetting(bool bSuccess, SINI_DevelopSetting sDeveloperSetting)
     {
         if (bSuccess)
         {
             _sSetting_Developer = sDeveloperSetting;
 
-            //Debug.Log("Success DebugMode : " + _sSetting_Developer.bDebugMode + " DebugFilter : " + _sSetting_Developer.eDebugFilter);
-            Debug.Log("Success DebugMode : " + _sSetting_Developer.bDebugMode + " Test ID : " + _sSetting_Developer.strTestID);
+			if(Application.isEditor)
+				Strix.Debug.Log_ForCore( Strix.EDebugLevel.System, "DevelopSetting - Parsing Success - Develper Name : " + _sSetting_Developer.strDeveloperName);
+			System.Text.StringBuilder pStrBuilder = new System.Text.StringBuilder();
+			for (int i = 0; i < _sSetting_Developer.arrLogIgnore_Writer.Length; i++)
+			{
+				pStrBuilder.Append( _sSetting_Developer.arrLogIgnore_Writer[i] );
+				Strix.Debug.AddIgnore_LogWriterList( _sSetting_Developer.arrLogIgnore_Writer[i].ConvertEnum<ELogWriter>() );
 
-            //if (_sSetting_Developer.bDebugMode)
-               // Application.logMessageReceived += CManagerUIShared.OnHandleLog;
-        }
-        else
+				if(i != _sSetting_Developer.arrLogIgnore_Writer.Length - 1)
+					pStrBuilder.Append(", ");
+			}
+			if (Application.isEditor)
+				Strix.Debug.Log_ForCore( Strix.EDebugLevel.System, "DevelopSetting - Debug Ignore Writer List : " + pStrBuilder.ToString() );
+			pStrBuilder.Length = 0;
+			for (int i = 0; i < _sSetting_Developer.arrLogIgnore_Level.Length; i++)
+			{
+				pStrBuilder.Append( _sSetting_Developer.arrLogIgnore_Level[i] );
+				Strix.Debug.AddIgnore_LogLevel( _sSetting_Developer.arrLogIgnore_Level[i] );
+
+				if (i != _sSetting_Developer.arrLogIgnore_Level.Length - 1)
+					pStrBuilder.Append( ", " );
+			}
+			if (Application.isEditor)
+				Strix.Debug.Log_ForCore(Strix.EDebugLevel.System, "DevelopSetting - Debug Ignore Level List : " + pStrBuilder.ToString() );
+
+			//if (_sSetting_Developer.bDebugMode)
+			// Application.logMessageReceived += CManagerUIShared.OnHandleLog;
+		}
+		else
         {
             _sSetting_Developer = new SINI_DevelopSetting();
-            Debug.Log("Fail DebugMode : " + _sSetting_Developer.bDebugMode + "DebugFilter : " + _sSetting_Developer.eDebugFilter);
-            if (Application.isEditor)
+			Debug.Log( "DevelopSetting Parsing Fail - Check your DevelpSetting" );
+
+			if (Application.isEditor)
                 _pJsonParser_StreammingAssets.DoWriteJson(EINI_JSON_FileName.DevelopSetting, _sSetting_Developer);
         }
 

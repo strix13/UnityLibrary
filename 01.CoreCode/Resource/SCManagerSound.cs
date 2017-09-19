@@ -13,8 +13,20 @@ using System.Collections.Generic;
 // ============================================ 
 
 [System.Serializable]
-public struct SINI_Sound
+public struct SINI_Sound : IDictionaryItem<string>
 {
+	public SINI_Sound( string strSoundName , float fVolume)
+	{
+		this.strSoundName = strSoundName;
+		this.fVolume = fVolume;
+		iGroupNumber = 0;
+	}
+
+	public string IDictionaryItem_GetKey()
+	{
+		return strSoundName;
+	}
+
 	public string strSoundName;
 	public float fVolume;
 	public int iGroupNumber;

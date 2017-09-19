@@ -26,6 +26,7 @@ public class CCompoEventTrigger : CUIObjectBase
 		OnTriggerEnter,
 
 		OnDestroy,
+		OnDisable,
     }
 
 	/* public - Field declaration            */
@@ -75,7 +76,15 @@ public class CCompoEventTrigger : CUIObjectBase
             DoPlayEvent();
     }
 
-    protected override void OnUIClick()
+	protected override void OnDisableObject()
+	{
+		base.OnDisableObject();
+
+		if (p_eInputType == EInputType.OnDisable)
+			DoPlayEvent();
+	}
+
+	protected override void OnUIClick()
     {
         base.OnUIClick();
 

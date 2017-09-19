@@ -99,12 +99,12 @@ public class CManagerUILocalize : CSingletonBase<CManagerUILocalize>
 				DoRegist_CompoLocalize(arrCompoLocalize[j]);
 		}
 
-		Debug.LogWarning("DoSetLocalize_CurrentScene + " + _eCurrentLocalize);
+		Strix.Debug.Log_ForCore( Strix.EDebugLevel.Warning_Core, "DoSetLocalize_CurrentScene + " + _eCurrentLocalize );
 
 		if (_eCurrentLocalize != SystemLanguage.Unknown)
-			DoSet_Localize(_eCurrentLocalize);
+			DoSet_Localize( _eCurrentLocalize );
 		else
-			Debug.LogWarning("현재 지정된 언어를 알수없습니다.");
+			Strix.Debug.Log_ForCore( Strix.EDebugLevel.Warning_Core, "현재 지정된 언어를 알수없습니다." );
 	}
 
     public void DoSet_Localize(SystemLanguage eLocalize)
@@ -250,7 +250,7 @@ public class CManagerUILocalize : CSingletonBase<CManagerUILocalize>
             {
                 _bIsFinishParse = true;
 
-				Debug.LogWarning("로컬라이징 파싱이 완료됨.");
+				Strix.Debug.Log_ForCore( Strix.EDebugLevel.System, "로컬라이징 파싱이 완료됨.", 0 );
 
                 _OnFinishParse_First();
                 EventDelegate.Execute(p_OnFinishParse_LocFile);

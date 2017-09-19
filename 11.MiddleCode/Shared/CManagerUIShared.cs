@@ -73,8 +73,8 @@ public class CManagerUIShared : CManagerUIBase<CManagerUIShared, CManagerUIShare
 	{
 		base.OnUpdate();
 
-		if (Input.GetMouseButtonUp(1) || Input.GetButtonUp("Jump"))
-			DoShowHide_Popup(EPopup.CUIPopupShared_DebugConsole, !CheckIsAlreadyShowConsole());
+		if(UICamera.activeTouches.Count >= 4)
+			DoShowHide_Popup( EPopup.CUIPopupShared_DebugConsole, !CheckIsAlreadyShowConsole() );
 	}
 
 	// ========================================================================== //

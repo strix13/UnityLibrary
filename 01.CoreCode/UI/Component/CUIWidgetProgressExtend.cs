@@ -58,8 +58,8 @@ public class CUIWidgetProgressExtend : CUIObjectBase
 
 	public void DoStartTween(float fFrom, float fTo, float fMax)
 	{
-		float fCalc_From = ProcCalculatePercentage(fFrom, fMax);
-		float fCalc_To = ProcCalculatePercentage(fTo, fMax);
+		float fCalc_From = PrimitiveHelper.GetPercentage_1(fFrom, fMax);
+		float fCalc_To = PrimitiveHelper.GetPercentage_1(fTo, fMax);
 
 		_pTweenProgress.ResetToBeginning();
 		_pTweenProgress.from = fCalc_From;
@@ -94,6 +94,18 @@ public class CUIWidgetProgressExtend : CUIObjectBase
 			_pLabelAnimation.DoPlayAnimation_Float(fFrom, fTo, _pTweenProgress.duration, iMaxFloatNum, strFormat);
 
 		DoStartTween(fFrom, fTo, fMax);
+	}
+
+	public void DoDestTween_Percent(float fTo, float fMax, int iMaxFloatNum = 0, string strFormat = "")
+	{
+		EventOnAwake();
+
+		if (_pLabelUnit != null)
+			_pLabelAnimation.DoPlayAnimation_Float(_fLastValue, fTo, _pTweenProgress.duration, iMaxFloatNum, strFormat);
+
+		DoStartTween(_fLastValue, fTo, fMax);
+
+		_fLastValue = fTo;
 	}
 
 	/* public - [Event] Function             

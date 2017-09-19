@@ -31,6 +31,7 @@ public class CManagerPooling<ENUM_Resource_Name, Class_Resource> : CSingletonBas
 	private Transform _pTransManagerObject;	public GameObject p_pObjectManager {  get { return _pTransManagerObject.gameObject; } }
 
 	private UIPanel _pPanel;
+	private int _iPopCount = 0;	public int p_iPopCount {  get { return _iPopCount; } }
 
 	// ========================================================================== //
 
@@ -59,7 +60,7 @@ public class CManagerPooling<ENUM_Resource_Name, Class_Resource> : CSingletonBas
 
 		if(pFindResource == null)
 		{
-			Debug.LogWarning( eResourceName + "를 못만들었다.." );
+			Debug.LogWarning( eResourceName + "가 Pop에 실패했습니다.." );
 			return null;
 		}
 
@@ -67,8 +68,9 @@ public class CManagerPooling<ENUM_Resource_Name, Class_Resource> : CSingletonBas
 			pFindResource.transform.SetParent(_pTransManagerObject);
 
 		pFindResource.gameObject.SetActive(bGameObjectActive);
+		_iPopCount++;
 
-		if(p_EVENT_OnPopResource != null)
+		if (p_EVENT_OnPopResource != null)
 			p_EVENT_OnPopResource(eResourceName, pFindResource);
 
 		return pFindResource;
@@ -109,7 +111,7 @@ public class CManagerPooling<ENUM_Resource_Name, Class_Resource> : CSingletonBas
 	/// <summary>
 	/// 사용한 모든 오브젝트를 강제로 리턴시킵니다.
 	/// </summary>
-	public void DoPopAll()
+	public void DoPushAll()
 	{
 		IEnumerator<KeyValuePair<int, Class_Resource>> pIter = _mapPoolingInstance.GetEnumerator();
 		while(pIter.MoveNext())

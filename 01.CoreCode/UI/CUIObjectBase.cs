@@ -105,11 +105,19 @@ public class CUIObjectBase : CObjectBase
 	/// </summary>
 	public void DoEnableFrameButtons(bool bEnable)
 	{
-		_mapButton.Values.ToList(_listButton);
+		//_mapButton.Values.ToList(_listButton);
 
-		int iLen = _listButton.Count;
+		//int iLen = _listButton.Count;
+		//for (int i = 0; i < iLen; i++)
+		//	_listButton[i].isEnabled = bEnable;
+
+		UIButton[] arrButtons = GetComponentsInChildren<UIButton>(true);
+		int iLen = arrButtons.Length;
+
 		for (int i = 0; i < iLen; i++)
-			_listButton[i].isEnabled = bEnable;
+		{
+			arrButtons[i].enabled = bEnable;
+		}
 	}
 
 	static public System.Type EventGetInterface_GenericParameter( System.Type pClass, string strInterfaceName )

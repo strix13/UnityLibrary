@@ -13,22 +13,25 @@ using System.Collections.Generic;
 public class SCSceneLoader<ENUM_Scene_Name>
     where ENUM_Scene_Name : System.IFormattable, System.IConvertible, System.IComparable
 {
-    //protected struct SSceneGroupInfo
-    //{
-    //    public ENUM_Scene_Name eBaseScene;
-    //    public List<ENUM_Scene_Name> listAdditiveScene;
+	//protected struct SSceneGroupInfo
+	//{
+	//    public ENUM_Scene_Name eBaseScene;
+	//    public List<ENUM_Scene_Name> listAdditiveScene;
 
-    //    public SSceneGroupInfo(ENUM_Scene_Name eBaseScene, List<ENUM_Scene_Name> listAdditiveScene)
-    //    {
-    //        this.eBaseScene = eBaseScene; this.listAdditiveScene = listAdditiveScene;
-    //    }
-    //}
+	//    public SSceneGroupInfo(ENUM_Scene_Name eBaseScene, List<ENUM_Scene_Name> listAdditiveScene)
+	//    {
+	//        this.eBaseScene = eBaseScene; this.listAdditiveScene = listAdditiveScene;
+	//    }
+	//}
 
-    // ===================================== //
-    // public - Variable declaration         //
-    // ===================================== //
+	// ===================================== //
+	// public - Variable declaration         //
+	// ===================================== //
 
-    public event UnityEngine.Events.UnityAction<Scene, LoadSceneMode> p_EVENT_OnSceneLoaded { add { SceneManager.sceneLoaded += value; } remove { SceneManager.sceneLoaded -= value; } }
+	public event System.Action<ENUM_Scene_Name, AsyncOperation> p_Event_OnSceneLoadRequest;
+
+    public event UnityEngine.Events.UnityAction<Scene, LoadSceneMode> p_EVENT_OnSceneLoaded
+	{ add { SceneManager.sceneLoaded += value; } remove { SceneManager.sceneLoaded -= value; } }
 
     // ===================================== //
     // protected - Variable declaration      //
@@ -58,14 +61,14 @@ public class SCSceneLoader<ENUM_Scene_Name>
         _iLoadSceneCountCurrent = 0;
         _iLoadSceneCount = listScene.Count;
 
-        ProcAsyncLoad(listScene[0].ToString(), LoadSceneMode.Single);
+        ProcAsyncLoad(listScene[0], LoadSceneMode.Single);
         for(int i = 1; i < listScene.Count; i++)
-            ProcAsyncLoad(listScene[i].ToString(), LoadSceneMode.Additive);
+            ProcAsyncLoad(listScene[i], LoadSceneMode.Additive);
     }
 
     public void DoLoadSceneAsync(ENUM_Scene_Name eScene, LoadSceneMode eLoadSceneMode)
     {
-        ProcAsyncLoad(eScene.ToString(), eLoadSceneMode);
+        ProcAsyncLoad(eScene, eLoadSceneMode);
     }
 
 	public void DoLoadSceneAsync_FadeInOut( ENUM_Scene_Name eScene, float fFadeDuration, Color pColor )
@@ -112,14 +115,16 @@ public class SCSceneLoader<ENUM_Scene_Name>
     // 중요 로직을 처리                      //
     // ===================================== //
 
-    private void ProcAsyncLoad(string strSceneName, LoadSceneMode eLoadSceneMode)
+    private void ProcAsyncLoad( ENUM_Scene_Name eSceneName, LoadSceneMode eLoadSceneMode)
     {
-        _pCurrentAsyncOP = SceneManager.LoadSceneAsync(strSceneName, eLoadSceneMode);
-    }
+		_pCurrentAsyncOP = SceneManager.LoadSceneAsync( eSceneName.ToString(), eLoadSceneMode);
+		//if (p_Event_OnSceneLoadRequest != null)
+		//	p_Event_OnSceneLoadRequest( eSceneName, _pCurrentAsyncOP );
+	}
 
-    // ===================================== //
-    // private - Other[Find, Calculate] Func //
-    // 찾기, 계산 등의 비교적 단순 로직      //
-    // ===================================== //
+	// ===================================== //
+	// private - Other[Find, Calculate] Func //
+	// 찾기, 계산 등의 비교적 단순 로직      //
+	// ===================================== //
 
 }

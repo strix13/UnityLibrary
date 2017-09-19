@@ -136,4 +136,52 @@ public static class SCEnumeratorHelper
 		for (int i = 0; i < list.Count; i++)
 			listOut.AddRange( list[i].IListItem_HasField_GetField() );
 	}
+
+	static public bool Contains_PrintOnError<T>( this List<T> list, T CheckData )
+	{
+		bool bIsContain = list.Contains( CheckData );
+		if (bIsContain == false)
+			Strix.Debug.Log_ForCore(Strix.EDebugLevel.Error_Core, "List.Contains 에 실패했습니다 - " + CheckData, 1);
+
+		return bIsContain;
+	}
+
+	static public bool TryGetValue<T>(this List<T> list, int iIndex, out T outData)
+		where T : new()
+	{
+		bool bIsContain = iIndex < list.Count;
+		if (bIsContain == false)
+		{
+			outData = new T();
+			Strix.Debug.Log_ForCore(Strix.EDebugLevel.Error_Core, "List.TryGetValue 에 실패했습니다 - Index :  " + iIndex, 1);
+		}
+		else
+			outData = list[iIndex];
+
+		return bIsContain;
+	}
+
+	static public bool ContainKey_PrintOnError<TKey, TValue>( this Dictionary<TKey, TValue> map, TKey CheckKey )
+	{
+		bool bIsContain = map.ContainsKey( CheckKey );
+		if (bIsContain == false)
+			Strix.Debug.Log_ForCore( Strix.EDebugLevel.Error_Core, "Dictionary.ContainsKey 에 실패했습니다 - " + CheckKey, 1 );
+
+		return bIsContain;
+	}
+
+	static System.Text.StringBuilder pStringBuilder = new System.Text.StringBuilder();
+	static public string ToString_DataList<T>(this List<T> list)
+		where T : MonoBehaviour
+	{
+		pStringBuilder.Length = 0;
+		for(int i = 0; i < list.Count; i++)
+		{
+			pStringBuilder.Append(list[i].name);
+			if(i < list.Count - 1)
+				pStringBuilder.Append(", ");
+		}
+
+		return pStringBuilder.ToString();
+	}
 }

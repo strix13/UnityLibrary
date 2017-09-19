@@ -44,6 +44,14 @@ public static class PrimitiveHelper
 		return new Vector3( fRandX, fRandY, fRandZ );
 	}
 
+	static public Vector2 RandomRange( Vector2 vecMinRange, Vector2 vecMaxRange )
+	{
+		float fRandX = Random.Range( vecMinRange.x, vecMaxRange.x );
+		float fRandY = Random.Range( vecMinRange.y, vecMaxRange.y );
+
+		return new Vector2( fRandX, fRandY );
+	}
+
 	static public Vector3 AddFloat( this Vector3 vecOrigin, float fAddValue )
 	{
 		vecOrigin.x += fAddValue;
@@ -100,7 +108,7 @@ public static class PrimitiveHelper
 	}
 
 
-	static public ENUM[] DoGetEnumArray<ENUM>( string strEnumName, int iIndexStart, int iIndexEnd )
+	static public ENUM[] DoGetEnumArray<ENUM>( int iIndexStart, int iIndexEnd )
 	{
 		int iLoopIndex = iIndexEnd - iIndexStart;
 		if (iIndexStart == 0)
@@ -112,11 +120,11 @@ public static class PrimitiveHelper
 		{
 			try
 			{
-				arrEnumArray[i] = (ENUM)System.Enum.Parse( typeof( ENUM ), string.Format( "{0}{1}", strEnumName, i ) );
+				arrEnumArray[i] = (ENUM)System.Enum.Parse( typeof( ENUM ), string.Format( "{0}{1}", typeof( ENUM).Name, i ) );
 			}
 			catch
 			{
-				Debug.LogWarning( typeof( ENUM ).ToString() + " 에 " + string.Format( "{0}{1}", strEnumName, i ) + "이 존재하지 않습니다." );
+				Debug.LogWarning( typeof( ENUM ).ToString() + " 에 " + string.Format( "{0}{1}", typeof( ENUM ).Name, i ) + "이 존재하지 않습니다." );
 				break;
 			}
 		}
@@ -199,10 +207,23 @@ public static class PrimitiveHelper
 	static public void Sort_ObjectSibilingIndex<TComponent>( this List<TComponent> listpObject )
 		where TComponent : UnityEngine.Component
 	{
-		listpObject.Sort( new CPrimitiveHelper().Comparer_Object );
+		listpObject.Sort( Comparer_Object );
 	}
 
 	static public int Comparer_Object( GameObject pObjectX, GameObject pObjectY )
+	{
+		int iSiblingIndexX = pObjectX.transform.GetSiblingIndex();
+		int iSiblingIndexY = pObjectY.transform.GetSiblingIndex();
+
+		if (iSiblingIndexX < iSiblingIndexY)
+			return -1;
+		else if (iSiblingIndexX > iSiblingIndexY)
+			return 1;
+		else
+			return 0;
+	}
+
+	static public int Comparer_Object( Component pObjectX, Component pObjectY )
 	{
 		int iSiblingIndexX = pObjectX.transform.GetSiblingIndex();
 		int iSiblingIndexY = pObjectY.transform.GetSiblingIndex();
@@ -222,20 +243,30 @@ public static class PrimitiveHelper
 
 		return pComponent != null;
 	}
-}
 
-public struct CPrimitiveHelper
-{
-	public int Comparer_Object( Component pObjectX, Component pObjectY )
+	static public int GetNumberDigit_1(this int iTarget)
 	{
-		int iSiblingIndexX = pObjectX.transform.GetSiblingIndex();
-		int iSiblingIndexY = pObjectY.transform.GetSiblingIndex();
+		return iTarget % 10;
+	}
 
-		if (iSiblingIndexX < iSiblingIndexY)
-			return -1;
-		else if (iSiblingIndexX > iSiblingIndexY)
-			return 1;
-		else
-			return 0;
+	static public int GetNumberDigit_10( this int iTarget )
+	{
+		iTarget = iTarget / 10;
+		return iTarget % 10;
+	}
+
+	static public int GetNumberDigit_100( this int iTarget )
+	{
+		iTarget = iTarget / 100;
+		return iTarget % 10;
+	}
+
+	public static float GetPercentage_1(float fCur, float fMax)
+	{
+		float fCalc = (fCur / fMax);
+		if (float.IsNaN(fCalc))
+			return 0f;
+
+		return fCalc;
 	}
 }

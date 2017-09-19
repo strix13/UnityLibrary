@@ -286,6 +286,12 @@ public class SCManagerLogIn : CSingletonBase_Not_UnityComponent<SCManagerLogIn>
     /* private - Other[Find, Calculate] Function 
        찾기, 계산 등의 비교적 단순 로직         */
 
+
+	static public string GetTestID()
+	{
+		return "Test";
+	}
+
     static public string CalculateHashPassword(int iLength)
     {
         _pStrBuilder.Length = 0;

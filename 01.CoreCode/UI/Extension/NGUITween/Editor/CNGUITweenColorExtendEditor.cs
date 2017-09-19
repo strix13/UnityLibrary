@@ -3,27 +3,14 @@ using UnityEditor;
 
 [CanEditMultipleObjects]
 [CustomEditor(typeof(CNGUITweenColorExtend))]
-public class CNGUITweenColorExtendEditor : CNGUITweenExtendBaseEditor
+public class CNGUITweenColorExtendEditor : CNGUITweenExtendBaseEditor<CNGUITweenColorExtend.STweenColorInfo>
 {
     public override void OnInspectorGUI()
     {
         base.OnInspectorGUI();
-        GUILayout.Space(6f);
-        NGUIEditorTools.SetLabelWidth(120f);
 
-        CNGUITweenColorExtend pTarget = target as CNGUITweenColorExtend;
-
-        GUI.changed = false;
-        GUILayout.BeginHorizontal();
-        int iGroupSizeNew = EditorGUILayout.IntField("TweenInfoCount", pTarget.listTweenInfo.Count, GUILayout.Width(170f));
-        GUILayout.EndHorizontal();
-
-        if (GUI.changed)
-        {
-            pTarget.SetTweenInfoSize(iGroupSizeNew);
-            NGUITools.SetDirty(pTarget);
-        }
-
+		CNGUITweenColorExtend pTarget = target as CNGUITweenColorExtend;
+		
         for (int i = 0; i < pTarget.listTweenInfo.Count; i++)
         {
             if (NGUIEditorTools.DrawHeader("Tweener_" + i))

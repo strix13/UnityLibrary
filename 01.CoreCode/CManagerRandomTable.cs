@@ -47,6 +47,11 @@ public class CManagerRandomTable<CLASS_Resource> : CSingletonBase_Not_UnityCompo
 	/* public - [Do] Function
      * 외부 객체가 호출                         */
 
+	public void DoClearRandomItemTable()
+	{
+		_listRandomTable.Clear();
+	}
+
 	public void DoAddRandomItem(CLASS_Resource pRandomItem)
     {
 		int iPercent = pRandomItem.IRandomItem_GetPercent();

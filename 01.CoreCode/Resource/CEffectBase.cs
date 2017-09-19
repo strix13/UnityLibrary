@@ -26,8 +26,8 @@ public class CEffectBase<CLASS_EFFECT, ENUM_EFFECT_NAME, ENUM_SOUND_NAME, CLASS_
 		Spine,
     }
 
-    /* public - Variable declaration            */
-
+	/* public - Variable declaration            */
+	
     /* protected - Variable declaration         */
 
     protected SCManagerEffect<ENUM_EFFECT_NAME, ENUM_SOUND_NAME, CLASS_EFFECT, CLASS_SOUNDPLAYER> _pManagerOwner;
@@ -45,6 +45,7 @@ public class CEffectBase<CLASS_EFFECT, ENUM_EFFECT_NAME, ENUM_SOUND_NAME, CLASS_
     private CUI2DSpriteAnimation _p2DSpriteAnimation;
 
     private bool _bIsPooling = false;   public bool p_bIsPooling {  set { _bIsPooling = value; } }
+	private System.Action _OnFinishEffect;
 
     // ========================================================================== //
 
@@ -65,11 +66,12 @@ public class CEffectBase<CLASS_EFFECT, ENUM_EFFECT_NAME, ENUM_SOUND_NAME, CLASS_
         OnPlayEffectAfter(_eEffectName);
     }
 
-    public void DoPlayEffect(Vector3 V3Targetpos)
+    public void DoPlayEffect(Vector3 V3Targetpos, System.Action OnFinishEffect = null)
     {
         OnPlayEffectBefore(_eEffectName, ref V3Targetpos);
 
-        _pTransformCached.position = V3Targetpos;
+		_OnFinishEffect = OnFinishEffect;
+		_pTransformCached.position = V3Targetpos;
         ProcPlayEffect();
         
         OnPlayEffectAfter(_eEffectName);
@@ -130,6 +132,7 @@ public class CEffectBase<CLASS_EFFECT, ENUM_EFFECT_NAME, ENUM_SOUND_NAME, CLASS_
 			case EEffectType.Particle:
 				StartCoroutine( CoPlayParticleSystem() );
 				break;
+
 			case EEffectType.TwoD:
 				StartCoroutine( CoPlay2DSpriteAnimation() );
 				break;
@@ -195,18 +198,29 @@ public class CEffectBase<CLASS_EFFECT, ENUM_EFFECT_NAME, ENUM_SOUND_NAME, CLASS_
             _p2DSpriteAnimation.Play(Disable2DSpriteAnimation);
     }
 
-    private void DisableParticleSystem()
+	private void DisableParticleSystem()
     {
         _pParticleSystem.Stop();
 
         _pGameObjectCached.SetActive(false);
-    }
+		ProcOnFinishEffect();
+	}
 
-    private void Disable2DSpriteAnimation()
+	private void Disable2DSpriteAnimation()
     {
         _pGameObjectCached.SetActive(false);
-    }
-    /* private - Other[Find, Calculate] Func 
+		ProcOnFinishEffect();
+	}
+
+	private void ProcOnFinishEffect()
+	{
+		if (_OnFinishEffect != null)
+		{
+			_OnFinishEffect();
+			_OnFinishEffect = null;
+		}
+	}
+	/* private - Other[Find, Calculate] Func 
        찾기, 계산 등의 비교적 단순 로직         */
 
 }

@@ -58,11 +58,17 @@ public class CUI_Joystick : CUIObjectBase
         UIRoot pRoot = GetComponentInParent<UIRoot>();
         if(pRoot == null)
         {
-            Debug.LogWarning("Joystick은 UIRoot 자식에 있어야 합니다.");
+            Debug.LogWarning(name + "Joystick은 UIRoot 자식에 있어야 합니다.", this);
             return;
         }
 
-        _pUICam = pRoot.GetComponentInChildren<Camera>();
+		if(GetComponent<Collider>() == null && GetComponent<Collider2D>() == null)
+		{
+			Debug.LogWarning( name + "Joystick은 Collider가 있어야 합니다.", this );
+			return;
+		}
+
+		_pUICam = pRoot.GetComponentInChildren<Camera>();
     }
 
 	private void FixedUpdate()

@@ -37,7 +37,7 @@ public class CLabelIndicator : CObjectBase
 	/* public - [Do] Function
      * 외부 객체가 호출                         */
 
-	public void DoStartTween_Indicator( string strText, int iDepth, Color pColor, CNGUILabelIndicator.SInfoIndicator sInfoIndicator )
+	public void DoStartTween_Indicator( string strText, int iDepth, Color pColor, Vector2 vecTweenPosFrom, CNGUILabelIndicator.SInfoIndicator sInfoIndicator )
 	{
 		_pUILabel.text = strText;
 		_pUILabel.fontSize = sInfoIndicator.iFontSize;
@@ -45,7 +45,7 @@ public class CLabelIndicator : CObjectBase
 		_pUILabel.depth = iDepth;
 		_OnDisable = sInfoIndicator.OnDisable;
 
-		ProcPlayTweenPosition(sInfoIndicator.v2Direction, sInfoIndicator.fDistance, sInfoIndicator.fDuration);
+		ProcPlayTweenPosition( vecTweenPosFrom, sInfoIndicator.v2Direction, sInfoIndicator.fDistance, sInfoIndicator.fDuration);
 		ProcPlayTweenAlpha(sInfoIndicator.fFadeDelay, sInfoIndicator.fFadeDuration);
 	}
 
@@ -87,11 +87,11 @@ public class CLabelIndicator : CObjectBase
 	/* private - [Proc] Function             
        중요 로직을 처리                         */
 
-	private void ProcPlayTweenPosition(Vector2 v2Direction, float fDistance, float fDistDuration)
+	private void ProcPlayTweenPosition(Vector2 vecFrom, Vector2 v2Direction, float fDistance, float fDistDuration)
 	{
 		_pTweenPosition.ResetToBeginning();
-		_pTweenPosition.from = Vector2.zero;
-		_pTweenPosition.to = v2Direction * fDistance;
+		_pTweenPosition.from = vecFrom;
+		_pTweenPosition.to = vecFrom + (v2Direction * fDistance);
 		_pTweenPosition.duration = fDistDuration;
 		_pTweenPosition.PlayForward();
 	}

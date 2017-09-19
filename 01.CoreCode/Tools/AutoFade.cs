@@ -69,16 +69,16 @@ public class AutoFade : MonoBehaviour
 			if (s == null)
 			{
 				string shaderText = "Shader \"Plane/No zTest\" { SubShader { Pass { Blend SrcAlpha OneMinusSrcAlpha ZWrite Off Cull Off Fog { Mode Off } BindChannels { Bind \"Color\",color } } } }";
-				string path = System.IO.Path.Combine(resDir.FullName, "Plane_No_zTest.shader");
+				string path = System.IO.Path.Combine(resDir.FullName, "Shader/Plane_No_zTest.shader");
 				Debug.Log("Shader missing, create asset: " + path);
 				System.IO.File.WriteAllText(path, shaderText);
 				UnityEditor.AssetDatabase.Refresh(UnityEditor.ImportAssetOptions.ForceSynchronousImport);
-				UnityEditor.AssetDatabase.LoadAssetAtPath<Shader>("Resources/Plane_No_zTest.shader");
+				UnityEditor.AssetDatabase.LoadAssetAtPath<Shader>("Resources/Shader/Plane_No_zTest.shader");
 				s = Shader.Find("Plane/No zTest");
 			}
 			var mat = new Material(s);
 			mat.name = "Plane_No_zTest";
-			UnityEditor.AssetDatabase.CreateAsset(mat, "Assets/Resources/Plane_No_zTest.mat");
+			UnityEditor.AssetDatabase.CreateAsset(mat, "Assets/Resources/Shader/Plane_No_zTest.mat");
 			m_Material = mat;
 
 		}

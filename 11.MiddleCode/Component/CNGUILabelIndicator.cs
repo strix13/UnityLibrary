@@ -39,11 +39,14 @@ public class CNGUILabelIndicator : CObjectBase
 
 	[Header("라벨 크기")] public int p_iFontSize;
 	[Header("라벨 이동방향")] public EDirection p_eDirection;
+	[Header( "라벨 위치 오프셋" )] public Vector2 p_vecStartPos = Vector2.zero;
 	[Header("라벨 이동거리")] public float p_fDistance;
 	[Header("라벨 이동속도")] public float p_fDuration;
 	[Header("라벨 사라지는시간")] public float p_fFadeDelay;
 	[Header("라벨 사라지는속도")] public float p_fFadeDuration;
 	[Header( "라벨 색상" )] public Color p_sColorIndicator = Color.white;
+
+
 	/* protected - Variable declaration         */
 
 	/* private - Variable declaration           */
@@ -51,7 +54,6 @@ public class CNGUILabelIndicator : CObjectBase
 	private CManagerPooling<ELabelIndicator, CLabelIndicator> _pManagerPool_LabelIndicator;
 	private SInfoIndicator _sInfoIndicator = new SInfoIndicator();
 
-	private UILabel _pUILabelInfo;
 	private Transform _pTrans_Label;
 	private Transform _pTrans_Manager;
 
@@ -67,7 +69,9 @@ public class CNGUILabelIndicator : CObjectBase
 		CLabelIndicator pResource = _pManagerPool_LabelIndicator.DoPop(ELabelIndicator.Label_Indicator);
 		pResource.p_pTransCached.parent = _pTrans_Label;
 		pResource.p_pTransCached.DoResetTransform();
-		pResource.DoStartTween_Indicator( string.Format( strFormat, strText ), ++_iLastDepth, _sInfoIndicator.sColor, _sInfoIndicator );
+		pResource.p_pTransCached.localPosition = p_vecStartPos;
+
+		pResource.DoStartTween_Indicator( string.Format( strFormat, strText ), ++_iLastDepth, _sInfoIndicator.sColor, p_vecStartPos, _sInfoIndicator );
 	}
 
 	public void DoStartTween_Indicator( Color pColor, string strText, string strFormat = "{0}" )
@@ -75,7 +79,7 @@ public class CNGUILabelIndicator : CObjectBase
 		CLabelIndicator pResource = _pManagerPool_LabelIndicator.DoPop( ELabelIndicator.Label_Indicator );
 		pResource.p_pTransCached.parent = _pTrans_Label;
 		pResource.p_pTransCached.DoResetTransform();
-		pResource.DoStartTween_Indicator( string.Format( strFormat, strText ), ++_iLastDepth, pColor, _sInfoIndicator );
+		pResource.DoStartTween_Indicator( string.Format( strFormat, strText ), ++_iLastDepth, pColor, p_vecStartPos, _sInfoIndicator );
 	}
 
 
@@ -100,17 +104,19 @@ public class CNGUILabelIndicator : CObjectBase
 	{
 		base.OnAwake();
 
-		_pUILabelInfo = GetComponent<UILabel>();
-		if (_pUILabelInfo == null)
-		{
-			Debug.LogWarning("라벨이 없습니다.");
-			return;
-		}
-
 		_pManagerPool_LabelIndicator = CManagerPooling<ELabelIndicator, CLabelIndicator>.instance;
 		_pTrans_Manager = _pManagerPool_LabelIndicator.p_pObjectManager.transform;
-		_pTrans_Label = _pUILabelInfo.transform;
-		_iLastDepth = _pUILabelInfo.depth;
+		_pTrans_Label = transform;
+
+		UIWidget pUIWidget = GetComponent<UIWidget>();
+		if (pUIWidget != null)
+			_iLastDepth = pUIWidget.depth + 1;
+		else
+		{
+			pUIWidget = GetComponentInParent<UIWidget>();
+			if (pUIWidget != null)
+				_iLastDepth = pUIWidget.depth + 1;
+		}
 
 		_sInfoIndicator.v2Direction = ProcGetEnumToDirection( p_eDirection );
 		_sInfoIndicator.iFontSize = p_iFontSize;

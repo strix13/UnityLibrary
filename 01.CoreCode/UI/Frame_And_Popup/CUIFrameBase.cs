@@ -28,40 +28,7 @@ abstract public class CUIFrameBase : CUIObjectBase
 
     // ========================== [ Division ] ========================== //
 
-	public void DoStartFadeInOutPanel_Delayed(bool bShow, float fDelay = 0, float fFadeTime = 1f)
-	{
-		_pUIPanel.alpha = bShow ? 0 : 1;
-
-		if (bShow) DoShow();
-
-		StartCoroutine(CoProcFadeInOutPanel(bShow, fDelay, fFadeTime));
-	}
-
-	private IEnumerator CoProcFadeInOutPanel(bool bShow, float fDelay, float fFadeTime)
-	{
-		yield return new WaitForSeconds(fDelay);
-
-		int iFadeLimit = bShow ? 1 : 0;
-		int iFadeDir = bShow ? 1 : -1;
-
-		bool bLoop = true;
-		while (bLoop)
-		{
-			_pUIPanel.alpha += iFadeDir * Time.unscaledDeltaTime * fFadeTime;
-
-			float fAlpha = _pUIPanel.alpha;
-			if (bShow && fAlpha >= iFadeLimit)
-				bLoop = false;
-			else if (bShow == false && fAlpha <= iFadeLimit)
-				bLoop = false;
-
-			yield return null;
-		}
-
-		if (bShow == false) DoHide();
-	}
-
-	public void DoShowHide(bool bShow)
+	public void DoShowHideFrame(bool bShow)
 	{
 		if (bShow)
 			DoShow();
@@ -71,8 +38,10 @@ abstract public class CUIFrameBase : CUIObjectBase
 
     public void DoShow()
     {
-        _bShowCurrent = true;
-        _pGameObjectCached.SetActive(true);
+		_bShowCurrent = true;
+		if (gameObject.activeSelf) return;
+
+		gameObject.SetActive(true);
 
         OnShow(_pUIPanel.depth);
 

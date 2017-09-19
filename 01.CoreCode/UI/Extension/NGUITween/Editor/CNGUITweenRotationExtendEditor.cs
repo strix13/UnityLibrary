@@ -2,28 +2,14 @@
 using UnityEditor;
 
 [CustomEditor(typeof(CNGUITweenRotationExtend))]
-public class CNGUITweenRotationExtendEditor : CNGUITweenExtendBaseEditor
+public class CNGUITweenRotationExtendEditor : CNGUITweenExtendBaseEditor<CNGUITweenRotationExtend.STweenRotationInfo>
 {
     public override void OnInspectorGUI()
     {
         base.OnInspectorGUI();
-        GUILayout.Space(6f);
-        NGUIEditorTools.SetLabelWidth(120f);
-
+        
         CNGUITweenRotationExtend pTarget = target as CNGUITweenRotationExtend;
-
-        GUI.changed = false;
-        GUILayout.BeginHorizontal();
-        int iGroupSizeNew = EditorGUILayout.IntField("TweenInfoCount", pTarget.listTweenInfo.Count, GUILayout.Width(170f));
-        GUILayout.EndHorizontal();
-
-        if (GUI.changed)
-        {
-            pTarget.SetTweenInfoSize(iGroupSizeNew);
-            NGUITools.SetDirty(pTarget);
-            GUI.changed = false;
-        }
-
+		
         for (int i = 0; i < pTarget.listTweenInfo.Count; i++)
         {
             if (NGUIEditorTools.DrawHeader("Tweener_" + i))

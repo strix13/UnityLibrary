@@ -55,7 +55,7 @@ public static class SCEnumHelper
 		}
 		catch
 		{
-			Debug.LogWarning(typeof(TENUM).ToString() + " 에 " + strText + "이 존재하지 않습니다.");
+			Strix.Debug.Log_ForCore(Strix.EDebugLevel.Error_Core, (typeof(TENUM).ToString() + " 에 " + strText + "이 존재하지 않습니다."));
 			bSuccess = false;
 		}
 
@@ -110,6 +110,30 @@ public static class SCEnumHelper
 			g_mapRandomTable.Add(eEnum, new List<System.Enum>());
 
 		g_mapRandomTable[eEnum].Add(eEnumGroupIn);
+	}
+
+	static Dictionary<System.Enum, Dictionary<System.Enum, System.Enum>> g_mapDictionary = new Dictionary<System.Enum, Dictionary<System.Enum, System.Enum>>();
+	public static void AddEnumDictionary( this System.Enum eEnumTarget, System.Enum eEnumKey, System.Enum eEnumValue )
+	{
+		if (g_mapDictionary.ContainsKey( eEnumTarget) == false)
+			g_mapDictionary[eEnumTarget] = new Dictionary<System.Enum, System.Enum>();
+
+		if (g_mapDictionary[eEnumTarget].ContainsKey( eEnumKey) == false)
+			g_mapDictionary[eEnumTarget].Add( eEnumKey, eEnumValue );
+	}
+
+	public static System.Enum GetEnumValue( this System.Enum eEnumTarget, System.Enum eEnumKey )
+	{
+		System.Enum eEnumReturn = default(System.Enum);
+		bool bSuccess = g_mapDictionary.ContainsKey( eEnumTarget );
+
+		if (bSuccess)
+			bSuccess = g_mapDictionary[eEnumTarget].TryGetValue( eEnumKey, out eEnumReturn );
+
+		if(bSuccess == false)
+			Debug.LogWarning( "GetEnumValue Error - " + eEnumTarget + " 에" + eEnumKey + " 가 없다" );
+
+		return eEnumReturn;
 	}
 
 	public static EnumItem GetRandomEnumInGroup<EnumItem>(this System.Enum eEnum)
