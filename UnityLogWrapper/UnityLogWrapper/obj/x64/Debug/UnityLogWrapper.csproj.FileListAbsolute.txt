@@ -1,0 +1,14 @@
+c:\users\strix\OneDrive\문서\Visual Studio 2017\Projects\UnityLogWrapper\UnityLogWrapper\bin\x64\Debug\UnityLogWrapper.dll
+c:\users\strix\OneDrive\문서\Visual Studio 2017\Projects\UnityLogWrapper\UnityLogWrapper\bin\x64\Debug\UnityLogWrapper.pdb
+c:\users\strix\OneDrive\문서\Visual Studio 2017\Projects\UnityLogWrapper\UnityLogWrapper\bin\x64\Debug\UnityEngine.dll
+c:\users\strix\OneDrive\문서\Visual Studio 2017\Projects\UnityLogWrapper\UnityLogWrapper\bin\x64\Debug\UnityEngine.xml
+c:\users\strix\OneDrive\문서\Visual Studio 2017\Projects\UnityLogWrapper\UnityLogWrapper\obj\x64\Debug\UnityLogWrapper.csprojResolveAssemblyReference.cache
+c:\users\strix\OneDrive\문서\Visual Studio 2017\Projects\UnityLogWrapper\UnityLogWrapper\obj\x64\Debug\UnityLogWrapper.dll
+c:\users\strix\OneDrive\문서\Visual Studio 2017\Projects\UnityLogWrapper\UnityLogWrapper\obj\x64\Debug\UnityLogWrapper.pdb
+C:\Users\strix\Desktop\UnityLogWrapper\UnityLogWrapper\bin\x64\Debug\UnityLogWrapper.dll
+C:\Users\strix\Desktop\UnityLogWrapper\UnityLogWrapper\bin\x64\Debug\UnityLogWrapper.pdb
+C:\Users\strix\Desktop\UnityLogWrapper\UnityLogWrapper\bin\x64\Debug\UnityEngine.dll
+C:\Users\strix\Desktop\UnityLogWrapper\UnityLogWrapper\bin\x64\Debug\UnityEngine.xml
+C:\Users\strix\Desktop\UnityLogWrapper\UnityLogWrapper\obj\x64\Debug\UnityLogWrapper.csprojResolveAssemblyReference.cache
+C:\Users\strix\Desktop\UnityLogWrapper\UnityLogWrapper\obj\x64\Debug\UnityLogWrapper.dll
+C:\Users\strix\Desktop\UnityLogWrapper\UnityLogWrapper\obj\x64\Debug\UnityLogWrapper.pdb
