@@ -19,7 +19,7 @@
 ## 00.CorePrefab
 - 범용적으로 사용하는 프리팹들아 들어있습니다.
 
-## 01.CoreCode
+## 01.CoreCodegit
 - 라이브러리 코드가 들어있습니다.
 
 ## 99.CoreExample
