@@ -1,9 +1,0 @@
-C:\Users\strix\Desktop\UnityLogWrapper\UnityLogWrapper\bin\Debug\UnityLogWrapper.dll
-C:\Users\strix\Desktop\UnityLogWrapper\UnityLogWrapper\bin\Debug\UnityLogWrapper.pdb
-C:\Users\strix\Desktop\UnityLogWrapper\UnityLogWrapper\bin\Debug\UnityEngine.dll
-C:\Users\strix\Desktop\UnityLogWrapper\UnityLogWrapper\bin\Debug\UnityEngine.xml
-C:\Users\strix\Desktop\UnityLogWrapper\UnityLogWrapper\obj\Debug\UnityLogWrapper.dll
-C:\Users\strix\Desktop\UnityLogWrapper\UnityLogWrapper\obj\Debug\UnityLogWrapper.pdb
-C:\Users\strix\Desktop\Pachinko\Assets\Plugins\UnityLogWrapper.dll
-C:\Users\strix\Desktop\Pachinko\Assets\Plugins\UnityLogWrapper.pdb
-C:\Users\strix\Desktop\UnityLogWrapper\UnityLogWrapper\obj\Debug\UnityLogWrapper.csprojResolveAssemblyReference.cache
