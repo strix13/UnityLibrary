@@ -93,7 +93,7 @@ public partial class CSpawnerBase<Enum_Key, Class_Resource> : CObjectBase
 		Vector3 vecCurrentRotation = transform.rotation.eulerAngles;
 		pTweenRotate.from = vecCurrentRotation;
 		pTweenRotate.to = new Vector3(0f, 0f, vecCurrentRotation.z + 360f);
-		pTweenRotate.duration = _fTweenDuration;
+		//pTweenRotate.duration = _fTweenDuration;
 
 		EventDelegate pOnFinishPattern = new EventDelegate(ProcSetPatternIsFinish);
 		pOnFinishPattern.oneShot = true;
@@ -129,15 +129,15 @@ public partial class CSpawnerBase<Enum_Key, Class_Resource> : CObjectBase
 		Vector3 vecCurrentRotation = transform.rotation.eulerAngles;
 		pTweenRotate.from = vecCurrentRotation;
 		pTweenRotate.to = new Vector3(0f, 0f, vecCurrentRotation.z + 360f);
-		pTweenRotate.duration = _fTweenDuration;
+		//pTweenRotate.duration = _fTweenDuration;
 
-		if (_fAngleRotate > 0f)
-			pTweenRotate.PlayForward();
-		else
-		{
-			pTweenRotate.ResetToFactor(1f);
-			pTweenRotate.PlayReverse();
-		}
+		//if (_fAngleRotate > 0f)
+		//	pTweenRotate.PlayForward();
+		//else
+		//{
+		//	pTweenRotate.ResetToFactor(1f);
+		//	pTweenRotate.PlayReverse();
+		//}
 
 		float fAngleGap = 360 / _iMuzzleCount;
 		float fAngle = 0;

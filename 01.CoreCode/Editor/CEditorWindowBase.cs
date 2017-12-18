@@ -67,6 +67,11 @@ public class CEditorWindowBase<TClass> : EditorWindow
 	/* private - [Proc] Function             
        로직을 처리(Process Local logic)           */
 
+	protected string ConvertRelativePath( string strPath )
+	{
+		return "Assets" + strPath.Substring( Application.dataPath.Length );
+	}
+
 	/* private - Other[Find, Calculate] Func 
        찾기, 계산등 단순 로직(Simpe logic)         */
 

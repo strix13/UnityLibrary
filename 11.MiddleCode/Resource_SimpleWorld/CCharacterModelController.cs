@@ -10,7 +10,7 @@ using System.Collections.Generic;
    ============================================ */
 
 [RequireComponent(typeof(CAnimatorController))]
-public class CCharacterModelController : CObjectBase, IAnimationEventListner
+public class CCharacterModelController : CObjectBase
 {
     /* const & readonly declaration             */
 

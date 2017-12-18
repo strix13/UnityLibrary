@@ -83,7 +83,7 @@ public class CObjectBase : MonoBehaviour
 
 		return pFindGameObj;
 	}
-
+	
 	public void EventOnAwake()
 	{
 		if (_bIsExcuteAwake == false)
@@ -105,9 +105,21 @@ public class CObjectBase : MonoBehaviour
 	}
 
 	public bool GetComponentInChildren<COMPONENT>( out COMPONENT pComponent )
-		where COMPONENT : UnityEngine.Component
+	where COMPONENT : UnityEngine.Component
 	{
 		pComponent = GetComponentInChildren<COMPONENT>();
+
+		return pComponent != null;
+	}
+
+	public bool GetComponentInChildren<COMPONENT>( string strObjectName, out COMPONENT pComponent )
+		where COMPONENT : UnityEngine.Component
+	{
+		GameObject pObjectFind = GetGameObject( strObjectName, false );
+		if (pObjectFind != null)
+			pComponent = pObjectFind.GetComponent<COMPONENT>();
+		else
+			pComponent = null;
 
 		return pComponent != null;
 	}

@@ -83,7 +83,7 @@ public static class SCEnumeratorHelper
 		{
 			TKey hDataID = arrDataTable[i].IDictionaryItem_GetKey();
 			if (mapDataTable.ContainsKey( hDataID ))
-				Debug.LogWarning( "에러, 데이터 테이블에 공통된 키값을 가진 데이터가 존재!!" + typeof( Struct ) + " : " + hDataID, pObjectForDebug);
+				Debug.LogWarning( "에러, 데이터 테이블에 공통된 키값을 가진 데이터가 존재!!" + typeof( Struct ) + " : " + hDataID, pObjectForDebug );
 			else
 				mapDataTable.Add( hDataID, arrDataTable[i] );
 		}
@@ -140,19 +140,19 @@ public static class SCEnumeratorHelper
 	{
 		bool bIsContain = list.Contains( CheckData );
 		if (bIsContain == bContains)
-			Debug.Log( "List.Contains 에 실패했습니다 - " + CheckData, null);
+			Debug.Log( "List.Contains 에 실패했습니다 - " + CheckData, null );
 
 		return bIsContain;
 	}
 
-	static public bool TryGetValue<T>(this List<T> list, int iIndex, out T outData)
+	static public bool TryGetValue<T>( this List<T> list, int iIndex, out T outData )
 		where T : new()
 	{
 		bool bIsContain = iIndex < list.Count;
 		if (bIsContain == false)
 		{
 			outData = new T();
-			Debug.Log( "List.TryGetValue 에 실패했습니다 - Index :  " + iIndex, null);
+			Debug.Log( "List.TryGetValue 에 실패했습니다 - Index :  " + iIndex, null );
 		}
 		else
 			outData = list[iIndex];
@@ -160,27 +160,82 @@ public static class SCEnumeratorHelper
 		return bIsContain;
 	}
 
-	static public bool ContainKey_PrintOnError<TKey, TValue>( this Dictionary<TKey, TValue> map, TKey CheckKey, Object pObjectForDebug = null )
+	static public bool ContainsKey_PrintOnError<TKey, TValue>( this Dictionary<TKey, TValue> map, TKey CheckKey, Object pObjectForDebug = null )
 	{
 		bool bIsContain = map.ContainsKey( CheckKey );
 		if (bIsContain == false)
-			Debug.Log( "Dictionary.ContainsKey 에 실패했습니다 - " + CheckKey, pObjectForDebug );
+		{
+			string strKeyName = typeof( TKey ).Name;
+			string strValueName = typeof( TValue ).Name;
+			Debug.Log( string.Format( "Dictionary<{0}, {1}>.ContainsKey 에 실패했습니다 - {2}", strKeyName, strValueName, CheckKey ), pObjectForDebug );
+		}
 
 		return bIsContain;
 	}
 
 	static System.Text.StringBuilder pStringBuilder = new System.Text.StringBuilder();
-	static public string ToString_DataList<T>(this List<T> list)
+	static public string ToString_DataList<T>( this List<T> list )
 		where T : MonoBehaviour
 	{
 		pStringBuilder.Length = 0;
-		for(int i = 0; i < list.Count; i++)
+		for (int i = 0; i < list.Count; i++)
 		{
-			pStringBuilder.Append(list[i].name);
-			if(i < list.Count - 1)
-				pStringBuilder.Append(", ");
+			pStringBuilder.Append( list[i].name );
+			if (i < list.Count - 1)
+				pStringBuilder.Append( ", " );
 		}
 
 		return pStringBuilder.ToString();
+	}
+
+	static public T GetRandomItem<T>( this List<T> list )
+	{
+		if (list.Count == 0)
+			return default( T );
+
+		int iRandomIndex = Random.Range( 0, list.Count );
+		return list[iRandomIndex];
+	}
+
+	static public T GetRandomItem<T>( this IEnumerable<T> source )
+	{
+		int iTotalCount = 0;
+		IEnumerator<T> pIter = source.GetEnumerator();
+		while (pIter.MoveNext())
+		{
+			iTotalCount++;
+		}
+
+		if (iTotalCount == 0)
+			return default( T );
+
+		int iRandomIndex = Random.Range( 0, iTotalCount ) + 1;
+		pIter = source.GetEnumerator();
+		T pDataReturn = default( T );
+
+		while (pIter.MoveNext() && iRandomIndex-- > 0)
+		{
+			pDataReturn = pIter.Current;
+		}
+
+		return pDataReturn;
+	}
+
+	static public void AddRange_First<T>( this LinkedList<T> source, IEnumerable<T> arrItem )
+	{
+		IEnumerator<T> pEnumerator = arrItem.GetEnumerator();
+		while (pEnumerator.MoveNext())
+		{
+			source.AddFirst( pEnumerator.Current );
+		}
+	}
+
+	static public void AddRange_Last<T>( this LinkedList<T> source, IEnumerable<T> arrItem )
+	{
+		IEnumerator<T> pEnumerator = arrItem.GetEnumerator();
+		while (pEnumerator.MoveNext())
+		{
+			source.AddLast( pEnumerator.Current );
+		}
 	}
 }

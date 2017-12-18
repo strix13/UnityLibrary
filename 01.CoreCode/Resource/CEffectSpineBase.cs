@@ -12,9 +12,8 @@ using Spine;
    Edit Log    : 
    ============================================ */
 
-abstract public class CEffectSpineBase<CLASS_EFFECT, ENUM_EFFECT_NAME, ENUM_SOUND_NAME, CLASS_SOUNDPLAYER> : CEffectBase<CLASS_EFFECT, ENUM_EFFECT_NAME>
-	where CLASS_EFFECT : CEffectSpineBase<CLASS_EFFECT, ENUM_EFFECT_NAME, ENUM_SOUND_NAME, CLASS_SOUNDPLAYER>
-	where CLASS_SOUNDPLAYER : CSoundPlayerBase<ENUM_SOUND_NAME>
+abstract public class CEffectSpineBase<CLASS_EFFECT, ENUM_EFFECT_NAME, ENUM_SOUND_NAME> : CEffectBase<CLASS_EFFECT, ENUM_EFFECT_NAME>
+	where CLASS_EFFECT : CEffectSpineBase<CLASS_EFFECT, ENUM_EFFECT_NAME, ENUM_SOUND_NAME>
 	where ENUM_EFFECT_NAME : System.IConvertible, System.IComparable
 	where ENUM_SOUND_NAME : System.IConvertible, System.IComparable
 {

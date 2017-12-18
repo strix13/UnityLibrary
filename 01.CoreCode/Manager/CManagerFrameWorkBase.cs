@@ -46,6 +46,10 @@ public class SINI_DeveloperSetting
 public class SINI_ApplicationSetting
 {
 	public int iBundleCode;
+
+	public string strDBName;
+	public string strPHPPrefix;
+
 	public string[] arrLogIgnore_Level;
 	public string[] arrLogIgnore_Writer;
 }
@@ -84,6 +88,7 @@ public class CManagerFrameWorkBase<CLASS_Framework, ENUM_SCENE_NAME, ENUM_SOUND_
 	where CLASS_SOUNDPLAYER : CSoundPlayerBase<ENUM_SOUND_NAME>
 {
 	private const string const_strLocalPath_INI = "/INI";
+	private const string const_strEmptySceneName = "Empty";
 
 	public enum EINI_JSON_FileName
 	{
@@ -112,6 +117,7 @@ public class CManagerFrameWorkBase<CLASS_Framework, ENUM_SCENE_NAME, ENUM_SOUND_
 	public static event System.Action<float> p_EVENT_OnLoadSceneProgress;
 	public static event System.Action p_EVENT_OnStartLoadScene;
 	public static event System.Action p_EVENT_OnFinishLoadScene;
+	public static event System.Action p_EVENT_OnFinishPreLoadScene;
 
 	public static System.Action p_EVENT_OnLoadFinish_LocalData;
 
@@ -298,7 +304,7 @@ public class CManagerFrameWorkBase<CLASS_Framework, ENUM_SCENE_NAME, ENUM_SOUND_
 	// 프랜드 객체가 요청                    //
 	// ===================================== //
 
-	static public void DoSetTimeScale( float fTimeScale )
+	static public void DoSetTimeScale(float fTimeScale)
 	{
 		// ITween에서 흔들리는 모션을 TimeScale에 조종하기 위해..
 		if (Time.timeScale != 0f && fTimeScale == 0f) // 플레이 중에 멈출때
@@ -307,7 +313,7 @@ public class CManagerFrameWorkBase<CLASS_Framework, ENUM_SCENE_NAME, ENUM_SOUND_
 			_listTween.Clear();
 			for (int i = 0; i < arrTween.Length; i++)
 			{
-				_listTween.Add( arrTween[i] );
+				_listTween.Add(arrTween[i]);
 				arrTween[i].isRunning = false;
 			}
 		}
@@ -320,19 +326,9 @@ public class CManagerFrameWorkBase<CLASS_Framework, ENUM_SCENE_NAME, ENUM_SOUND_
 		Time.timeScale = fTimeScale;
 	}
 
-	static public void DoLoadScene( string strSceneName, LoadSceneMode eLoadSceneMode, System.Action OnFinishLoading = null )
+	static public void DoLoadScene(ENUM_SCENE_NAME eSceneName, LoadSceneMode eLoadSceneMode, System.Action OnFinishLoading = null)
 	{
-		SceneManager.LoadScene( strSceneName, eLoadSceneMode );
-		if (_OnFinishLoad_Scene == null && OnFinishLoading != null)
-		{
-			_OnFinishLoad_Scene = OnFinishLoading;
-			_strCallBackRequest_SceneName = strSceneName;
-		}
-	}
-
-	static public void DoLoadScene( ENUM_SCENE_NAME eSceneName, LoadSceneMode eLoadSceneMode, System.Action OnFinishLoading = null )
-	{
-		SceneManager.LoadScene( eSceneName.ToString(), eLoadSceneMode );
+		SceneManager.LoadScene(eSceneName.ToString(), eLoadSceneMode);
 		if (_OnFinishLoad_Scene == null && OnFinishLoading != null)
 		{
 			_OnFinishLoad_Scene = OnFinishLoading;
@@ -340,42 +336,27 @@ public class CManagerFrameWorkBase<CLASS_Framework, ENUM_SCENE_NAME, ENUM_SOUND_
 		}
 	}
 
-	public void DoLoadSceneAsync_Manual( params ENUM_SCENE_NAME[] arrSceneName )
-	{
-		ProcStart_Loading( arrSceneName, true );
-	}
-
-	public void DoLoadSceneAsync_Manual( System.Action OnFinishLoadScene, params ENUM_SCENE_NAME[] arrSceneName )
-	{
-		p_EVENT_OnFinishLoadScene = OnFinishLoadScene;
-		ProcStart_Loading( arrSceneName, true );
-	}
-
 	public void DoLoadSceneAsync( params ENUM_SCENE_NAME[] arrSceneName )
 	{
 		StartCoroutine(CoProcLoadSceneAsync(arrSceneName, false));
-		//ProcStart_Loading( arrSceneName, false );
 	}
 
 	public void DoLoadSceneAsync( System.Action OnFinishLoadScene, params ENUM_SCENE_NAME[] arrSceneName )
 	{
 		p_EVENT_OnFinishLoadScene = OnFinishLoadScene;
-		//ProcStart_Loading( arrSceneName, false );
 
 		StartCoroutine(CoProcLoadSceneAsync(arrSceneName, false));
 	}
 
 	private IEnumerator CoProcLoadSceneAsync(ENUM_SCENE_NAME[] arrSceneName, bool bManualCall_EventOnFinishLoadScene)
 	{
-		yield return new WaitForSecondsRealtime(0.25f);
-
 		// 로딩전 빈씬으로 메모리를 비워준다. 다음 로딩씬의 메모리가 너무 커서 프리징 걸릴수도있기때문에...
-		AsyncOperation pAsyncOperation_Empty = SceneManager.LoadSceneAsync("Empty");
+		AsyncOperation pAsyncOperation_Empty = SceneManager.LoadSceneAsync(const_strEmptySceneName);
 		yield return pAsyncOperation_Empty;
 
-		System.GC.Collect();
+		//System.GC.Collect(System.GC.GetGeneration(this), System.GCCollectionMode.Optimized);
 
-		yield return new WaitForSecondsRealtime(0.25f);
+		yield return new WaitForSecondsRealtime(0.5f);
 
 		if (p_EVENT_OnStartLoadScene != null)
 			p_EVENT_OnStartLoadScene();
@@ -389,6 +370,8 @@ public class CManagerFrameWorkBase<CLASS_Framework, ENUM_SCENE_NAME, ENUM_SOUND_
 			pAsyncOperation.allowSceneActivation = false;
 
 			listAsyncLoadScene.Add(pAsyncOperation);
+
+			yield return null;
 		}
 
 		float fStackProgress = 0f;
@@ -416,95 +399,38 @@ public class CManagerFrameWorkBase<CLASS_Framework, ENUM_SCENE_NAME, ENUM_SOUND_
 
 			if (p_EVENT_OnLoadSceneProgress != null)
 				p_EVENT_OnLoadSceneProgress(fStackProgress / iMaxLoadScene);
-			
+
 			yield return pAsyncOperation;
 		}
 
+		Scene pScene_Empty = SceneManager.GetSceneByName(const_strEmptySceneName);
+		Scene pScene_First = SceneManager.GetSceneByName(arrSceneName[0].ToString());
+
+		GameObject[] arrGameObject = pScene_Empty.GetRootGameObjects();
+		int iLen = arrGameObject.Length;
+		for (int i = 0; i < iLen; i++)
+		{
+			GameObject pGameObject = arrGameObject[i];
+			if (pGameObject.name.Equals("Camera")) { Destroy(pGameObject); continue; }
+		}
+
+		SceneManager.MergeScenes(pScene_Empty, pScene_First);
+
+		// 로딩 끝난후 먼저 실행되는 이벤트
+		if (p_EVENT_OnFinishPreLoadScene != null)
+			p_EVENT_OnFinishPreLoadScene();
+
 		// 로딩 끝, 자연스러운 연출을 위해 0.25초 대기
-		yield return new WaitForSecondsRealtime(0.25f);
+		yield return new WaitForSecondsRealtime(0.5f);
 
 		if (bManualCall_EventOnFinishLoadScene == false)
 			EventCall_OnFinishLoadScene();
 
+		p_EVENT_OnFinishPreLoadScene = null;
 		p_EVENT_OnLoadSceneProgress = null;
 		p_EVENT_OnStartLoadScene = null;
 
-		System.GC.Collect();
-	}
-
-	private void ProcStart_Loading( ENUM_SCENE_NAME[] arrSceneName, bool bManualCall_EventOnFinishLoadScene )
-	{
-		_fStackProgress = 0f;
-		_iMaxLoadScene = arrSceneName.Length;
-		_bManualCall_EventOnFinishLoadScene = bManualCall_EventOnFinishLoadScene;
-		_eSceneLoadState = ESceneLoadState.SceneLoadStart;
-
-		Time.timeScale = 0;
-		Scene pLastScene = SceneManager.GetActiveScene();
-
-		//GameObject[] arrGameObjects = pLastScene.GetRootGameObjects();
-		//int iLenObj = arrGameObjects.Length;
-		//for (int i = 0; i < iLenObj; i++)
-		//{
-		//	GameObject pGameObject = arrGameObjects[i];
-		//	if (pGameObject.hideFlags == HideFlags.DontSave)
-		//		Destroy(pGameObject);
-		//}
-
-		if (p_EVENT_OnStartLoadScene != null)
-			p_EVENT_OnStartLoadScene();
-
-		LoadSceneMode eLoadSceneMode = LoadSceneMode.Single; // 처음 로딩하는 씬은 무조건 Single 로
-		_listAsyncLoadScene.Clear();
-		for (int i = 0; i < _iMaxLoadScene; i++)
-		{
-			AsyncOperation pAsyncOperation = SceneManager.LoadSceneAsync( arrSceneName[i].ToString(), eLoadSceneMode );
-			pAsyncOperation.allowSceneActivation = false;
-			pAsyncOperation.priority = i;
-
-			_listAsyncLoadScene.Add( pAsyncOperation );
-			eLoadSceneMode = LoadSceneMode.Additive;
-		}
-	}
-
-	private IEnumerator ProcFinish_Loading()
-	{
-		_eSceneLoadState = ESceneLoadState.SceneLoadFinish;
-
-		for (int i = 0; i < _iMaxLoadScene; i++)
-		{
-			AsyncOperation pAsyncOperation = _listAsyncLoadScene[i];
-			pAsyncOperation.allowSceneActivation = true;
-
-			_fStackProgress += 0.1f;
-
-			if (p_EVENT_OnLoadSceneProgress != null)
-				p_EVENT_OnLoadSceneProgress( _fStackProgress / _iMaxLoadScene );
-
-			yield return new WaitForEndOfFrame();
-		}
-
-		yield return new WaitForSecondsRealtime(0.2f);
-
-		Time.timeScale = 1;
-
-		if (_bManualCall_EventOnFinishLoadScene == false)
-			EventCall_OnFinishLoadScene();
-
-		p_EVENT_OnLoadSceneProgress = null;
-		p_EVENT_OnStartLoadScene = null;
-
-		_eSceneLoadState = ESceneLoadState.None;
-	}
-
-	static public void DoLoadScene_FadeInOut( ENUM_SCENE_NAME eSceneName, float fFadeDuration, Color pColor, System.Action OnFinishLoading = null )
-	{
-		AutoFade.LoadLevel( eSceneName.ToString(), fFadeDuration * 0.5f, fFadeDuration * 0.5f, pColor );
-		if (_OnFinishLoad_Scene == null && OnFinishLoading != null)
-		{
-			_OnFinishLoad_Scene = OnFinishLoading;
-			_strCallBackRequest_SceneName = eSceneName.ToString();
-		}
+		//System.GC.Collect(System.GC.GetGeneration(this), System.GCCollectionMode.Optimized);
 	}
 
 	public void EventOnSlotPlayClip( CSoundSlot pSlot )
@@ -532,8 +458,7 @@ public class CManagerFrameWorkBase<CLASS_Framework, ENUM_SCENE_NAME, ENUM_SOUND_
 	// ===================================== //
 
 	virtual protected void OnSceneLoaded( UnityEngine.SceneManagement.Scene pScene, UnityEngine.SceneManagement.LoadSceneMode eLoadMode ) { }
-	virtual protected void OnLoadFinish_INI_PlayerSetting( bool bSuccess, SINI_UserSetting sUserrSetting ) { }
-	virtual protected void OnLoadFinish_INI_Developer( bool bSuccess ) { }
+	virtual protected void OnLoadFinish_LocalData( ) { }
 
 	// ===================================== //
 	// protected - Unity API                 //
@@ -572,11 +497,8 @@ public class CManagerFrameWorkBase<CLASS_Framework, ENUM_SCENE_NAME, ENUM_SOUND_
 	{
 		if (_pJsonParser_Persistent.DoReadJson( EINI_JSON_FileName.UserSetting, out _sSetting_User ))
 		{
-			Debug.Log( "UserInfo - bParsingResult Is Success " + _sSetting_User.ID );
-
 			_pManagerSound.DoSetVolumeEffect( _sSetting_User.fVolumeEffect );
 			_pManagerSound.DoSetVolumeBGM( _sSetting_User.fVolumeBGM );
-			OnLoadFinish_INI_PlayerSetting( true, _sSetting_User );
 		}
 		else
 		{
@@ -586,8 +508,6 @@ public class CManagerFrameWorkBase<CLASS_Framework, ENUM_SCENE_NAME, ENUM_SOUND_
 			_pJsonParser_Persistent.DoWriteJson( EINI_JSON_FileName.UserSetting, _sSetting_User );
 			if (Application.isEditor)
 				_pJsonParser_StreammingAssets.DoWriteJsonArray( EINI_JSON_FileName.Sound, new SINI_Sound[] { new SINI_Sound(), new SINI_Sound() } );
-
-			OnLoadFinish_INI_PlayerSetting( false, _sSetting_User );
 		}
 	}
 
@@ -648,22 +568,22 @@ public class CManagerFrameWorkBase<CLASS_Framework, ENUM_SCENE_NAME, ENUM_SOUND_
 	{
 		base.OnUpdate();
 
-		float fTotalProgress = 0f;
+		//float fTotalProgress = 0f;
 
-		if (_eSceneLoadState == ESceneLoadState.SceneLoadStart)
-		{
-			for (int i = 0; i < _iMaxLoadScene; i++)
-				fTotalProgress += _listAsyncLoadScene[i].progress;
+		//if (_eSceneLoadState == ESceneLoadState.SceneLoadStart)
+		//{
+		//	for (int i = 0; i < _iMaxLoadScene; i++)
+		//		fTotalProgress += _listAsyncLoadScene[i].progress;
 
-			if (p_EVENT_OnLoadSceneProgress != null)
-				p_EVENT_OnLoadSceneProgress( _fStackProgress / _iMaxLoadScene );
+		//	if (p_EVENT_OnLoadSceneProgress != null)
+		//		p_EVENT_OnLoadSceneProgress( _fStackProgress / _iMaxLoadScene );
 
-			if (_fStackProgress > 0.9f * _iMaxLoadScene)
-				StartCoroutine( ProcFinish_Loading() );
-		}
+		//	if (_fStackProgress > 0.9f * _iMaxLoadScene)
+		//		StartCoroutine( ProcFinish_Loading() );
+		//}
 
-		if (_fStackProgress < fTotalProgress)
-			_fStackProgress += Time.unscaledDeltaTime * _iMaxLoadScene;
+		//if (_fStackProgress < fTotalProgress)
+		//	_fStackProgress += Time.unscaledDeltaTime * _iMaxLoadScene;
 	}
 
 	// ========================================================================== //
@@ -679,6 +599,8 @@ public class CManagerFrameWorkBase<CLASS_Framework, ENUM_SCENE_NAME, ENUM_SOUND_
 		{
 			if (p_EVENT_OnLoadFinish_LocalData != null)
 				p_EVENT_OnLoadFinish_LocalData();
+
+			instance.OnLoadFinish_LocalData();
 		}
 	}
 
@@ -741,18 +663,20 @@ public class CManagerFrameWorkBase<CLASS_Framework, ENUM_SCENE_NAME, ENUM_SOUND_
 			if (Application.isEditor)
 				_pJsonParser_Persistent.DoWriteJson( EINI_JSON_FileName.DeveloperSetting, _sSetting_Developer );
 		}
-
-		OnLoadFinish_INI_Developer( bSuccess );
 	}
 
 	private void OnFinishParse_AppSetting( bool bResult, SINI_ApplicationSetting sAppSetting )
 	{
-		if(bResult == false)
+		_sSetting_App = sAppSetting;
+		if (bResult == false)
 		{
 			Debug.Log("Error, AppSetting Is Null");
 			_pJsonParser_StreammingAssets.DoWriteJson( EINI_JSON_FileName.ApplicationSetting, new SINI_ApplicationSetting() );
 			return;
 		}
+
+		CManagerNetworkDB_Common.instance.DoSetNetworkAddress( sAppSetting.strPHPPrefix, sAppSetting.strDBName );
+		CManagerNetworkDB_Project.instance.DoSetNetworkAddress( sAppSetting.strPHPPrefix, sAppSetting.strDBName );
 
 		//_sSetting_App = sAppSetting;
 		//System.Text.StringBuilder pStrBuilder = new System.Text.StringBuilder();

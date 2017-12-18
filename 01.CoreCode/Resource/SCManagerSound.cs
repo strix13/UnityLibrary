@@ -85,7 +85,7 @@ public class SCManagerSound<ENUM_SOUND_NAME> : SCManagerResourceBase<SCManagerSo
 		return bIsPlaying;
 	}
 
-	public void DoPlayBGM(ENUM_SOUND_NAME eSound, System.Action CallBackOnFinishBGM )
+	public void DoPlayBGM(ENUM_SOUND_NAME eSound, System.Action CallBackOnFinishBGM = null )
     {
         float fVolume = 0f;
         if (_mapSoundVolume.ContainsKey(eSound))
@@ -273,9 +273,8 @@ public class SCManagerSound<ENUM_SOUND_NAME> : SCManagerResourceBase<SCManagerSo
 
     public void EventOnSlotPlayClip(CSoundSlot pSlot)
     {
-        if (_linkedListNotUseSlot.Contains(pSlot))
-            _linkedListNotUseSlot.Remove(pSlot);
-    }
+        _linkedListNotUseSlot.Remove(pSlot);
+	}
 
     public void EventOnSlotFinishClip(CSoundSlot pSlot)
     {
@@ -291,7 +290,7 @@ public class SCManagerSound<ENUM_SOUND_NAME> : SCManagerResourceBase<SCManagerSo
 		else
 		{
 			_linkedListNotUseSlot.AddLast( pSlot );
-			if(pSlot.p_pAudioSource.clip != null)
+			if (pSlot.p_pAudioSource.clip != null)
 			{
 				string strClipName = pSlot.p_pAudioSource.clip.name;
 				if (_mapCurrentPlayingSound.ContainsKey( strClipName ))

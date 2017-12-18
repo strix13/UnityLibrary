@@ -47,8 +47,11 @@ public class CSingletonBase_Not_UnityComponent<CLASS_SingletoneTarget>
 
 	static public void DoReleaseSingleton()
 	{
-		_instance.OnReleaseSingleton();
-		_instance = null;
+		if(_instance != null)
+		{
+			_instance.OnReleaseSingleton();
+			_instance = null;
+		}
 	}
 
 	// ========================== [ Division ] ========================== //

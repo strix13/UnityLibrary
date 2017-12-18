@@ -49,8 +49,6 @@ public class CCompoEventTrigger : CObjectBase, IPointerDownHandler, IPointerUpHa
 
 	/* private - Field declaration           */
 
-	private CDictionary_ForEnumKey<EInputType, List<System.Action>> _mapCallBack = new CDictionary_ForEnumKey<EInputType, List<System.Action>>();
-
 	// ========================================================================== //
 
 	/* public - [Do] Function

@@ -31,11 +31,16 @@ abstract public class CManagerSpawnBase<Class_Manager, Enum_SpawnName, Class_Spa
 	[SerializeField]
 	private int _iDifficulty_Default = 1;
 	[SerializeField]
-	private float _fSpawnDelay = 1f;
+	private float _fSpawnDelay_Min = 1f;
+	[SerializeField]
+	private float _fSpawnDelay_Max = 1f;
 	[SerializeField]
 	private int _iIncreaseDifficulty = 1;
 	[SerializeField]
 	private int _iIncreaseCondition_LoopCount = 5;
+
+	[SerializeField]
+	private bool _bIsAutoIncreseDifficulty = false;
 
 	/* protected - Variable declaration         */
 
@@ -57,7 +62,7 @@ abstract public class CManagerSpawnBase<Class_Manager, Enum_SpawnName, Class_Spa
 	public void DoStopSpawning()
 	{
 		_eState = EState.Wait;
-		StopAllCoroutines();
+		StopCoroutine( "CoUpdateSpawnAuto" );
 	}
 
 	public void DoPlaySpawn()
@@ -69,7 +74,9 @@ abstract public class CManagerSpawnBase<Class_Manager, Enum_SpawnName, Class_Spa
 	{
 		_iDifficulty_OnAuto = iDifficulty;
 		OnSetDifficulty(iDifficulty);
-		StartCoroutine(CoUpdateSpawnAuto());
+
+		StopCoroutine( "CoUpdateSpawnAuto" );
+		StartCoroutine( "CoUpdateSpawnAuto");
 	}
 
 	public void DoPlaySpawnSomthing( int iDifficultyValue )
@@ -130,12 +137,14 @@ abstract public class CManagerSpawnBase<Class_Manager, Enum_SpawnName, Class_Spa
 		while (true)
 		{
 			DoPlaySpawnSomthing(_iDifficulty_OnAuto);
-			if(iLoopCount++ > _iIncreaseCondition_LoopCount)
+			if(_bIsAutoIncreseDifficulty && iLoopCount++ > _iIncreaseCondition_LoopCount)
 			{
 				iLoopCount = 0;
 				_iDifficulty_OnAuto += _iIncreaseDifficulty;
 			}
-			yield return SCManagerYield.GetWaitForSecond(_fSpawnDelay);
+
+			float fRandomDelay = Random.Range( _fSpawnDelay_Min, _fSpawnDelay_Max );
+			yield return SCManagerYield.GetWaitForSecond( fRandomDelay );
 		}
 	}
 

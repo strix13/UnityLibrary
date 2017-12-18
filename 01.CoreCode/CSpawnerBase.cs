@@ -46,11 +46,7 @@ public partial class CSpawnerBase<Enum_Key, Class_Resource> : CObjectBase
 	[SerializeField]
 	private float _fAngleMuzzle = 15f;
 	[SerializeField]
-	private float _fAngleRotate = 15f;
-	[SerializeField]
 	private Vector2 _vecPosGap = Vector2.zero;
-	[SerializeField]
-	private float _fTweenDuration = 2f;
 	[SerializeField]
 	private int _iMuzzleCount = 1;
 	[SerializeField]

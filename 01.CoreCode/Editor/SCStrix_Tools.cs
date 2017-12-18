@@ -28,7 +28,7 @@ public class SCStrix_Tools
 	/* public - [Do] Function
      * 외부 객체가 호출                         */
 
-	[MenuItem( "Assets/StrixTool/Apply Prefabs(s)", false, 10000 )]
+	[MenuItem( "GameObject/StrixTool/Apply Multiple Prefabs", false, 15 )]
 	static void ApplyPrefabs()
 	{
 		var selections = Selection.gameObjects;
@@ -46,17 +46,6 @@ public class SCStrix_Tools
 				EditorSceneManager.MarkSceneDirty( goRoot.scene );
 			}
 		}
-	}
-
-	[MenuItem( "Assets/StrixTool/Apply Prefabs(s)", true, 10000 )]
-	static bool ApplyPrefabs_Validate()
-	{
-		if (AnimationMode.InAnimationMode())
-		{
-			return false;
-		}
-
-		return Selection.gameObjects.Length > 1;
 	}
 
 	/* public - [Event] Function             

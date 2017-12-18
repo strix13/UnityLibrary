@@ -16,6 +16,8 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 
+#pragma warning disable 0661
+
 [System.Serializable]
 public struct SHugeNumber
 {

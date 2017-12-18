@@ -131,7 +131,7 @@ public class SCManagerLogIn : CSingletonBase_Not_UnityComponent<SCManagerLogIn>
         _strEmailAddress = strEmailAddress;
         _strPassword = strPassword;
 
-        _pObjectDummy_ForCoroutine.StartCoroutine(CManagerNetworkDB_Common.instance.CoExcutePHP(strEmailAddress, EPHPName.Check_Value, CDefineMap.const_strTableName_Account, OnResult_Login, new StringPair("password", strPassword)));
+       // _pObjectDummy_ForCoroutine.StartCoroutine(CManagerNetworkDB_Common.instance.CoExcutePHP(strEmailAddress, EPHPName.Check_Value, CDefineMap.const_strTableName_Account, OnResult_Login, new StringPair("password", strPassword)));
     }
 
     static public void DoRegistAccount(string strEmailAddress, string strPassword, System.Action<SCManagerLogIn.EResult_RegistAccount> OnResult_RegistAccount)
@@ -159,7 +159,7 @@ public class SCManagerLogIn : CSingletonBase_Not_UnityComponent<SCManagerLogIn>
         _strPassword = strPassword;
         _OnResult_RegistAccount = OnResult_RegistAccount;
 
-        _pObjectDummy_ForCoroutine.StartCoroutine(CManagerNetworkDB_Common.instance.CoExcutePHP(strEmailAddress, EPHPName.Get, CDefineMap.const_strTableName_Account, OnResult_ExistEmail, new StringPair("id", _strEmailAddress)));
+        //_pObjectDummy_ForCoroutine.StartCoroutine(CManagerNetworkDB_Common.instance.CoExcutePHP(strEmailAddress, EPHPName.Get, CDefineMap.const_strTableName_Account, OnResult_ExistEmail, new StringPair("id", _strEmailAddress)));
     }
 
     static public void DoChangePassword(string strEmailAddress, string strPassword_Old, string strPassword_New, System.Action<bool> OnFinishChangePassword)
@@ -172,7 +172,7 @@ public class SCManagerLogIn : CSingletonBase_Not_UnityComponent<SCManagerLogIn>
 		_strEmailAddress = strEmailAddress;
         _strPassword = strPassword_New;
         _OnResult_DB = OnFinishChangePassword;
-        _pObjectDummy_ForCoroutine.StartCoroutine(CManagerNetworkDB_Common.instance.CoExcutePHP(strEmailAddress, EPHPName.CheckValue_AndUpdateSet, CDefineMap.const_strTableName_Account, OnResult_ChangePassword, new StringPair("password", strPassword_Old), new StringPair("passwordNew", strPassword_New)));
+        //_pObjectDummy_ForCoroutine.StartCoroutine(CManagerNetworkDB_Common.instance.CoExcutePHP(strEmailAddress, EPHPName.CheckValue_AndUpdateSet, CDefineMap.const_strTableName_Account, OnResult_ChangePassword, new StringPair("password", strPassword_Old), new StringPair("passwordNew", strPassword_New)));
     }
 
     static public void DoResetPassword(string strEmailAddress)
@@ -181,7 +181,7 @@ public class SCManagerLogIn : CSingletonBase_Not_UnityComponent<SCManagerLogIn>
 
         _strEmailAddress = strEmailAddress;
         _strPassword = CalculateHashPassword(10);
-        _pObjectDummy_ForCoroutine.StartCoroutine(CManagerNetworkDB_Common.instance.CoExcutePHP(strEmailAddress, EPHPName.Update_Set_ID, CDefineMap.const_strTableName_Account, OnResult_ResetPassword, new StringPair("password", _strPassword)));
+        //_pObjectDummy_ForCoroutine.StartCoroutine(CManagerNetworkDB_Common.instance.CoExcutePHP(strEmailAddress, EPHPName.Update_Set_ID, CDefineMap.const_strTableName_Account, OnResult_ResetPassword, new StringPair("password", _strPassword)));
     }
 
     /* public - [Event] Function             
@@ -248,8 +248,8 @@ public class SCManagerLogIn : CSingletonBase_Not_UnityComponent<SCManagerLogIn>
     {
         if (bResult)
             _OnResult_RegistAccount(EResult_RegistAccount.RegistAccount_Fail_ExistEmail);
-        else
-            _pObjectDummy_ForCoroutine.StartCoroutine(CManagerNetworkDB_Common.instance.CoExcutePHP(_strEmailAddress, EPHPName.Insert, CDefineMap.const_strTableName_Account, OnResult_RegistAccount, new StringPair("id", _strEmailAddress), new StringPair("password", _strPassword)));
+        //else
+        //    _pObjectDummy_ForCoroutine.StartCoroutine(CManagerNetworkDB_Common.instance.CoExcutePHP(_strEmailAddress, EPHPName.Insert, CDefineMap.const_strTableName_Account, OnResult_RegistAccount, new StringPair("id", _strEmailAddress), new StringPair("password", _strPassword)));
     }
 
     static private void OnResult_RegistAccount(bool bResult)

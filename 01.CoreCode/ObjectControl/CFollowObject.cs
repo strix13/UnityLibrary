@@ -31,7 +31,11 @@ public class CFollowObject : CObjectBase
     [SerializeField]
     private float _fShakeMinusDelta = 0.1f;
 
-    private Vector3 _vecOriginPos;
+	[Header( "디버그용" )]
+	private bool _bIsFollow = false;
+
+	private Vector3 _vecAwakePos;
+	private Vector3 _vecOriginPos;
     private Vector3 _vecTargetOffset;
     private float _fRemainShakePow;
 
@@ -40,6 +44,11 @@ public class CFollowObject : CObjectBase
     private bool _bFollowZ;
 
     // ========================== [ Division ] ========================== //
+
+	public void DoSetPos_OnAwake()
+	{
+		transform.position = _vecAwakePos;
+	}
 
     public void DoShakeObject(float fShakePow)
     {
@@ -55,20 +64,29 @@ public class CFollowObject : CObjectBase
     public void DoInitTarget(Transform pTarget)
     {
         _pTransTarget = pTarget;
-        _vecTargetOffset = _pTransTarget.position - _pTransformCached.position;
-        
-        _bFollowX = _eFollowPos == EFollowPos.All || _eFollowPos == EFollowPos.X || _eFollowPos == EFollowPos.XY || _eFollowPos == EFollowPos.XZ;
-        _bFollowY = _eFollowPos == EFollowPos.All || _eFollowPos == EFollowPos.Y || _eFollowPos == EFollowPos.XY || _eFollowPos == EFollowPos.YZ;
-        _bFollowZ = _eFollowPos == EFollowPos.All || _eFollowPos == EFollowPos.Z || _eFollowPos == EFollowPos.XZ || _eFollowPos == EFollowPos.YZ;
-    }
+		DoResetFollowOffset();
+	}
 
-	public void DoRemoveTarget()
+	public void DoResetFollowOffset()
 	{
-		_pTransTarget = null;
+		if (_pTransTarget == null) return;
+
+		_vecTargetOffset = _pTransTarget.position - _pTransformCached.position;
+
+		_bFollowX = _eFollowPos == EFollowPos.All || _eFollowPos == EFollowPos.X || _eFollowPos == EFollowPos.XY || _eFollowPos == EFollowPos.XZ;
+		_bFollowY = _eFollowPos == EFollowPos.All || _eFollowPos == EFollowPos.Y || _eFollowPos == EFollowPos.XY || _eFollowPos == EFollowPos.YZ;
+		_bFollowZ = _eFollowPos == EFollowPos.All || _eFollowPos == EFollowPos.Z || _eFollowPos == EFollowPos.XZ || _eFollowPos == EFollowPos.YZ;
+	}
+
+	public void DoSetFollow(bool bFollow)
+	{
+		_bIsFollow = bFollow;
 	}
 
     public void DoUpdateFollow()
     {
+		if (_bIsFollow == false) return;
+
         if (_pTransTarget != null)
         {
             Vector3 vecFollowPos = _pTransformCached.position;
@@ -125,10 +143,9 @@ public class CFollowObject : CObjectBase
     {
         base.OnAwake();
 
-        if(_pTransTarget != null)
-        {
+		_vecAwakePos = transform.position;
+		if (_pTransTarget != null)
             DoInitTarget(_pTransTarget);
-        }
     }
 
     protected override void OnUpdate()

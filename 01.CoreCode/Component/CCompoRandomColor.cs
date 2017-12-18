@@ -19,6 +19,8 @@ public class CCompoRandomColor : CCompoEventTrigger
 	public Color _pColorRandom_Min = Color.green;
 	public Color _pColorRandom_Max = Color.white;
 
+	public bool _bChange_Children = false;
+
 	/* protected - Variable declaration         */
 
 	/* private - Variable declaration           */
@@ -26,13 +28,26 @@ public class CCompoRandomColor : CCompoEventTrigger
 #if NGUI
 	private UIWidget _pWidget;
 #endif
+	private UnityEngine.UI.Image _pImage;
 	private MeshRenderer _pRenderer_Mesh;
 	private SpriteRenderer _pRenderer_Sprite;
+
+	private SpriteRenderer[] _arrRenderer_Sprite;
 
 	// ========================================================================== //
 
 	/* public - [Do] Function
      * 외부 객체가 호출(For External class call)*/
+
+	public Color GetRandomColor()
+	{
+		float fRandomR = Random.Range( _pColorRandom_Min.r, _pColorRandom_Max.r );
+		float fRandomG = Random.Range( _pColorRandom_Min.g, _pColorRandom_Max.g );
+		float fRandomB = Random.Range( _pColorRandom_Min.b, _pColorRandom_Max.b );
+		float fRandomA = Random.Range( _pColorRandom_Min.a, _pColorRandom_Max.a );
+
+		return new Color( fRandomR, fRandomG, fRandomB, fRandomA );
+	}
 
 	/* public - [Event] Function             
        프랜드 객체가 호출(For Friend class call)*/
@@ -53,25 +68,36 @@ public class CCompoRandomColor : CCompoEventTrigger
 #if NGUI
 		_pWidget = GetComponentInChildren<UIWidget>( true );
 #endif
+		_pImage = GetComponentInChildren<UnityEngine.UI.Image>( true );
 		_pRenderer_Sprite = GetComponentInChildren<SpriteRenderer>(true);
 		_pRenderer_Mesh = GetComponentInChildren<MeshRenderer>(true);
+
+		if(_bChange_Children)
+			_arrRenderer_Sprite = GetComponentsInChildren<SpriteRenderer>( true );
 	}
 
 	protected override void OnPlayEventMain()
 	{
 		base.OnPlayEventMain();
-
-		float fRandomR = Random.Range( _pColorRandom_Min.r, _pColorRandom_Max.r );
-		float fRandomG = Random.Range( _pColorRandom_Min.g, _pColorRandom_Max.g );
-		float fRandomB = Random.Range( _pColorRandom_Min.b, _pColorRandom_Max.b );
-		float fRandomA = Random.Range( _pColorRandom_Min.a, _pColorRandom_Max.a );
-
-		Color pColorRandom = new Color( fRandomR, fRandomG, fRandomB, fRandomA );
+		
+		Color pColorRandom = GetRandomColor();
 		if (_pRenderer_Sprite != null)
 			_pRenderer_Sprite.color = pColorRandom;
 
 		if (_pRenderer_Mesh != null)
 			_pRenderer_Mesh.material.color = pColorRandom;
+
+		if(_pImage != null)
+			_pImage.color = pColorRandom;
+
+		if (_bChange_Children)
+		{
+			if(_arrRenderer_Sprite != null)
+			{
+				for (int i = 0; i < _arrRenderer_Sprite.Length; i++)
+					_arrRenderer_Sprite[i].color = pColorRandom;
+			}
+		}
 
 #if NGUI
 		if (_pWidget != null)

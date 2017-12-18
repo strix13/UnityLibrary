@@ -47,6 +47,9 @@ public class SCSceneLoader<ENUM_Scene_Name>
     private int _iLoadSceneCountCurrent;
     private int _iLoadSceneCount;
     private bool _bCheckLoadSceneListComplete;       public bool p_bCheckLoadSceneListComplete {  get { return _bCheckLoadSceneListComplete; } }
+
+	private bool _bAlreadyLoading = false;
+
     // ========================================================================== //
 
     // ===================================== //
@@ -56,7 +59,10 @@ public class SCSceneLoader<ENUM_Scene_Name>
 
     public void DoLoadSceneAsync(List<ENUM_Scene_Name> listScene, System.Action OnLoadCompleteAll )
     {
-        _bCheckLoadSceneListComplete = true;
+		if (_bAlreadyLoading) return;
+		_bAlreadyLoading = true;
+
+		_bCheckLoadSceneListComplete = true;
         _OnLoadCompleteAll = OnLoadCompleteAll;
         _iLoadSceneCountCurrent = 0;
         _iLoadSceneCount = listScene.Count;
@@ -87,7 +93,8 @@ public class SCSceneLoader<ENUM_Scene_Name>
         {
             if (++_iLoadSceneCountCurrent == _iLoadSceneCount)
             {
-                _bCheckLoadSceneListComplete = false;
+				_bAlreadyLoading = false;
+				_bCheckLoadSceneListComplete = false;
                 _OnLoadCompleteAll();
             }
         }

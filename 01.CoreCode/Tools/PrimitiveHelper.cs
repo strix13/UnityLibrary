@@ -9,30 +9,54 @@ using System.Text;
    Description : 
    Edit Log    : 
    ============================================ */
-
-// 성능 측정
-//System.Diagnostics.Stopwatch stopWatch = new System.Diagnostics.Stopwatch();
-//stopWatch.Start();
-//      for (int i = 0; i< 1000000; i++)
-//         transform.position = Vector3.zero;
-
-//      stopWatch.Stop();
-//      Debug.Log("transform - Normal" + stopWatch.Elapsed);
-
-//      stopWatch = new System.Diagnostics.Stopwatch();
-//      stopWatch.Start();
-
-//      for (int i = 0; i< 1000000; i++)
-//         p_pTransCached.position = Vector3.zero;
-
-//      stopWatch.Stop();
-//      Debug.Log("transform - Cached" + stopWatch.Elapsed);
-
+   
 public static class PrimitiveHelper
 {
 	static public Vector3 Inverse(this Vector3 vecTarget)
 	{
 		return vecTarget * -1;
+	}
+
+	/// <summary>
+	/// String Format : "(X.00, Y.00, Z.00)"
+	/// </summary>
+	/// <param name="strText"></param>
+	/// <param name="vecOut"></param>
+	/// <returns></returns>
+	static public bool TryParse_Vector3(this string strText, out Vector3 vecOut)
+	{
+		vecOut = Vector3.zero;
+		strText = strText.Trim();
+
+		// Parsing X
+		int iIndex = strText.IndexOf( "," );
+		string strFloat = strText.Substring( 1, iIndex - 1); // (를 뺀다.
+
+		if (float.TryParse( strFloat, out vecOut.x ) == false) return false;
+		strText = strText.Substring( iIndex + 1);
+
+		// Parsing Y
+		iIndex = strText.IndexOf( "," );
+		strFloat = strText.Substring( 0, iIndex );
+
+		if (float.TryParse( strFloat, out vecOut.y ) == false) return false;
+		strText = strText.Substring( iIndex + 1);
+		strText = strText.Substring( 0, strText.Length - 1 );
+
+		// Parsing Z
+		float.TryParse( strText, out vecOut.z );
+
+		return true;
+	}
+
+	static public Vector3 ConvertToVector3( this Color pColor )
+	{
+		return new Vector3( pColor .r, pColor .g, pColor .b);
+	}
+
+	static public Color ConvertToColor( this Vector3 sVector )
+	{
+		return new Color( sVector.x, sVector.y, sVector.z );
 	}
 
 	static public Vector3 RandomRange(Vector3 vecMinRange, Vector3 vecMaxRange)
@@ -251,6 +275,8 @@ public static class PrimitiveHelper
 
 	public static void SetActive(this CObjectBase pObj, bool bEnable)
 	{
+		if (pObj == null) return;
+
 		if (pObj.p_pGameObjectCached == null)
 			pObj.EventOnAwake();
 
@@ -402,7 +428,7 @@ public static class PrimitiveHelper
 		Debug.Log(strFormat);
 	}
 
-	static public COMPONENT GetComponentInChildrenOnly<COMPONENT>( this MonoBehaviour pTarget )
+	static public COMPONENT GetComponentInChildrenOnly<COMPONENT>( this Component pTarget )
 	where COMPONENT : UnityEngine.Component
 	{
 		COMPONENT pFindCompo = null;
@@ -417,5 +443,34 @@ public static class PrimitiveHelper
 		}
 
 		return pFindCompo;
+	}
+
+	static public COMPONENT[] GetComponentsInChildrenOnly<COMPONENT>( this Component pTarget )
+		where COMPONENT : UnityEngine.Component
+	{
+		List<COMPONENT> listComponentChildrenOnly = new List<COMPONENT>();
+		COMPONENT[] arrChildrenCompo = pTarget.GetComponentsInChildren<COMPONENT>();
+		for (int i = 0; i < arrChildrenCompo.Length; i++)
+		{
+			if (arrChildrenCompo[i].transform != pTarget.transform)
+				listComponentChildrenOnly.Add( arrChildrenCompo[i] );
+		}
+
+		return listComponentChildrenOnly.ToArray();
+	}
+
+	public enum ETransformSibling
+	{
+		First,
+		Last,
+	}
+
+	static public void SetParent_SetSibling( this Transform pTransform, Transform pTransformTarget, ETransformSibling eTransformSibling )
+	{
+		pTransform.SetParent( pTransformTarget );
+		if (eTransformSibling == ETransformSibling.First)
+			pTransform.SetAsFirstSibling();
+		else if (eTransformSibling == ETransformSibling.Last)
+			pTransform.SetAsLastSibling();
 	}
 }

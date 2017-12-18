@@ -159,17 +159,6 @@ abstract public class CManagerUIBase<Class_Instance, ENUM_Panel_Name, Class_Pane
     }
 	
 	/// <summary>
-	/// UI Panel을 얻어옵니다.
-	public Class_Panel GetUIPanel(ENUM_Panel_Name eUIPanelName)
-	{
-		Class_Panel pFindPanel = null;
-		if (_mapPanelInstance.TryGetValue(eUIPanelName, out pFindPanel) == false)
-			Debug.LogWarning(string.Format("{0}을 찾을 수 없습니다.", eUIPanelName));
-
-		return pFindPanel;
-	}
-	
-	/// <summary>
 	/// 타겟 카메라의 좌표로 UI 오브젝트를 이동합니다. ( 타겟 카메라의 WorldToView -> UI 카메라의 WorldToView )
 	/// </summary>
 	/// <param name="pCameraTarget">타겟 카메라</param>

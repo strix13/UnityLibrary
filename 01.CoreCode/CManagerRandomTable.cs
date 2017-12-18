@@ -54,19 +54,18 @@ public class CManagerRandomTable<CLASS_Resource> : CSingletonBase_Not_UnityCompo
 
 	public void DoAddRandomItem(CLASS_Resource pRandomItem)
     {
+		_listRandomTable.Add( pRandomItem );
+		_listRandomTable.Sort( ComparerRandomItem );
+
 		int iPercent = pRandomItem.IRandomItem_GetPercent();
-		if(iPercent <= 0)
+		if (iPercent <= 0)
 		{
-			Debug.LogWarning("Percent is less or equal to zero" + pRandomItem.ToString());
+			// Debug.LogWarning("Percent is less or equal to zero" + pRandomItem.ToString());
 			return;
 		}
-
-		//Debug.Log(pRandomItem.ToString() + iPercent);
-
 		_iTotalValue += iPercent;
 
-        _listRandomTable.Add(pRandomItem);
-        _listRandomTable.Sort(ComparerRandomItem);
+		//Debug.Log(pRandomItem.ToString() + iPercent);
 
 		if (_eRandomGetMode == ERandomGetMode.Delete)
 		{
@@ -79,6 +78,40 @@ public class CManagerRandomTable<CLASS_Resource> : CSingletonBase_Not_UnityCompo
 	{
 		for(int i = 0; i < listRandomItem.Count; i++)
 			DoAddRandomItem(listRandomItem[i]);
+	}
+	
+	public CLASS_Resource GetItem( string strItemName )
+	{
+		for (int i = 0; i < _listRandomTable.Count; i++)
+		{
+			MonoBehaviour pMono = _listRandomTable[i] as MonoBehaviour;
+			if(pMono != null)
+			{
+				if (pMono.name.Equals( strItemName ))
+					return _listRandomTable[i];
+			}
+		}
+
+		return null;
+	}
+
+	public CLASS_Resource GetRandomItem( List<CLASS_Resource> listRandomItem )
+	{
+		int iMaxValue = 0;
+		for (int i = 0; i < listRandomItem.Count; i++)
+			iMaxValue += listRandomItem[i].IRandomItem_GetPercent();
+
+		return ProcGetRandomItem( iMaxValue, listRandomItem );
+	}
+
+	public CLASS_Resource GetRandomItem( List<CLASS_Resource> listRandomItem, int iLimitValue )
+	{
+		int iMaxValue = 0;
+		for (int i = 0; i < listRandomItem.Count; i++)
+			iMaxValue += listRandomItem[i].IRandomItem_GetPercent();
+
+		ProcGetList_CutGreaterMaxValue_MoveToTempList( iLimitValue, listRandomItem );
+		return ProcGetRandomItem( iLimitValue, _listRandomTable_Temp );
 	}
 
 	public CLASS_Resource GetRandomItem()
@@ -93,9 +126,9 @@ public class CManagerRandomTable<CLASS_Resource> : CSingletonBase_Not_UnityCompo
 	{
 		CLASS_Resource pRandomItem = null;
 		if(_eRandomGetMode == ERandomGetMode.Peek)
-			ProcGetRandomItemList(iMaxValue, _listRandomTable);
+			ProcGetList_CutGreaterMaxValue_MoveToTempList(iMaxValue, _listRandomTable);
 		else
-			ProcGetRandomItemList(iMaxValue, _listRandomTable_Delete);
+			ProcGetList_CutGreaterMaxValue_MoveToTempList(iMaxValue, _listRandomTable_Delete);
 
 		if (_listRandomTable_Temp.Count != 0)
 		{
@@ -104,22 +137,22 @@ public class CManagerRandomTable<CLASS_Resource> : CSingletonBase_Not_UnityCompo
 			{
 				do
 				{
-					if (_setWinTable_OnDelete.Contains(_listRandomTable_Temp[iRandomIndex]))
+					if (_setWinTable_OnDelete.Contains( _listRandomTable_Temp[iRandomIndex] ))
 					{
-						_listRandomTable_Temp.RemoveAt(iRandomIndex);
-						iRandomIndex = Random.Range(0, _listRandomTable_Temp.Count);
+						_listRandomTable_Temp.RemoveAt( iRandomIndex );
+						iRandomIndex = Random.Range( 0, _listRandomTable_Temp.Count );
 						continue;
 					}
 					else
 						break;
 
-				} while (_setWinTable_OnDelete.Contains(_listRandomTable_Temp[iRandomIndex]) && _listRandomTable_Temp.Count != 0);
+				} while (_setWinTable_OnDelete.Contains( _listRandomTable_Temp[iRandomIndex] ) && _listRandomTable_Temp.Count != 0);
 
 				pRandomItem = _listRandomTable_Temp[iRandomIndex];
-				ProcAddDeleteItem(pRandomItem);
+				ProcAddDeleteItem( pRandomItem );
 			}
 			else
-				pRandomItem = _listRandomTable_Temp[iRandomIndex];
+				pRandomItem = ProcGetRandomItem( iMaxValue, _listRandomTable_Temp );
 		}
 
 		return pRandomItem;
@@ -179,6 +212,9 @@ public class CManagerRandomTable<CLASS_Resource> : CSingletonBase_Not_UnityCompo
 
 	private CLASS_Resource ProcGetRandomItem(int iMaxValue, List<CLASS_Resource> listTable)
 	{
+		if (listTable.Count == 1)
+			return listTable[0];
+
 		CLASS_Resource pRandomItem = null;
 		int iRandomValue = Random.Range(0, iMaxValue);
 		int iCheckValue = 0;
@@ -196,7 +232,7 @@ public class CManagerRandomTable<CLASS_Resource> : CSingletonBase_Not_UnityCompo
 		return pRandomItem;
 	}
 
-	public void ProcGetRandomItemList(int iMaxValue, List<CLASS_Resource> listTable)
+	private void ProcGetList_CutGreaterMaxValue_MoveToTempList(int iMaxValue, List<CLASS_Resource> listTable)
 	{
 		_listRandomTable_Temp.Clear();
 		for (int i = 0; i < listTable.Count; i++)
@@ -232,6 +268,5 @@ public class CManagerRandomTable<CLASS_Resource> : CSingletonBase_Not_UnityCompo
 		_listRandomTable_Delete.Remove(pItem);
 		_iTotalValue_Decrease_OnDelete += pItem.IRandomItem_GetPercent();
 		_setWinTable_OnDelete.Add(pItem);
-
 	}
 }

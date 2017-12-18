@@ -45,7 +45,7 @@ public class CSoundSlot : CObjectBase
     // public - [Do] Function                //
     // 외부 객체가 요청                      //
     // ===================================== //
-
+	
     public void DoPlaySound()
     {
 		ProcPlaySound(_pAudioClip);

@@ -7,7 +7,7 @@ public class CEditorProjectView_GetObjectNameList : Editor
 {
 	[MenuItem("Assets/StrixTool/Get Object Name List Like Enum", false, 0)]
 	[MenuItem( "GameObject/StrixTool/Get Object Name List Like Enum", false, 15 )]
-	static public void DoGetObjectNameList()
+	static public void DoGetObjectNameList_Enum()
 	{
 		if (Selection.objects == null)
 			return;
@@ -20,12 +20,32 @@ public class CEditorProjectView_GetObjectNameList : Editor
 			for (int i = 0; i < listObject.Count; i++)
 			{
 				pStrBuilder.Append(listObject[i].name);
-
-				if(i != listObject.Count - 1)
-					pStrBuilder.Append(",");
+				pStrBuilder.Append(",");
 			}
 
 			UnityEngine.Debug.Log(pStrBuilder.ToString());
+		}
+	}
+
+	[MenuItem( "Assets/StrixTool/Get Object Name List by Enter", false, 0 )]
+	[MenuItem( "GameObject/StrixTool/Get Object Name List by Enter", false, 15 )]
+	static public void DoGetObjectNameList_Enter()
+	{
+		if (Selection.objects == null)
+			return;
+		else
+		{
+			StringBuilder pStrBuilder = new StringBuilder();
+			List<UnityEngine.Object> listObject = new List<UnityEngine.Object>();
+			listObject.AddRange( Selection.objects );
+			listObject.Sort( CompareObject_ByName );
+			for (int i = 0; i < listObject.Count; i++)
+			{
+				pStrBuilder.Append( listObject[i].name );
+				pStrBuilder.Append( "\n" );
+			}
+
+			UnityEngine.Debug.Log( pStrBuilder.ToString() );
 		}
 	}
 

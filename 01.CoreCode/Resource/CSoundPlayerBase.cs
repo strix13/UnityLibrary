@@ -23,6 +23,8 @@ public class CSoundPlayerBase<ENUM_SOUND_NAME> : CCompoEventTrigger
     private ENUM_SOUND_NAME _eSoundName;
     [SerializeField]
     private string _strSoundName = "";
+	[SerializeField]
+	private float _fSoundVolume = 1f;
 
     /* protected - Field declaration         */
 
@@ -85,7 +87,7 @@ public class CSoundPlayerBase<ENUM_SOUND_NAME> : CCompoEventTrigger
             _pManagerSound = SCManagerSound<ENUM_SOUND_NAME>.instance;
 
         if(_pManagerSound != null)
-            _pManagerSound.DoPlaySoundEffect(_eSoundName);
+            _pManagerSound.DoPlaySoundEffect(_eSoundName, _fSoundVolume );
     }
 
     // ========================================================================== //

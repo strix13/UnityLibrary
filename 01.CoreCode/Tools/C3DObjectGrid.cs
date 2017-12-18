@@ -32,6 +32,10 @@ public class C3DObjectGrid : CObjectBase
 	public Vector3 _vecRotate_OnCircle;
 	public Vector3 _vecPos_OnCircle;
 
+	public bool p_bPivotIsCenter = false;
+
+	public bool p_bIsUpdateRectTransform = false;
+
 	/* protected - Variable declaration         */
 
 	/* private - Variable declaration           */
@@ -40,6 +44,53 @@ public class C3DObjectGrid : CObjectBase
 
 	/* public - [Do] Function
      * 외부 객체가 호출                         */
+
+	public void DoSetGrid()
+	{
+		Vector3 vecOffset = Vector3.zero;
+		if (p_bPivotIsCenter)
+			vecOffset = ((_vecLocalPosOffset * transform.childCount) / 2f) - (_vecLocalPosOffset / 2f);
+
+		for (int i = 0; i < transform.childCount; i++)
+		{
+			Transform pTransformChild = transform.GetChild( i );
+			pTransformChild.localPosition = (_vecLocalPosOffset * i) - vecOffset;
+
+			if (_eCircleOption != ECircleOption.None)
+			{
+				pTransformChild.localRotation = Quaternion.Euler( _vecRotate_OnCircle * i );
+				Vector3 vecCurrentLocalPos = pTransformChild.localPosition;
+
+				vecCurrentLocalPos += pTransformChild.forward * _vecPos_OnCircle.z;
+				vecCurrentLocalPos += pTransformChild.up * _vecPos_OnCircle.y;
+				vecCurrentLocalPos += pTransformChild.right * _vecPos_OnCircle.x;
+				pTransformChild.localPosition = vecCurrentLocalPos;
+
+				if (_eCircleOption == ECircleOption.Rotate_Circle_Inverse_Y)
+				{
+					Vector3 vecDirection = _pTransformCached.position - pTransformChild.position;
+					pTransformChild.up = vecDirection.normalized;
+				}
+				else if (_eCircleOption == ECircleOption.Rotate_Circle_Inverse_Z)
+				{
+					Vector3 vecDirection = _pTransformCached.position - pTransformChild.position;
+					pTransformChild.forward = vecDirection.normalized;
+				}
+			}
+		}
+
+		if (p_bIsUpdateRectTransform)
+		{
+			p_bIsUpdateRectTransform = false;
+			RectTransform pTransform = GetComponent<RectTransform>();
+			if (pTransform == null) return;
+
+			Vector2 vecSizeDelta = pTransform.sizeDelta;
+			vecSizeDelta = _vecLocalPosOffset * transform.childCount;
+
+			pTransform.sizeDelta = vecSizeDelta;
+		}
+	}
 
 	/* public - [Event] Function             
        프랜드 객체가 호출                       */
@@ -77,33 +128,7 @@ public class C3DObjectGrid : CObjectBase
 
 		if (transform.childCount == 0) return;
 
-		for (int i = 0; i < transform.childCount; i++)
-		{
-			Transform pTransformChild = transform.GetChild( i );
-			pTransformChild.localPosition = _vecLocalPosOffset * i;
-
-			if (_eCircleOption != ECircleOption.None)
-			{
-				pTransformChild.localRotation = Quaternion.Euler( _vecRotate_OnCircle * i );
-				Vector3 vecCurrentLocalPos = pTransformChild.localPosition;
-
-				vecCurrentLocalPos += pTransformChild.forward * _vecPos_OnCircle.z;
-				vecCurrentLocalPos += pTransformChild.up * _vecPos_OnCircle.y;
-				vecCurrentLocalPos += pTransformChild.right * _vecPos_OnCircle.x;
-				pTransformChild.localPosition = vecCurrentLocalPos;
-
-				if (_eCircleOption == ECircleOption.Rotate_Circle_Inverse_Y)
-				{
-					Vector3 vecDirection = _pTransformCached.position - pTransformChild.position;
-					pTransformChild.up = vecDirection.normalized;
-				}
-				else if (_eCircleOption == ECircleOption.Rotate_Circle_Inverse_Z)
-				{
-					Vector3 vecDirection = _pTransformCached.position - pTransformChild.position;
-					pTransformChild.forward = vecDirection.normalized;
-				}
-			}
-		}
+		DoSetGrid();
 	}
 
 	// ========================================================================== //

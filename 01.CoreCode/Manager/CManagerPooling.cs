@@ -20,23 +20,25 @@ public class CManagerPooling<ENUM_Resource_Name, Class_Resource> : CSingletonBas
 
 	/* protected - Field declaration            */
 
-	protected Dictionary<ENUM_Resource_Name, Class_Resource> _mapResourceOriginCopy = new Dictionary<ENUM_Resource_Name, Class_Resource>();
+	static protected Dictionary<ENUM_Resource_Name, Class_Resource> _mapResourceOrigin = new Dictionary<ENUM_Resource_Name, Class_Resource>();
+	static protected Dictionary<ENUM_Resource_Name, Class_Resource> _mapResourceOriginCopy = new Dictionary<ENUM_Resource_Name, Class_Resource>();
 
-	protected GameObject _pObjectManager; public GameObject p_pObjectManager { get { return _pObjectManager; } }
-	protected Transform _pTransManager;
+	static protected GameObject _pObjectManager; public GameObject p_pObjectManager { get { return _pObjectManager; } }
+	static protected Transform _pTransManager;
 
 	/* private - Field declaration           */
 
 	static private bool _bIsInit = false;
 	static private bool _bIsDestroy = false;
 
-	private Dictionary<int, Class_Resource> _mapPoolingInstance = new Dictionary<int, Class_Resource>();
-	private Dictionary<int, ENUM_Resource_Name> _mapPoolingResourceType = new Dictionary<int, ENUM_Resource_Name>();
+	static private Dictionary<int, Class_Resource> _mapPoolingInstance = new Dictionary<int, Class_Resource>();
+	static private Dictionary<int, ENUM_Resource_Name> _mapPoolingResourceType = new Dictionary<int, ENUM_Resource_Name>();
 
-	private Dictionary<ENUM_Resource_Name, Queue<Class_Resource>> _queuePoolingDisable = new Dictionary<ENUM_Resource_Name, Queue<Class_Resource>>();
-	private Dictionary<ENUM_Resource_Name, int> _mapResourcePoolingCount = new Dictionary<ENUM_Resource_Name, int>();
+	static private Dictionary<ENUM_Resource_Name, Queue<Class_Resource>> _queuePoolingDisable = new Dictionary<ENUM_Resource_Name, Queue<Class_Resource>>();
+	static private Dictionary<ENUM_Resource_Name, int> _mapResourcePoolingCount = new Dictionary<ENUM_Resource_Name, int>();
 
 	private int _iPopCount = 0;	public int p_iPopCount {  get { return _iPopCount; } }
+
 	// ========================================================================== //
 
 	/* public - [Do] Function
@@ -50,12 +52,19 @@ public class CManagerPooling<ENUM_Resource_Name, Class_Resource> : CSingletonBas
 	static public void DoSetParents_ManagerObject(Transform pTransformParents)
 	{
 		CManagerPooling<ENUM_Resource_Name, Class_Resource> pManagerCurrent = instance;
-		pManagerCurrent._pTransManager.SetParent( pTransformParents );
-		pManagerCurrent._pTransManager.DoResetTransform();
-
-		if(pManagerCurrent._queuePoolingDisable.Count != 0)
+		if(_pTransManager == null)
 		{
-			var listOrigin = pManagerCurrent._mapResourceOriginCopy.Values.ToList();
+			_bIsInit = false; _bIsDestroy = false;
+			pManagerCurrent = instance;
+			pManagerCurrent.OnMakeSingleton();
+		}
+
+		_pTransManager.SetParent( pTransformParents );
+		_pTransManager.DoResetTransform();
+
+		if(_queuePoolingDisable.Count != 0)
+		{
+			var listOrigin = _mapResourceOriginCopy.Values.ToList();
 			for (int i = 0; i < listOrigin.Count; i++)
 				listOrigin[i].transform.DoResetTransform();
 		}
@@ -66,19 +75,38 @@ public class CManagerPooling<ENUM_Resource_Name, Class_Resource> : CSingletonBas
 		ProcInitManagerPooling( listPoolingObject );
 	}
 
-	static public void DoClearPoolingObject()
+	static public void DoInitPoolingObject(List<ENUM_Resource_Name> listPoolingObject)
 	{
-		_bIsInit = false;
-
-		if(instance._pObjectManager != null)
+		string strEnumName = typeof( ENUM_Resource_Name ).Name;
+		List<GameObject> listObject = new List<GameObject>();
+		GameObject[] arrResources = Resources.LoadAll<GameObject>( string.Format( "{0}/", strEnumName ) );
+		for (int i = 0; i < arrResources.Length; i++)
 		{
-			GameObject.DestroyObject( instance._pObjectManager );
-			instance._pObjectManager = null;
+			ENUM_Resource_Name eResourceName;
+			if (arrResources[i].name.ConvertEnum_IgnoreError( out eResourceName ))
+			{
+				if(listPoolingObject.Contains( eResourceName ))
+					listObject.Add( arrResources[i] );
+			}
 		}
 
-		instance._queuePoolingDisable.Clear();
-		instance._mapResourcePoolingCount.Clear();
-		instance._mapResourceOriginCopy.Clear();
+		ProcInitManagerPooling( listObject );
+	}
+
+	static public void DoClearPoolingObject()
+	{
+		_mapPoolingInstance.Clear();
+		_mapPoolingResourceType.Clear();
+		_queuePoolingDisable.Clear();
+		_mapResourcePoolingCount.Clear();
+		_mapResourceOrigin.Clear();
+		_mapResourceOriginCopy.Clear();
+
+		if (_pObjectManager != null)
+		{
+			GameObject.DestroyObject( _pObjectManager );
+			_pObjectManager = null;
+		}
 	}
 
 	/// <summary>
@@ -95,9 +123,6 @@ public class CManagerPooling<ENUM_Resource_Name, Class_Resource> : CSingletonBas
 			_mapResourcePoolingCount.Add(eResourceName, 0);
 			_queuePoolingDisable.Add(eResourceName, new Queue<Class_Resource>());
 		}
-
-		if (_queuePoolingDisable[eResourceName].Count == 0)
-			pFindResource = MakeResource(eResourceName);
 
 		int iLoopCount = 0;
 		while(pFindResource == null && iLoopCount++ < _queuePoolingDisable[eResourceName].Count)
@@ -124,6 +149,11 @@ public class CManagerPooling<ENUM_Resource_Name, Class_Resource> : CSingletonBas
 		if (p_EVENT_OnPopResource != null)
 			p_EVENT_OnPopResource(eResourceName, pFindResource);
 
+		//if (typeof( ENUM_Resource_Name ) == typeof( EEnemy ))
+		//	Debug.Log( "Pop" + eResourceName + " Name : " + pFindResource.name, pFindResource );
+
+		//if (pFindResource is CScrollObject)
+		//	Debug.Log( eResourceName + " [Pop] Remain Count : " + _queuePoolingDisable[eResourceName].Count );
 		return pFindResource;
 	}
 
@@ -131,9 +161,33 @@ public class CManagerPooling<ENUM_Resource_Name, Class_Resource> : CSingletonBas
 	/// 사용했던 오브젝트를 반환합니다. 자동으로 GameObject가 Disable 됩니다.
 	/// </summary>
 	/// <param name="pResource">사용한 리소스</param>
-	public void DoPush(Class_Resource pResource)
+	public void DoPush(Class_Resource pResource, bool bSetPaents_ManagerObject = false)
 	{
-		ProcReturnResource(pResource);
+		ProcReturnResource(pResource, bSetPaents_ManagerObject );
+	}
+
+	/// <summary>
+	/// Enum형태의 리소스 이름의 List에 있는 오브젝트만 풀링을 위해 오브젝트를 새로 생성합니다. 
+	/// </summary>
+	/// <param name="listRequestPooling">풀링할 Enum 형태의 리소스 리스트</param>
+	public void DoStartPooling( int iPoolingCount )
+	{
+		if(_bIsInit == false)
+			ProcPooling_From_ResourcesFolder();
+
+		List<ENUM_Resource_Name> listKey = _mapResourceOriginCopy.Keys.ToList();
+		for (int i = 0; i < listKey.Count; i++)
+		{
+			ENUM_Resource_Name eResourceName = listKey[i];
+			for (int j = 0; j < iPoolingCount; j++)
+			{
+				if (_queuePoolingDisable[eResourceName].Count > iPoolingCount)
+					continue;
+
+				Class_Resource pResource = MakeResource( eResourceName );
+				ProcReturnResource( pResource, true );
+			}
+		}
 	}
 
 	/// <summary>
@@ -154,7 +208,7 @@ public class CManagerPooling<ENUM_Resource_Name, Class_Resource> : CSingletonBas
 			for (int j = 0; j < iPoolingCount; j++)
 			{
 				Class_Resource pResource = MakeResource(eResourceName);
-				ProcReturnResource(pResource);
+				ProcReturnResource(pResource, true );
 			}
 		}
 	}
@@ -167,13 +221,27 @@ public class CManagerPooling<ENUM_Resource_Name, Class_Resource> : CSingletonBas
 		IEnumerator<KeyValuePair<int, Class_Resource>> pIter = _mapPoolingInstance.GetEnumerator();
 		while(pIter.MoveNext())
 		{
-			ProcReturnResource(pIter.Current.Value);
+			ProcReturnResource(pIter.Current.Value, true);
 		}
+	}
+
+	public Class_Resource GetOriginObject( Class_Resource pResource )
+	{
+		int hInstanceID = pResource.GetInstanceID();
+		if (_mapPoolingInstance.ContainsKey( hInstanceID ) == false ||
+			_mapPoolingResourceType.ContainsKey( hInstanceID ) == false)
+		{
+			//Debug.LogWarning(pResource.name + " Return fail!!");
+			return null;
+		}
+
+		ENUM_Resource_Name eResourceName = _mapPoolingResourceType[hInstanceID];
+		return _mapResourceOrigin[eResourceName];
 	}
 
 	static public void EventUpdateTransform()
 	{
-		instance._pTransManager = instance._pObjectManager.transform;
+		_pTransManager = _pObjectManager.transform;
 	}
 
 	// ========================================================================== //
@@ -186,13 +254,7 @@ public class CManagerPooling<ENUM_Resource_Name, Class_Resource> : CSingletonBas
 
 		if (_bIsInit || _bIsDestroy) return;
 
-		// Enum 과 같은 이름의 폴더를 확인
-		string strEnumName = typeof(ENUM_Resource_Name).Name;
-		if (strEnumName[0] == 'E')
-			strEnumName = strEnumName.Substring(1, strEnumName.Length - 1);
-
-		GameObject[] arrResources = Resources.LoadAll<GameObject>(string.Format("{0}/", strEnumName));
-		ProcInitManagerPooling( arrResources.ToList() );
+		ProcPooling_From_ResourcesFolder();
 	}
 
 	protected override void OnReleaseSingleton()
@@ -208,33 +270,68 @@ public class CManagerPooling<ENUM_Resource_Name, Class_Resource> : CSingletonBas
 	/* private - [Proc] Function             
        중요 로직을 처리                         */
 
+	private void ProcPooling_From_ResourcesFolder()
+	{
+		// Enum 과 같은 이름의 폴더를 확인
+		string strEnumName = typeof( ENUM_Resource_Name ).Name;
+		if (strEnumName[0] == 'E')
+			strEnumName = strEnumName.Substring( 1, strEnumName.Length - 1 );
+
+		GameObject[] arrResources = Resources.LoadAll<GameObject>( string.Format( "{0}/", strEnumName ) );
+		ProcInitManagerPooling( arrResources.ToList() );
+	}
+
 	static private void ProcInitManagerPooling( List<GameObject> listObject)
 	{
-		_bIsInit = true;
+		System.Type pType_Enum = typeof( ENUM_Resource_Name );
+		System.Type pType_Class = typeof( Class_Resource );
+		string strEnumName = pType_Enum.Name;
+		string strClassName = pType_Class.Name;
 
-		System.Type pType = typeof( ENUM_Resource_Name );
-		string strEnumName = pType.Name;
 		if (listObject.Count == 0)
 		{
 			Debug.Log( "Init Fail. Please Check Resources Path " + strEnumName );
 			return;
 		}
-		
+
+		_bIsInit = true;
+		if (_pObjectManager == null)
+		{
+			_pObjectManager = new GameObject( string.Format( "ManagerPool_{0}_{1}", strEnumName, strClassName ) );
+			_pTransManager = _pObjectManager.transform;
+			CCompoEventTrigger pTrigger = _pObjectManager.AddComponent<CCompoEventTrigger>();
+			pTrigger.p_eInputType_Main = CCompoEventTrigger.EInputType.OnDestroy;
+			pTrigger.DoAddEvent_Main( DoReleaseSingleton );
+		}
+
 		for (int i = 0; i < listObject.Count; i++)
 		{
 			ENUM_Resource_Name eResourceName = default( ENUM_Resource_Name );
-
 			try
 			{
-				eResourceName = (ENUM_Resource_Name)System.Enum.Parse( pType, listObject[i].name );
+				eResourceName = (ENUM_Resource_Name)System.Enum.Parse( pType_Enum, listObject[i].name );
 			}
 			catch
 			{
-				eResourceName = (ENUM_Resource_Name)((object)listObject[i].name);
-				
-				if(pType.IsEnum)
+				try
+				{
+					eResourceName = (ENUM_Resource_Name)((object)listObject[i].name);
+				}
+				catch
+				{
+					Debug.Log( "Error Pooling : " + listObject[i].name );
+				}
+				if (pType_Enum.IsEnum)
 					Debug.Log( string.Format( "{0} is not in Enum {1}", listObject[i].name, strEnumName ));
 			}
+
+			if (_mapResourceOrigin.ContainsKey( eResourceName ))
+				continue;
+
+			GameObject pObjectOrigin = listObject[i].gameObject;
+			Class_Resource pResourceOrigin = pObjectOrigin.GetComponent<Class_Resource>();
+			//if (pResourceOrigin == null)
+			//	pResourceOrigin = pObjectOrigin.AddComponent<Class_Resource>();
 
 			GameObject pObjectCopy = Object.Instantiate( listObject[i].gameObject );
 			pObjectCopy.SetActive( false );
@@ -242,31 +339,27 @@ public class CManagerPooling<ENUM_Resource_Name, Class_Resource> : CSingletonBas
 			if (pResource == null)
 				pResource = pObjectCopy.AddComponent<Class_Resource>();
 
-			if (instance._queuePoolingDisable.ContainsKey( eResourceName ) == false)
+			if (_queuePoolingDisable.ContainsKey( eResourceName ) == false)
 			{
-				instance._queuePoolingDisable.Add( eResourceName, new Queue<Class_Resource>() );
-				instance._mapResourcePoolingCount.Add( eResourceName, 0 );
+				_queuePoolingDisable.Add( eResourceName, new Queue<Class_Resource>() );
+				_mapResourcePoolingCount.Add( eResourceName, 0 );
 			}
 
 			//if (p_EVENT_OnMakeResource != null)
 			//	p_EVENT_OnMakeResource(eResourceName, pResource);
 
-			instance._mapResourceOriginCopy.Add( eResourceName, pResource );
-			instance.ProcSetChild( eResourceName, pResource );
-			pResource.name = string.Format( "{0}(Origin)", eResourceName );
-		}
+			_mapResourceOrigin.Add( eResourceName, pResourceOrigin );
+			_mapResourceOriginCopy.Add( eResourceName, pResource );
+			//ProcSetChild( eResourceName, pResource );
 
-		if(instance._pObjectManager == null)
-		{
-			instance._pObjectManager = new GameObject( string.Format( "ManagerPool_{0}", strEnumName ) );
-			instance._pTransManager = instance._pObjectManager.transform;
-			CCompoEventTrigger pTrigger = instance._pObjectManager.AddComponent<CCompoEventTrigger>();
-			pTrigger.p_eInputType_Main = CCompoEventTrigger.EInputType.OnDestroy;
-			pTrigger.DoAddEvent_Main( DoReleaseSingleton );
+			pResource.name = string.Format( "{0}(Origin)", eResourceName );
+			Transform pTransMake = pResource.transform;
+			pTransMake.SetParent( _pTransManager );
+			pTransMake.DoResetTransform();
 		}
 	}
 
-	private void ProcSetChild(ENUM_Resource_Name eResourceName, Class_Resource pObjectMake)
+	static private void ProcSetChild(ENUM_Resource_Name eResourceName, Class_Resource pObjectMake)
 	{
 		Transform pTransMake = pObjectMake.transform;
 		pTransMake.SetParent(_pTransManager);
@@ -281,24 +374,22 @@ public class CManagerPooling<ENUM_Resource_Name, Class_Resource> : CSingletonBas
 	private Class_Resource MakeResource(ENUM_Resource_Name eResourceName)
 	{
 		if(_mapResourceOriginCopy.ContainsKey(eResourceName) == false)
-		{
-			Debug.LogWarning(string.Format("Dictionary has not exist Key {0} Check Resource Path {1}", eResourceName, typeof(ENUM_Resource_Name).Name));
-			return null;
-		}
+			ProcPooling_From_ResourcesFolder();
 
 		Class_Resource pObjectMake = null;
-
-		try
-		{
+		//try
+		//{
 			pObjectMake = Object.Instantiate( _mapResourceOriginCopy[eResourceName] );
 			ProcSetChild( eResourceName, pObjectMake );
+		//}
+		//catch
+		//{
+		//	if (_mapResourceOriginCopy.ContainsKey( eResourceName ) == false)
+		//		ProcPooling_From_ResourcesFolder();
 
-		}
-		catch
-		{
-			pObjectMake = Object.Instantiate( _mapResourceOriginCopy[eResourceName] );
-			ProcSetChild( eResourceName, pObjectMake );
-		}
+		//	pObjectMake = Object.Instantiate( _mapResourceOriginCopy[eResourceName] );
+		//	ProcSetChild( eResourceName, pObjectMake );
+		//}
 
 		if (p_EVENT_OnMakeResource != null)
 			p_EVENT_OnMakeResource(eResourceName, pObjectMake);
@@ -306,8 +397,11 @@ public class CManagerPooling<ENUM_Resource_Name, Class_Resource> : CSingletonBas
 		return pObjectMake;
 	}
 	
-	private void ProcReturnResource(Class_Resource pResource)
+	private void ProcReturnResource(Class_Resource pResource, bool bSetPaents_ManagerObject )
 	{
+		if (pResource.gameObject.activeSelf)
+			pResource.gameObject.SetActive( false );
+
 		int hInstanceID = pResource.GetInstanceID();
 		if (_mapPoolingInstance.ContainsKey(hInstanceID) == false ||
 			_mapPoolingResourceType.ContainsKey(hInstanceID) == false)
@@ -316,17 +410,23 @@ public class CManagerPooling<ENUM_Resource_Name, Class_Resource> : CSingletonBas
 			return;
 		}
 
-		if(pResource.gameObject.activeSelf)
-			pResource.gameObject.SetActive(false);
-
 		ENUM_Resource_Name eResourceName = _mapPoolingResourceType[hInstanceID];
 		if (_queuePoolingDisable.ContainsKey( eResourceName) == false || 
 			_queuePoolingDisable[eResourceName].Contains(pResource))
 			return;
-		
+
+		if (bSetPaents_ManagerObject)
+			pResource.transform.SetParent( _pTransManager );
+
 		_queuePoolingDisable[eResourceName].Enqueue(pResource);
 
 		if (p_EVENT_OnPushResource != null)
 			p_EVENT_OnPushResource(eResourceName, pResource);
+
+		//if (typeof(ENUM_Resource_Name) == typeof(EEnemy))
+		//	Debug.Log( "Push" + eResourceName + " Name : " + pResource.name, pResource );
+
+		//if (_queuePoolingDisable[eResourceName].Count <= 1)
+		//	Debug.Log( eResourceName + " [Push Remain Count <= 1] Total Pooling Count : " + _mapResourcePoolingCount[eResourceName]);
 	}
 }
