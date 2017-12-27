@@ -89,10 +89,10 @@ public class CDOTweenAnimDialogueBase<ENUM_BUTTON> : CUGUIPanelHasInputBase<ENUM
 		_pText_NPCName.text = strNPCName;
 
 		_pText_Dialogue.text = "";
-		_pText_Dialogue.DOText(strDialogueText, const_fTextAnimDuration)
-					   .OnStart(OnStart_DialogueTextAnimation)
-					   .OnUpdate(OnUpdate_DialogueTextAnimation)
-					   .OnComplete(OnFinish_DialogueTextAnimation);
+		//_pText_Dialogue.DOText(strDialogueText, const_fTextAnimDuration)
+		//			   .OnStart(OnStart_DialogueTextAnimation)
+		//			   .OnUpdate(OnUpdate_DialogueTextAnimation)
+		//			   .OnComplete(OnFinish_DialogueTextAnimation);
 	}
 
 	/* protected - [Event] Function           
