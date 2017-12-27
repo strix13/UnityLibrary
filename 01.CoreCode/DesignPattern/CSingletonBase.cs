@@ -13,7 +13,7 @@ public class CSingletonBase<CLASS_SingletoneTarget> : CObjectBase
                 _instance = FindObjectOfType<CLASS_SingletoneTarget>();
                 if (_instance != null && _instance._bIsExcuteAwake == false)
                     _instance.OnAwake();
-            }
+			}
 
             return _instance;
         }
@@ -47,12 +47,12 @@ public class CSingletonBase<CLASS_SingletoneTarget> : CObjectBase
 
 	// ========================== [ Division ] ========================== //
 
-	static protected void EventMakeSingleton()
+	static public CLASS_SingletoneTarget EventMakeSingleton()
     {
-		if (_bIsQuitApplication) return;
-		if (_instance != null) return;
+		if (_bIsQuitApplication) return null;
+		if (_instance != null) return instance;
 
         GameObject pObjectNewManager = new GameObject(typeof(CLASS_SingletoneTarget).ToString());
-        pObjectNewManager.AddComponent<CLASS_SingletoneTarget>();
+        return pObjectNewManager.AddComponent<CLASS_SingletoneTarget>();
     }
 }

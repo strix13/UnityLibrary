@@ -39,7 +39,7 @@ public class CManagerStat : CSingletonBase<CManagerStat>
 	[SerializeField]
 	private EDamageCalculateOption _eDamageCalculateOption = EDamageCalculateOption.PlusMinus;
 	[SerializeField]
-	private float _fDamageMin = 0f;
+	private int _iDamageMin = 0;
 
 	/* protected - Field declaration         */
 
@@ -72,12 +72,16 @@ public class CManagerStat : CSingletonBase<CManagerStat>
 		}
 
 		CCompoStat pStat_Victim = _mapObjectStat[iID_Victim];
-		if (pStat_Victim.p_bIsAlive == false) return;
+		if (pStat_Victim.p_bIsAlive == false)
+		{
+			pStat_Victim.DoDamage( 0, false, pObjectDamager );
+			return;
+		}
 
 		CCompoStat pStat_Damager = _mapObjectStat[iID_Damager];
 		bool bIsCriticalAttack = pStat_Damager.p_pStat.p_bIsCritical;
-		float fDamage = CalculateDamage( pStat_Damager.p_pStat, pStat_Victim.p_pStat, bIsCriticalAttack );
-		pStat_Victim.DoDamage( fDamage, bIsCriticalAttack, pStat_Damager.gameObject, out bIsDead );
+		int iDamage = CalculateDamage( pStat_Damager.p_pStat, pStat_Victim.p_pStat, bIsCriticalAttack );
+		pStat_Victim.DoDamage( iDamage, bIsCriticalAttack, pStat_Damager.gameObject, out bIsDead );
 
 		if (bIsDead && p_Event_OnDead != null)
 			p_Event_OnDead( pObjectVictim, iID_Victim );
@@ -126,30 +130,30 @@ public class CManagerStat : CSingletonBase<CManagerStat>
 	/* private - Other[Find, Calculate] Func 
        찾기, 계산등 단순 로직(Simpe logic)         */
 
-	private float CalculateDamage(CCompoStat.SStat pStatAttacker, CCompoStat.SStat pStatVictim, bool bIsCritical )
+	private int CalculateDamage(CCompoStat.SStat pStatAttacker, CCompoStat.SStat pStatVictim, bool bIsCritical )
 	{
-		float fDamageCalculated = pStatAttacker.p_fDamage_Max_Current;
+		int iDamageCalculated = pStatAttacker.p_iDamage_Max_Current;
 		switch (_eDamageCalculateOption)
 		{
 			case EDamageCalculateOption.Percentage:
-				fDamageCalculated *= (pStatVictim.p_fArmorCurrent * 0.01f);
+				//iDamageCalculated *= (pStatVictim.p_iArmorCurrent * 0.01f);
 				break;
 
 			case EDamageCalculateOption.PlusMinus:
-				fDamageCalculated -= pStatVictim.p_fArmorCurrent;
+				iDamageCalculated -= pStatVictim.p_iArmorCurrent;
 				break;
 		}
 
 		if (bIsCritical)
-			fDamageCalculated *= pStatAttacker.p_fCriticalDamage;
+			iDamageCalculated *= pStatAttacker.p_iCriticalDamage;
 
 		if (p_Event_OnCalculateDamage != null)
-			p_Event_OnCalculateDamage( pStatAttacker, pStatVictim, fDamageCalculated );
+			p_Event_OnCalculateDamage( pStatAttacker, pStatVictim, iDamageCalculated );
 
-		if (fDamageCalculated < _fDamageMin)
-			fDamageCalculated = _fDamageMin;
+		if (iDamageCalculated < _iDamageMin)
+			iDamageCalculated = _iDamageMin;
 
-		return fDamageCalculated;
+		return iDamageCalculated;
 	}
 
 	#endregion Private

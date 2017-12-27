@@ -23,7 +23,7 @@ public interface IDropDownInitializer
 	void IDropDownInitializer_Regist_DropDownItem( CUGUIDropdownItem pItem );
 }
 
-[RequireComponent( typeof( GraphicRaycaster ) )]
+//[RequireComponent( typeof( GraphicRaycaster ) )]
 //[RequireComponent( typeof( CanvasScaler ) )]
 abstract public class CUGUIPanelHasInputBase<Enum_InputName> : CUGUIPanelBase, IDropDownInitializer
 {
@@ -97,6 +97,7 @@ abstract public class CUGUIPanelHasInputBase<Enum_InputName> : CUGUIPanelBase, I
 	/* protected - [abstract & virtual]         */
 
 	abstract public void OnClick_Buttons( Enum_InputName eButtonName );
+	virtual public void OnPress_And_Hold_Buttons( Enum_InputName eButtonName, bool bPress ) { }
 	virtual public void OnScrollView_ClickItem( CUGUIScrollItem pScrollItem, IUGUIScrollItemData pScrollData, Enum_InputName eButtonName ) { }
 	virtual public void OnDropDown_SelectItem( Enum_InputName eDropDownName, CUGUIDropDown.SDropDownData pData, string strItemText) { }
 	virtual public void OnDropDown_HoverItem( Enum_InputName eDropDownName, CUGUIDropDown.SDropDownData pData, string strItemText ) { }
@@ -110,7 +111,7 @@ abstract public class CUGUIPanelHasInputBase<Enum_InputName> : CUGUIPanelBase, I
 	{
 		base.OnAwake();
 
-		Button[] arrButton = GetComponentsInChildren<Button>();
+		Button[] arrButton = GetComponentsInChildren<Button>(true);
 		for (int i = 0; i < arrButton.Length; i++)
 		{
 			Button pButton = arrButton[i];
@@ -119,8 +120,15 @@ abstract public class CUGUIPanelHasInputBase<Enum_InputName> : CUGUIPanelBase, I
 			Enum_InputName eButtonName;
 			if (strButtonName.ConvertEnum( out eButtonName ))
 			{
-				pButton.onClick.AddListener( delegate { OnClick_Buttons( eButtonName ); } );
+				pButton.onClick.AddListener(() => { OnClick_Buttons(eButtonName); });
 				_mapButton.Add(strButtonName, pButton);
+
+				CUGUIButton_Press pButtonPress = pButton.GetComponent<CUGUIButton_Press>();
+				if (pButtonPress != null)
+				{
+					pButtonPress.p_Event_OnPress_Down.AddListener( delegate { OnPress_And_Hold_Buttons( eButtonName, true ); } );
+					pButtonPress.p_Event_OnPress_Up.AddListener( delegate { OnPress_And_Hold_Buttons( eButtonName, false ); } );
+				}
 			}
 		}
 

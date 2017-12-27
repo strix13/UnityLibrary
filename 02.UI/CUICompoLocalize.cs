@@ -9,7 +9,6 @@ using System.Collections.Generic;
    Edit Log    : 
    ============================================ */
 
-[ExecuteInEditMode]
 public class CUICompoLocalize : CObjectBase
 {
 	/* const & readonly declaration             */
@@ -17,48 +16,33 @@ public class CUICompoLocalize : CObjectBase
 	/* enum & struct declaration                */
 
 	/* public - Variable declaration            */
-#if NGUI
-	public string p_strText { set { p_pUILabel.text = value; } }
-	public UILabel p_pUILabel { get { return _pUILabel; } }
-#endif
+
 	/* protected - Variable declaration         */
 
 	/* private - Variable declaration           */
-	[SerializeField]
-    private string _strLangKey; public string p_strLangKey { set { _strLangKey = value; } get { return _strLangKey; } }
-    [SerializeField]
-    private string _strPrintFormat = null;
 
+	private System.Action<string> _EVENT_OnChangeText;
+
+	private UnityEngine.UI.Text _pText_UGUI;
 #if NGUI
-    private UILabel _pUILabel;
+	private UILabel _pText_NGUI;
+#endif
+#if TMPro
+	private TMPro.TextMeshPro _pText_TMPro;
 #endif
 
-    // ========================================================================== //
+	// ========================================================================== //
 
-    /* public - [Do] Function
+	/* public - [Do] Function
      * 외부 객체가 호출                         */
 
-    public void DoChangeLocaleLabel(params string[] arrParams)
-    {
-#if NGUI
-        if (_strPrintFormat != null)
-            _pUILabel.text = string.Format(_strPrintFormat, arrParams);
-        else
-        {
-            _pUILabel.text = "";
-            for (int i = 0; i < arrParams.Length; i++)
-                _pUILabel.text += arrParams[i];
-        }
-#endif
+	public void DoChangeText(string strText)
+	{
+		_EVENT_OnChangeText(strText);
 	}
 
 	/* public - [Event] Function             
        프랜드 객체가 호출                       */
-
-	public void EventSetLocalePrintFormat(string strPrintFormat)
-    {
-        _strPrintFormat = strPrintFormat;
-    }
 
 	// ========================================================================== //
 
@@ -67,29 +51,52 @@ public class CUICompoLocalize : CObjectBase
 	/* protected - [Event] Function           
        자식 객체가 호출                         */
 
-	/* protected - Override & Unity API         */
-
-	private void Reset()
+	private void EventChangeText_UGUI(string strText)
 	{
-		if (Application.isEditor)
-			_strLangKey = name;
+		_pText_UGUI.text = strText;
 	}
+
+	private void EventChangeText_NGUI(string strText)
+	{
+#if NGUI
+		_pText_NGUI.text = strText;
+#endif
+	}
+
+	private void EventChangeText_TMPro(string strText)
+	{
+#if TMPro
+		_pText_TMPro.text = strText;
+#endif
+	}
+
+	/* protected - Override & Unity API         */
 
 	protected override void OnAwake()
     {
         base.OnAwake();
 
+		_pText_UGUI = GetComponent<UnityEngine.UI.Text>();
+		if (_pText_UGUI != null)
+			_EVENT_OnChangeText = EventChangeText_UGUI;
 #if NGUI
-        _pUILabel = GetComponent<UILabel>();
+		_pText_NGUI = GetComponent<UILabel>();
+		if (_pText_NGUI != null)
+			_EVENT_OnChangeText = EventChangeText_NGUI;
+#endif
+#if TMPro
+		_pText_TMPro = GetComponent<TMPro.TextMeshPro>();
+		if (_pText_TMPro != null)
+			_EVENT_OnChangeText = EventChangeText_TMPro;
 #endif
 	}
 
-    // ========================================================================== //
+	// ========================================================================== //
 
-    /* private - [Proc] Function             
+	/* private - [Proc] Function             
        중요 로직을 처리                         */
 
-    /* private - Other[Find, Calculate] Func 
+	/* private - Other[Find, Calculate] Func 
        찾기, 계산 등의 비교적 단순 로직         */
 
 }

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 public static class SCEnumHelper
@@ -40,7 +41,7 @@ public static class SCEnumHelper
 		{
 			eEnum = default(TENUM);
 			if(bIgnoreError == false)
-				Debug.Log( typeof(TENUM).ToString() + " 에 " + strText + "이 존재하지 않습니다.", null);
+				Debug.LogWarning( typeof(TENUM).ToString() + " 에 " + strText + "이 존재하지 않습니다.", null);
 		}
 
 		return eEnum;

@@ -33,6 +33,11 @@ public class CCompoMovePos : CCompoEventTrigger
 	/* public - [Do] Function
      * 외부 객체가 호출(For External class call)*/
 
+	public void DoSetVelocity(Vector3 vecVelocity)
+	{
+		_vecVelocity = vecVelocity;
+	}
+
 	/* public - [Event] Function             
        프랜드 객체가 호출(For Friend class call)*/
 

@@ -149,11 +149,9 @@ public class CManagerPooling<ENUM_Resource_Name, Class_Resource> : CSingletonBas
 		if (p_EVENT_OnPopResource != null)
 			p_EVENT_OnPopResource(eResourceName, pFindResource);
 
-		//if (typeof( ENUM_Resource_Name ) == typeof( EEnemy ))
-		//	Debug.Log( "Pop" + eResourceName + " Name : " + pFindResource.name, pFindResource );
+		//if (typeof( ENUM_Resource_Name ) == typeof( string ))
+		//	Debug.Log( "Pop " + eResourceName + " Count : " + _queuePoolingDisable[eResourceName].Count, pFindResource );
 
-		//if (pFindResource is CScrollObject)
-		//	Debug.Log( eResourceName + " [Pop] Remain Count : " + _queuePoolingDisable[eResourceName].Count );
 		return pFindResource;
 	}
 
@@ -170,7 +168,7 @@ public class CManagerPooling<ENUM_Resource_Name, Class_Resource> : CSingletonBas
 	/// Enum형태의 리소스 이름의 List에 있는 오브젝트만 풀링을 위해 오브젝트를 새로 생성합니다. 
 	/// </summary>
 	/// <param name="listRequestPooling">풀링할 Enum 형태의 리소스 리스트</param>
-	public void DoStartPooling( int iPoolingCount )
+	public void DoStartPooling( int iPoolingCount, Transform pTransParents = null )
 	{
 		if(_bIsInit == false)
 			ProcPooling_From_ResourcesFolder();
@@ -186,6 +184,9 @@ public class CManagerPooling<ENUM_Resource_Name, Class_Resource> : CSingletonBas
 
 				Class_Resource pResource = MakeResource( eResourceName );
 				ProcReturnResource( pResource, true );
+
+				if (pTransParents != null)
+					pResource.transform.SetParent( pTransParents );
 			}
 		}
 	}
@@ -194,7 +195,7 @@ public class CManagerPooling<ENUM_Resource_Name, Class_Resource> : CSingletonBas
 	/// Enum형태의 리소스 이름의 List에 있는 오브젝트만 풀링을 위해 오브젝트를 새로 생성합니다. 
 	/// </summary>
 	/// <param name="listRequestPooling">풀링할 Enum 형태의 리소스 리스트</param>
-	public void DoStartPooling(List<ENUM_Resource_Name> listRequestPooling, int iPoolingCount)
+	public void DoStartPooling(List<ENUM_Resource_Name> listRequestPooling, int iPoolingCount, Transform pTransParents = null )
 	{
 		for (int i = 0; i < listRequestPooling.Count; i++)
 		{
@@ -209,6 +210,9 @@ public class CManagerPooling<ENUM_Resource_Name, Class_Resource> : CSingletonBas
 			{
 				Class_Resource pResource = MakeResource(eResourceName);
 				ProcReturnResource(pResource, true );
+
+				if (pTransParents != null)
+					pResource.transform.SetParent( pTransParents );
 			}
 		}
 	}
@@ -377,19 +381,8 @@ public class CManagerPooling<ENUM_Resource_Name, Class_Resource> : CSingletonBas
 			ProcPooling_From_ResourcesFolder();
 
 		Class_Resource pObjectMake = null;
-		//try
-		//{
-			pObjectMake = Object.Instantiate( _mapResourceOriginCopy[eResourceName] );
-			ProcSetChild( eResourceName, pObjectMake );
-		//}
-		//catch
-		//{
-		//	if (_mapResourceOriginCopy.ContainsKey( eResourceName ) == false)
-		//		ProcPooling_From_ResourcesFolder();
-
-		//	pObjectMake = Object.Instantiate( _mapResourceOriginCopy[eResourceName] );
-		//	ProcSetChild( eResourceName, pObjectMake );
-		//}
+		pObjectMake = Object.Instantiate( _mapResourceOriginCopy[eResourceName] );
+		ProcSetChild( eResourceName, pObjectMake );
 
 		if (p_EVENT_OnMakeResource != null)
 			p_EVENT_OnMakeResource(eResourceName, pObjectMake);
@@ -399,8 +392,16 @@ public class CManagerPooling<ENUM_Resource_Name, Class_Resource> : CSingletonBas
 	
 	private void ProcReturnResource(Class_Resource pResource, bool bSetPaents_ManagerObject )
 	{
-		if (pResource.gameObject.activeSelf)
-			pResource.gameObject.SetActive( false );
+		try
+		{
+			if (pResource.gameObject.activeSelf)
+				pResource.gameObject.SetActive( false );
+		}
+		catch
+		{
+			if (pResource.gameObject.activeSelf)
+				pResource.gameObject.SetActive( false );
+		}
 
 		int hInstanceID = pResource.GetInstanceID();
 		if (_mapPoolingInstance.ContainsKey(hInstanceID) == false ||
@@ -423,8 +424,8 @@ public class CManagerPooling<ENUM_Resource_Name, Class_Resource> : CSingletonBas
 		if (p_EVENT_OnPushResource != null)
 			p_EVENT_OnPushResource(eResourceName, pResource);
 
-		//if (typeof(ENUM_Resource_Name) == typeof(EEnemy))
-		//	Debug.Log( "Push" + eResourceName + " Name : " + pResource.name, pResource );
+		//if (typeof( ENUM_Resource_Name ) == typeof( string ))
+		//	Debug.Log( "Push" + eResourceName + " Count : " + _queuePoolingDisable[eResourceName].Count, pResource );
 
 		//if (_queuePoolingDisable[eResourceName].Count <= 1)
 		//	Debug.Log( eResourceName + " [Push Remain Count <= 1] Total Pooling Count : " + _mapResourcePoolingCount[eResourceName]);

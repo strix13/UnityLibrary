@@ -109,8 +109,6 @@ public class CEditorWindow_SpriteEditor : CEditorWindowBase<CEditorWindow_Sprite
 			pImporter.SaveAndReimport();
 			AssetDatabase.Refresh( ImportAssetOptions.ForceUpdate );
 		}
-
-		Selection.objects = null;
 	}
 
 	private void ProcAddTextureImporter_InDirectory( DirectoryInfo pDirectory, List<TextureImporter> listTexture )

@@ -234,12 +234,18 @@ public class CManagerNetworkDB_Base<CLASS_Driven> : CSingletonBase_Not_UnityComp
         for (int i = 0; i < arrParameter.Length; i++)
         {
 			if (arrParameter[i].strKey == null)
-				Debug.Log( string.Format("Error key {0} is null PHP : {1} Table : {2}", i, strPHPName, strTableName));
+			{
+				form.AddField( "key" + i, "" );
+				//Debug.Log( string.Format( "Error key {0} is null PHP : {1} Table : {2}", i, strPHPName, strTableName ) );
+			}
 			else
 				form.AddField("key" + i, arrParameter[i].strKey);
 
 			if (arrParameter[i].strValue == null)
-				Debug.Log( string.Format("Error value {0} is null PHP : {1} Table : {2}", i, strPHPName, strTableName));
+			{
+				form.AddField( "value" + i, "" );
+				//Debug.Log( string.Format( "Error value {0} is null PHP : {1} Table : {2}", i, strPHPName, strTableName ) );
+			}
 			else
 				form.AddField("value" + i, arrParameter[i].strValue);
         }

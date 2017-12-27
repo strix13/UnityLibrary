@@ -26,9 +26,8 @@ public class CInventorySlotDataBase
 	private int _iSlotID; public int p_iSlotID { get { return _iSlotID; } }
 	private int _iRealID; public int p_iRealID { get { return _iRealID; } }
 
-	public void DoInit(string strImageName, IInventoryListener pInventoryListener)
+	public void DoInit(Sprite pSprite, IInventoryListener pInventoryListener)
 	{
-		Sprite pSprite = CResourceImage.instance.GetSpriteByName(strImageName);
 		DoInitSprite(pSprite);
 		DoInitOwnerListener(pInventoryListener);
 	}
@@ -109,7 +108,7 @@ public class CUGUIInventoryBase<CLASS_DATA> : CObjectBase, IInventoryListener
 
 		int iCount = _mapInventorySlot.Count;
 		for (int i = 0; i < iCount; i++)
-			_mapInventorySlot[i].DoEnableImage(false);
+			_mapInventorySlot[i].DoSetEmptySlot();
 
 		int iSlotID = 0;
 		var pIter = mapItemData.GetEnumerator();

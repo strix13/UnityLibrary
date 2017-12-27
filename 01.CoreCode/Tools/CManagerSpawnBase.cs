@@ -54,10 +54,17 @@ abstract public class CManagerSpawnBase<Class_Manager, Enum_SpawnName, Class_Spa
 	[SerializeField]
 	private EState _eState = EState.Wait;	public EState p_eState {  get { return _eState; } }
 
+	private float _fDelayOffset = 1f;
+
 	// ========================================================================== //
 
 	/* public - [Do] Function
      * 외부 객체가 호출(For External class call)*/
+
+	public void DoSetDelayOffset(float fDelayOffset)
+	{
+		_fDelayOffset = fDelayOffset;
+	}
 
 	public void DoStopSpawning()
 	{
@@ -143,7 +150,7 @@ abstract public class CManagerSpawnBase<Class_Manager, Enum_SpawnName, Class_Spa
 				_iDifficulty_OnAuto += _iIncreaseDifficulty;
 			}
 
-			float fRandomDelay = Random.Range( _fSpawnDelay_Min, _fSpawnDelay_Max );
+			float fRandomDelay = Random.Range( _fSpawnDelay_Min, _fSpawnDelay_Max ) * _fDelayOffset;
 			yield return SCManagerYield.GetWaitForSecond( fRandomDelay );
 		}
 	}

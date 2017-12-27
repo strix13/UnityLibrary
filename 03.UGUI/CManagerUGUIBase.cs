@@ -51,7 +51,7 @@ abstract public class CManagerUGUIBase<Class_Instance, Enum_Panel_Name, Enum_Ima
 				if (strEnumName[0] == 'E')
 					strEnumName = strEnumName.Substring( 1, strEnumName.Length - 1 );
 
-				_pManagerImage = SCManagerImage.DoMakeClass( instance, strEnumName, SCManagerResourceBase<SCManagerImage, Enum_Image_Name, Sprite>.EResourcePath.Resources );
+				_pManagerImage = SCManagerImage.DoMakeInstance( instance, strEnumName, EResourcePath.Resources );
 			}
 			return _pManagerImage;
 		}

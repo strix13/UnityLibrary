@@ -73,7 +73,6 @@ public class CManagerUIShared_UGUI : CManagerUGUIBase<CManagerUIShared_UGUI, CMa
 		if ((Input.acceleration.magnitude > 5 && fConsoleDelay < Time.time) ||
 			 Application.isEditor && Input.GetKeyDown(KeyCode.BackQuote))
 		{
-			print( Input.acceleration.magnitude );
 			DoShowHide_Panel( EFrame.CUIPopupShared_DebugConsole_UGUI, !CheckIsAlreadyShowConsole() );
 
 			fConsoleDelay = Time.time + const_fConsoleDelay;

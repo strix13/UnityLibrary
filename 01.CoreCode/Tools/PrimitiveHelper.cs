@@ -184,6 +184,12 @@ public static class PrimitiveHelper
 		return string.Format("{0:#,###}", iResult);
 	}
 
+
+	public static string CommaString(this object pObject)
+	{
+		return string.Format("{0:#,##0}", pObject);
+	}
+
 	private static readonly string[] const_arrPrefix_Ordinal = {
 		"th", "st", "nd", "rd", "th", "th", "th", "th", "th", "th"
 	};

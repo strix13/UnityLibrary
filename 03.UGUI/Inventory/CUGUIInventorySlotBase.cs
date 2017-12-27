@@ -28,7 +28,8 @@ public class CUGUIInventorySlotBase : CObjectBase,
 	private enum EImage
 	{
 		Image_Item,
-		Image_Selected
+		Image_Selected,
+		Image_Equip
 	}
 
 	#region Field
@@ -41,13 +42,13 @@ public class CUGUIInventorySlotBase : CObjectBase,
 
 	[SerializeField] private Sprite _pSprite_SlotEmpty;
 	[SerializeField] private Sprite _pSprite_SlotNotEmpty;
-	[SerializeField] private Sprite _pSprite_SlotSelected;
 
 	private IInventoryListener _IInventoryListener;
 
 	private Image _pImageSlot;
 	private Image _pImage_Item; public Image p_pImage { get { return _pImage_Item; } }
 	private Image _pImage_Selected;
+	private Image _pImage_Equip;
 
 	private int _iSlotID; public int p_iSlotID { get { return _iSlotID; } }
 	private int _iInvenHashCode; public int p_iInvenHashCode { get { return _iInvenHashCode; } }
@@ -69,6 +70,11 @@ public class CUGUIInventorySlotBase : CObjectBase,
 		EventRegisterSlot();
 	}
 
+	public void DoEnableImage_Equip(bool bEnable)
+	{
+		EventEnableImage_Equip(bEnable);
+	}
+
 	public void EventSetData(CInventorySlotDataBase IData)
 	{
 		Sprite pSprite = IData.p_pSprite;
@@ -78,12 +84,17 @@ public class CUGUIInventorySlotBase : CObjectBase,
 
 	public void DoEnableImage(bool bEnable)
 	{
-		EventEnableImage(bEnable);
+		EventSetNotEmptySlot(bEnable);
 	}
 
 	public void DoEnableImageSelected(bool bEnable)
 	{
 		_pImage_Selected.enabled = bEnable;
+	}
+
+	public void DoSetEmptySlot()
+	{
+		EventSetEmptySlot();
 	}
 
 	/* public - [Event] Function             
@@ -134,15 +145,29 @@ public class CUGUIInventorySlotBase : CObjectBase,
 	private void EventSetImage(Sprite pSprite)
 	{
 		_pImageSlot.sprite = _pSprite_SlotNotEmpty;
+
 		_pImage_Item.sprite = pSprite;
 		_pImage_Item.SetNativeSize();
 
-		EventEnableImage(true);
+		EventSetNotEmptySlot(true);
 	}
 
-	private void EventEnableImage(bool bEnable)
+	private void EventSetNotEmptySlot(bool bEnable)
 	{
 		_pImage_Item.enabled = bEnable;
+	}
+
+	private void EventSetEmptySlot()
+	{
+		_pImageSlot.sprite = _pSprite_SlotEmpty;
+
+		EventEnableImage_Equip(false);
+		EventSetNotEmptySlot(false);
+	}
+
+	private void EventEnableImage_Equip(bool bEnable)
+	{
+		_pImage_Equip.enabled = bEnable;
 	}
 
     /* protected - Override & Unity API         */
@@ -156,6 +181,10 @@ public class CUGUIInventorySlotBase : CObjectBase,
 		_pImage_Item = GetGameObject(EImage.Image_Item).GetComponent<Image>();
 		_pImage_Item.raycastTarget = false;
 		_pImage_Item.enabled = false;
+
+		_pImage_Equip = GetGameObject(EImage.Image_Equip).GetComponent<Image>();
+		_pImage_Equip.raycastTarget = false;
+		_pImage_Equip.enabled = false;
 
 		GameObject pGoImage_Selected = GetGameObject(EImage.Image_Selected, false);
 		if (pGoImage_Selected != null)

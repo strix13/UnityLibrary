@@ -29,6 +29,8 @@ public class CCompoAddForce : CCompoEventTrigger
 	public Vector3 _vecRandomAngulerForce_AbsoluteMin = new Vector3( 0f, 0f, 5f );
 
 	[Header( "디버그용" )]
+	[SerializeField]
+	private bool _bIsReverseX = false;
 	public Vector3 _vecRandoResult;
 	public Vector3 _vecRandoResult_Angular;
 
@@ -43,6 +45,11 @@ public class CCompoAddForce : CCompoEventTrigger
 
 	/* public - [Do] Function
      * 외부 객체가 호출(For External class call)*/
+
+	public void DoSetReverseX(bool bReverseX)
+	{
+		_bIsReverseX = bReverseX;
+	}
 
 	public void DoSetPhysics(bool bEnablePhysics)
 	{
@@ -102,6 +109,9 @@ public class CCompoAddForce : CCompoEventTrigger
 		else if (vecRandomForce.z > 0f && vecRandomForce.z < _vecRandomForce_AbsoluteMin.z)
 			vecRandomForce.z = _vecRandomForce_AbsoluteMin.z;
 
+		if (_bIsReverseX)
+			vecRandomForce = new Vector3( -vecRandomForce.x, vecRandomForce.y, vecRandomForce.z);
+		
 		_vecRandoResult = vecRandomForce;
 		if (_pRigidbody != null)
 			_pRigidbody.AddForce( vecRandomForce );

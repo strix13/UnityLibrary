@@ -74,10 +74,13 @@ public class CManagerRandomTable<CLASS_Resource> : CSingletonBase_Not_UnityCompo
 		}
 	}
 
-	public void DoAddRandomItem_Range(List<CLASS_Resource> listRandomItem)
+	public void DoAddRandomItem_Range(IEnumerable<CLASS_Resource> listRandomItem)
 	{
-		for(int i = 0; i < listRandomItem.Count; i++)
-			DoAddRandomItem(listRandomItem[i]);
+		IEnumerator<CLASS_Resource> pIter = listRandomItem.GetEnumerator();
+		while(pIter.MoveNext())
+		{
+			DoAddRandomItem( pIter.Current );
+		}
 	}
 	
 	public CLASS_Resource GetItem( string strItemName )

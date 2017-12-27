@@ -21,14 +21,20 @@ public class CFollowObject : CObjectBase
         Update,   
     }
 
+	[Header("쫓아가기 옵션")]
     [SerializeField]
     private EFollowPos _eFollowPos = EFollowPos.All;
     [SerializeField]
     private Transform _pTransTarget = null;
     [SerializeField]
     private EFollowMode _bUseFixedUpdate = EFollowMode.Update;
+	[SerializeField]
+	private bool _bIsSmoothFollow = false;
+	[SerializeField] [Range(0, 1f)]
+	private float _fSmoothFollowDelta = 0.1f;
 
-    [SerializeField]
+	[Header("흔들기 옵션")]
+	[SerializeField]
     private float _fShakeMinusDelta = 0.1f;
 
 	[Header( "디버그용" )]
@@ -86,55 +92,18 @@ public class CFollowObject : CObjectBase
     public void DoUpdateFollow()
     {
 		if (_bIsFollow == false) return;
+		if (_pTransTarget == null) return;
 
-        if (_pTransTarget != null)
-        {
-            Vector3 vecFollowPos = _pTransformCached.position;
-            Vector3 vecTargetPos = _pTransTarget.position;
+        Vector3 vecFollowPos = _pTransformCached.position;
+        Vector3 vecTargetPos = _pTransTarget.position;
 
-            if (_eFollowPos != EFollowPos.All)
-            {
-                if (_bFollowX)
-                    vecFollowPos.x = vecTargetPos.x - _vecTargetOffset.x;
+		if(_bIsSmoothFollow)
+			ProcFollow_Smooth( ref vecFollowPos, vecTargetPos );
+		else
+			ProcFollow_Normal( ref vecFollowPos, vecTargetPos );
 
-                if (_bFollowY)
-                    vecFollowPos.y = vecTargetPos.y - _vecTargetOffset.y;
-
-                if (_bFollowZ)
-                    vecFollowPos.z = vecTargetPos.z - _vecTargetOffset.z;
-            }
-            else
-                vecFollowPos = vecTargetPos - _vecTargetOffset;
-
-
-            if (_fRemainShakePow > 0f)
-            {
-                _fRemainShakePow -= _fShakeMinusDelta;
-                if (_fRemainShakePow <= 0f)
-                {
-                    if (_bFollowX == false)
-                        vecFollowPos.x = _vecOriginPos.x;
-
-                    if (_bFollowY == false)
-                        vecFollowPos.y = _vecOriginPos.y;
-
-                    if (_bFollowZ == false)
-                        vecFollowPos.z = _vecOriginPos.z;
-                }
-                else
-                {
-                    Vector3 vecShakePos = PrimitiveHelper.RandomRange(vecFollowPos.AddFloat(-_fRemainShakePow), vecFollowPos.AddFloat(_fRemainShakePow));
-
-                    if (_bFollowX) vecShakePos.x = vecFollowPos.x;
-                    if (_bFollowY) vecShakePos.y = vecFollowPos.y;
-                    if (_bFollowZ) vecShakePos.z = vecFollowPos.z;
-
-                    vecFollowPos = vecShakePos;
-                }
-            }
-            
-            _pTransformCached.position = vecFollowPos;
-        }
+		vecFollowPos = ProcShake( vecFollowPos );
+		_pTransformCached.position = vecFollowPos;
     }
 
     // ========================== [ Division ] ========================== //
@@ -145,8 +114,11 @@ public class CFollowObject : CObjectBase
 
 		_vecAwakePos = transform.position;
 		if (_pTransTarget != null)
-            DoInitTarget(_pTransTarget);
-    }
+		{
+			DoInitTarget( _pTransTarget );
+			DoSetFollow( true );
+		}
+	}
 
     protected override void OnUpdate()
     {
@@ -162,5 +134,60 @@ public class CFollowObject : CObjectBase
             DoUpdateFollow();
     }
 
-    // ========================== [ Division ] ========================== //
+	// ========================== [ Division ] ========================== //
+
+	private void ProcFollow_Smooth( ref Vector3 vecFollowPos, Vector3 vecTargetPos )
+	{
+		Vector3 vecDestPos = vecFollowPos;
+		ProcFollow_Normal( ref vecDestPos, vecTargetPos );
+		vecFollowPos = Vector3.Lerp( _pTransformCached.position, vecDestPos, _fSmoothFollowDelta );
+	}
+
+	private void ProcFollow_Normal( ref Vector3 vecFollowPos, Vector3 vecTargetPos )
+	{
+		if (_eFollowPos != EFollowPos.All)
+		{
+			if (_bFollowX)
+				vecFollowPos.x = vecTargetPos.x - _vecTargetOffset.x;
+
+			if (_bFollowY)
+				vecFollowPos.y = vecTargetPos.y - _vecTargetOffset.y;
+
+			if (_bFollowZ)
+				vecFollowPos.z = vecTargetPos.z - _vecTargetOffset.z;
+		}
+		else
+			vecFollowPos = vecTargetPos - _vecTargetOffset;
+	}
+
+	private Vector3 ProcShake(Vector3 vecFollowPos )
+	{
+		if (_fRemainShakePow > 0f)
+		{
+			_fRemainShakePow -= _fShakeMinusDelta;
+			if (_fRemainShakePow <= 0f)
+			{
+				if (_bFollowX == false)
+					vecFollowPos.x = _vecOriginPos.x;
+
+				if (_bFollowY == false)
+					vecFollowPos.y = _vecOriginPos.y;
+
+				if (_bFollowZ == false)
+					vecFollowPos.z = _vecOriginPos.z;
+			}
+			else
+			{
+				Vector3 vecShakePos = PrimitiveHelper.RandomRange( vecFollowPos.AddFloat( -_fRemainShakePow ), vecFollowPos.AddFloat( _fRemainShakePow ) );
+
+				if (_bFollowX) vecShakePos.x = vecFollowPos.x;
+				if (_bFollowY) vecShakePos.y = vecFollowPos.y;
+				if (_bFollowZ) vecShakePos.z = vecFollowPos.z;
+
+				vecFollowPos = vecShakePos;
+			}
+		}
+
+		return vecFollowPos;
+	}
 }

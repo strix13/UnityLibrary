@@ -45,13 +45,15 @@ using System.Collections.Generic;
 
 public class SCManagerParserJson : SCManagerResourceBase<SCManagerParserJson, string, TextAsset>
 {
-    [Serializable]
-    private class Wrapper<T>
+	public const string const_strFolderName = "JsonData";
+
+	[Serializable]
+    public class Wrapper_ForArray<T>
     {
         public T[] array;
     }
 
-    private StringBuilder _pStrBuilder = new StringBuilder();
+    static private StringBuilder _pStrBuilder = new StringBuilder();
 
     // ========================== [ Division ] ========================== //
 
@@ -79,7 +81,7 @@ public class SCManagerParserJson : SCManagerResourceBase<SCManagerParserJson, st
                 encodedString = Encoding.UTF8.GetString(www.bytes, 3, www.bytes.Length - 3);
             }
 
-            Wrapper<T> wrapper = JsonUtility.FromJson<Wrapper<T>>(encodedString);
+            Wrapper_ForArray<T> wrapper = JsonUtility.FromJson<Wrapper_ForArray<T>>(encodedString);
             arrData = wrapper.array;
         }
         catch { arrData = null; bSuccess = false; }
@@ -100,7 +102,7 @@ public class SCManagerParserJson : SCManagerResourceBase<SCManagerParserJson, st
                 encodedString = Encoding.UTF8.GetString(www.bytes, 3, www.bytes.Length - 3);
             }
 
-            Wrapper<T> wrapper = JsonUtility.FromJson<Wrapper<T>>(encodedString);
+            Wrapper_ForArray<T> wrapper = JsonUtility.FromJson<Wrapper_ForArray<T>>(encodedString);
             for (int i = 0; i < wrapper.array.Length; i++)
                 listOutData.Add(wrapper.array[i]);
         }
@@ -109,7 +111,7 @@ public class SCManagerParserJson : SCManagerResourceBase<SCManagerParserJson, st
         return bSuccess;
     }
 
-    public bool DoReadJson<ENUM_FILE_NAME, T>(ENUM_FILE_NAME eFileName, out T sData)
+    public bool DoReadJson_FromResource<ENUM_FILE_NAME, T>(ENUM_FILE_NAME eFileName, out T sData)
         where ENUM_FILE_NAME : System.IConvertible, System.IComparable
     {
         bool bSuccess = true;
@@ -120,7 +122,7 @@ public class SCManagerParserJson : SCManagerResourceBase<SCManagerParserJson, st
                 strText = DoGetResource_Origin(eFileName.ToString()).text;
             else if (_eResourcePath == EResourcePath.PersistentDataPath)
             {
-                string strFilePath = ExtractLocalFilePath(eFileName);
+                string strFilePath = ExtractLocalFilePath(eFileName, _strFolderPath);
                 if (System.IO.File.Exists(strFilePath))
                     strText = System.IO.File.ReadAllText(strFilePath);
             }
@@ -135,7 +137,7 @@ public class SCManagerParserJson : SCManagerResourceBase<SCManagerParserJson, st
         return bSuccess;
     }
 
-    public void DoReadJsonArray<ENUM_FILE_NAME, T>(ENUM_FILE_NAME eFileName, out T[] arrOutData)
+    public void DoReadJsonArray_FromResource<ENUM_FILE_NAME, T>(ENUM_FILE_NAME eFileName, out T[] arrOutData)
         where ENUM_FILE_NAME : System.IConvertible, System.IComparable
     {
         string strText = "";
@@ -144,19 +146,46 @@ public class SCManagerParserJson : SCManagerResourceBase<SCManagerParserJson, st
             strText = DoGetResource_Origin(eFileName.ToString()).text;
         else if (_eResourcePath == EResourcePath.PersistentDataPath)
         {
-            string strFilePath = ExtractLocalFilePath(eFileName);
+            string strFilePath = ExtractLocalFilePath(eFileName, _strFolderPath );
             if (System.IO.File.Exists(strFilePath))
                 strText = System.IO.File.ReadAllText(strFilePath);
         }
 
-        Wrapper<T> wrapper = JsonUtility.FromJson<Wrapper<T>>(strText);
+        Wrapper_ForArray<T> wrapper = JsonUtility.FromJson<Wrapper_ForArray<T>>(strText);
         arrOutData = wrapper.array;
     }
 
-    public void DoWriteJson<ENUM_FILE_NAME>(ENUM_FILE_NAME eFileName, System.Object pWriteObj)
+	public void DoReadJson_And_InitEnumerator<T_Value>( string strFileName, ref List<T_Value> listOutData )
+	{
+		T_Value[] arrData = DoReadJsonArray_FromResource<T_Value>( strFileName );
+		listOutData.AddRange( arrData );
+	}
+
+	public void DoReadJson_And_InitEnumerator<T_Key, T_Value>( string strFileName, ref Dictionary<T_Key, T_Value> mapOutData )
+		where T_Value : IDictionaryItem<T_Key>
+	{
+		T_Value[] arrData = DoReadJsonArray_FromResource<T_Value>( strFileName );
+		mapOutData.DoAddItem( arrData );
+	}
+
+	public void DoReadJson_And_InitEnumerator<T_Key, T_Value>( string strFileName, ref Dictionary<T_Key, List<T_Value>> mapOutData )
+	where T_Value : IDictionaryItem<T_Key>
+	{
+		T_Value[] arrData = DoReadJsonArray_FromResource<T_Value>( strFileName );
+		mapOutData.DoAddItem( arrData );
+	}
+
+	public T[] DoReadJsonArray_FromResource<T>( string strFileName )
+	{
+		T[] arrReturn;
+		DoReadJsonArray_FromResource<string, T>( strFileName, out arrReturn );
+		return arrReturn;
+	}
+
+	public void DoWriteJson<ENUM_FILE_NAME>(ENUM_FILE_NAME eFileName, System.Object pWriteObj)
         where ENUM_FILE_NAME : System.IConvertible, System.IComparable
     {
-        string strFilePath = ExtractLocalFilePath(eFileName);
+        string strFilePath = ExtractLocalFilePath(eFileName, _strFolderPath );
         _pStrBuilder.Length = 0;
         string strJson = JsonUtility.ToJson(pWriteObj, true);
         _pStrBuilder.Append(strJson);
@@ -177,13 +206,38 @@ public class SCManagerParserJson : SCManagerResourceBase<SCManagerParserJson, st
         }
     }
 
-    public void DoWriteJsonArray<ENUM_FILE_NAME, T>(ENUM_FILE_NAME eFileName, T[] pWriteObj)
+	static public void DoWriteJson<ENUM_FILE_NAME>( string strFolderPath, ENUM_FILE_NAME eFileName, System.Object pWriteObj )
+		where ENUM_FILE_NAME : System.IConvertible, System.IComparable
+	{
+		strFolderPath = Application.dataPath + "/" + strFolderPath;
+		string strFilePath = ExtractLocalFilePath( eFileName, strFolderPath );
+		_pStrBuilder.Length = 0;
+		string strJson = JsonUtility.ToJson( pWriteObj, true );
+		_pStrBuilder.Append( strJson );
+
+		try
+		{
+			if (System.IO.File.Exists( strFolderPath ) == false)
+				System.IO.Directory.CreateDirectory( strFolderPath );
+
+			using (StreamWriter sw = new StreamWriter( File.Open( strFilePath, FileMode.Create ), Encoding.UTF8 ))
+			{
+				sw.Write( _pStrBuilder.ToString() );
+			}
+		}
+		catch (System.Exception e)
+		{
+			Debug.LogWarning( "경고 Json Write 에러 파일이름 : " + eFileName + " 에러 : " + e );
+		}
+	}
+
+	public void DoWriteJsonArray<ENUM_FILE_NAME, T>(ENUM_FILE_NAME eFileName, T[] pWriteObj)
         where ENUM_FILE_NAME : System.IConvertible, System.IComparable
     {
-        string strFilePath = ExtractLocalFilePath(eFileName);
+        string strFilePath = ExtractLocalFilePath(eFileName, _strFolderPath );
         _pStrBuilder.Length = 0;
 
-        Wrapper<T> wrapper = new Wrapper<T>();
+        Wrapper_ForArray<T> wrapper = new Wrapper_ForArray<T>();
         wrapper.array = pWriteObj;
         _pStrBuilder.Append(JsonUtility.ToJson(wrapper, true));
 
@@ -209,21 +263,28 @@ public class SCManagerParserJson : SCManagerResourceBase<SCManagerParserJson, st
     {
         base.OnMakeClass(pBaseClass, ref bIsMultipleResource);
 
-        if (_eResourcePath == EResourcePath.PersistentDataPath)
+		_pStrBuilder.Length = 0;
+		if (_eResourcePath == EResourcePath.PersistentDataPath)
             _pStrBuilder.Append(Application.persistentDataPath);
-        if (_eResourcePath == EResourcePath.StreamingAssets)
+        else if (_eResourcePath == EResourcePath.StreamingAssets)
             _pStrBuilder.Append(Application.streamingAssetsPath);
+		else if(_eResourcePath == EResourcePath.Resources)
+			_pStrBuilder.Append( Application.dataPath + "/Resources" );
 
-        _pStrBuilder.Append(_strResourceLocalPath);
-
-        if (Application.isEditor)
+		_pStrBuilder.Append( "/" + _strResourceLocalPath );
+#if UNITY_EDITOR
+		if (Application.isEditor && _eResourcePath != EResourcePath.Resources)
         {
             DirectoryInfo pDirectoryInfo = new DirectoryInfo(_pStrBuilder.ToString());
             if (pDirectoryInfo.Exists == false)
-                pDirectoryInfo.Create();
-        }
+			{
+				Debug.Log( "pDirectoryInfo.Exists == false // Create : " + _pStrBuilder.ToString() );
+				pDirectoryInfo.Create();
+			}
+		}
+#endif
 
-        _strFolderPath = _pStrBuilder.ToString();
+		_strFolderPath = _pStrBuilder.ToString();
     }
 
     protected override bool OnWWWToResource<TResource>(WWW www, ref TResource pResource)
@@ -248,7 +309,7 @@ public class SCManagerParserJson : SCManagerResourceBase<SCManagerParserJson, st
         try
         {
             string encodedString = Encoding.UTF8.GetString(www.bytes, 3, www.bytes.Length - 3);
-            Wrapper<TResource> wrapper = JsonUtility.FromJson<Wrapper<TResource>>(encodedString);
+            Wrapper_ForArray<TResource> wrapper = JsonUtility.FromJson<Wrapper_ForArray<TResource>>(encodedString);
             arrResource = wrapper.array;
         }
         catch { bSuccess = false; }
@@ -263,11 +324,11 @@ public class SCManagerParserJson : SCManagerResourceBase<SCManagerParserJson, st
 
     // ========================== [ Division ] ========================== //
 
-    private string ExtractLocalFilePath<ENUM_FILE_NAME>(ENUM_FILE_NAME eFileName)
+    static private string ExtractLocalFilePath<ENUM_FILE_NAME>(ENUM_FILE_NAME eFileName, string strFolderPath)
         where ENUM_FILE_NAME : System.IConvertible, System.IComparable
     {
         _pStrBuilder.Length = 0;
-        _pStrBuilder.Append(_strFolderPath);
+        _pStrBuilder.Append( strFolderPath );
         _pStrBuilder.Append("/");
 
         _pStrBuilder.Append(eFileName.ToString());

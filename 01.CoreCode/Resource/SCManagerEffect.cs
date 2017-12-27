@@ -31,17 +31,17 @@ public class SCManagerEffect<ENUM_EFFECT_NAME, CLASS_EFFECT> : CManagerPooling<E
     static public CLASS_EFFECT DoPlayEffect(ENUM_EFFECT_NAME eEffect, Vector3 vecPos)
     {
         CLASS_EFFECT pEffect = instance.DoPop(eEffect);
-        if (pEffect != null)
-            pEffect.DoPlayEffect(vecPos);
+        pEffect.DoPlayEffect(vecPos);
 
-        return pEffect;
+		//Debug.Log( eEffect, pEffect);
+
+		return pEffect;
     }
 
 	static public CLASS_EFFECT DoPlayEffect(ENUM_EFFECT_NAME eEffect, Transform pTransParents, Vector3 vecPos)
 	{
 		CLASS_EFFECT pEffect = instance.DoPop( eEffect);
-		if (pEffect != null)
-			pEffect.DoPlayEffect(eEffect, pTransParents, vecPos);
+		pEffect.DoPlayEffect(eEffect, pTransParents, vecPos);
 
 		return pEffect;
 	}
@@ -49,11 +49,8 @@ public class SCManagerEffect<ENUM_EFFECT_NAME, CLASS_EFFECT> : CManagerPooling<E
 	static public CLASS_EFFECT DoPlayEffect(ENUM_EFFECT_NAME eEffect, Vector3 vecPos, Quaternion quatRot)
     {
         CLASS_EFFECT pEffect = instance.DoPop( eEffect);
-        if (pEffect != null)
-        {
-            pEffect.DoPlayEffect(vecPos);
-            pEffect.p_pTransCached.rotation = quatRot;
-        }
+        pEffect.DoPlayEffect(vecPos);
+        pEffect.p_pTransCached.rotation = quatRot;
 
         return pEffect;
     }
@@ -62,11 +59,8 @@ public class SCManagerEffect<ENUM_EFFECT_NAME, CLASS_EFFECT> : CManagerPooling<E
 	static public CLASS_EFFECT DoPlayEffect(ENUM_EFFECT_NAME eEffect, Vector3 vecPos, Vector3 vecRot)
     {
         CLASS_EFFECT pEffect = instance.DoPop( eEffect);
-        if (pEffect != null)
-        {
-            pEffect.DoPlayEffect(vecPos);
-            pEffect.p_pTransCached.rotation = Quaternion.LookRotation(vecRot);
-        }
+        pEffect.DoPlayEffect(vecPos);
+        pEffect.p_pTransCached.rotation = Quaternion.LookRotation(vecRot);
 
         return pEffect;
     }

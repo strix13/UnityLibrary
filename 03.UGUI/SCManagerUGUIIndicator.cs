@@ -25,9 +25,8 @@ public class SCManagerUGUIIndicator : CManagerPooling<SCManagerUGUIIndicator.EUI
 
 	public enum EUIObject
 	{
-		UGUI_Indicator_Hanna,
-		UGUI_Indicator_Nanum,
-		UGUI_Indicator_Nanum_TMPro
+		Indicator_Nanum_InGame,
+		Indicator_Nanum_UI
 	}
 
 	public enum EInidicatorType
@@ -105,14 +104,14 @@ public class SCManagerUGUIIndicator : CManagerPooling<SCManagerUGUIIndicator.EUI
 	}
 
 	static public void DoStartTween_UIObject( string strText, Vector3 v3From, Vector3 v3To, Color pColor,
-				 float fDuration, EUIObject eUIObject = EUIObject.UGUI_Indicator_Hanna/*, LeanTweenType eEndEaseType = LeanTweenType.linear*/ )
+				 float fDuration, EUIObject eUIObject/*, LeanTweenType eEndEaseType = LeanTweenType.linear*/ )
 	{
 		CDOTweenIndicator pResource = instance.DoPop( eUIObject );
 		pResource.DoStartTween_UGUI( strText, v3From + _vecUIRootOffset, v3To + _vecUIRootOffset, pColor, pColor, fDuration/*, eEndEaseType*/ );
 	}
 
 	static public void DoStartTween_UIObject( string strText, Vector3 v3From, Vector3 v3To, Color colFrom, Color colTo,
-						 float fDuration, EUIObject eUIObject = EUIObject.UGUI_Indicator_Hanna/*, LeanTweenType eEndEaseType = LeanTweenType.linear*/ )
+						 float fDuration, EUIObject eUIObject /*, LeanTweenType eEndEaseType = LeanTweenType.linear*/ )
 	{
 		CDOTweenIndicator pResource = instance.DoPop( eUIObject );
 		pResource.DoStartTween_UGUI( strText, v3From + _vecUIRootOffset, v3To + _vecUIRootOffset, colFrom, colTo, fDuration/*, eEndEaseType*/ );
@@ -126,7 +125,7 @@ public class SCManagerUGUIIndicator : CManagerPooling<SCManagerUGUIIndicator.EUI
 
 
 	static public void DoStartTween_InGameObject( string strText, Vector3 v3From, Vector3 v3To, Color colFrom,
-					 float fDuration, EUIObject eUIObject = EUIObject.UGUI_Indicator_Hanna/*, LeanTweenType eEndEaseType = LeanTweenType.linear*/)
+					 float fDuration, EUIObject eUIObject /*, LeanTweenType eEndEaseType = LeanTweenType.linear*/)
 	{
 		if(_bIsInit_InGameCamera == false)
 		{
@@ -140,7 +139,7 @@ public class SCManagerUGUIIndicator : CManagerPooling<SCManagerUGUIIndicator.EUI
 	}
 
 	static public void DoStartTween_InGameObject(string strText, Vector3 v3From, Vector3 v3To, Color colFrom, Color colTo,
-							 float fDuration, EUIObject eUIObject = EUIObject.UGUI_Indicator_Hanna/*, LeanTweenType eEndEaseType = LeanTweenType.linear*/ )
+							 float fDuration, EUIObject eUIObject/*, LeanTweenType eEndEaseType = LeanTweenType.linear*/ )
 	{
 		if (_bIsInit_InGameCamera == false)
 		{
@@ -152,6 +151,12 @@ public class SCManagerUGUIIndicator : CManagerPooling<SCManagerUGUIIndicator.EUI
 		Vector3 vecUIPos = ProcConvertPosition_World_To_UI( pResource.transform, v3From );
 		pResource.DoStartTween_UGUI(strText, vecUIPos, vecUIPos + (v3To - v3From), colFrom, colTo, fDuration/*, eEndEaseType*/);
 	}
+
+	new static public CDOTweenIndicator DoPop( EUIObject eUIObject, bool bGameObjectActive = true )
+	{
+		return instance.DoPop( eUIObject, bGameObjectActive );
+	}
+
 
 	static public CDOTweenIndicator DoPop(string strText, Vector3 vecFrom, Vector3 vecTo, Color colFrom, Color colTo, float fDuration, EUIObject eUIObject)
 	{

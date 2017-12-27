@@ -16,6 +16,15 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 
+public interface IStat_Buffer
+{
+	int GetStat_AddHP();
+	int GetStat_AddArmor();
+	int GetStat_AddDamage();
+	int GetStat_CriticalPercent();
+	int GetStat_CriticalDamage();
+}
+
 public class CCompoStat : CObjectBase
 {
 	/* const & readonly declaration             */
@@ -28,88 +37,134 @@ public class CCompoStat : CObjectBase
 		// 인스펙터 세팅
 		[Header( "스텟 세팅" )]
 		[SerializeField]
-		private float fHP = 2f;
+		private int iHP = 2;
 		[SerializeField] [Header( "방어력은 퍼센트로 계산할 시 0 ~ 100으로 조정할 것" )]
-		private float fArmor = 1f;
+		private int iArmor = 1;
 		[SerializeField]
-		private float fDamage_Min = 1f;
+		private int iDamage_Min = 1;
 		[SerializeField]
-		private float fDamage_Max = 1f;
+		private int iDamage_Max = 1;
 		[SerializeField]
 		private float fCriticalPercent = 10f;
 		[SerializeField] [Header( "크리티컬 데미지는 기본 데미지에서 곱셈" )]
-		private float fCriticalDamage_Min = 1.5f;
+		private int iCriticalDamage_Min = 1;
 		[SerializeField]
-		private float fCriticalDamage_Max = 3f;
+		private int iCriticalDamage_Max = 3;
 
 		[Header( "디버그용 프린트" )]
 		[SerializeField]
-		private float fHP_Max; public float p_fHPMax { get { return fHP_Max; } }
+		private int iHP_Max; public int p_iHPMax { get { return iHP_Max; } }
 		[SerializeField]
-		private float fHP_Current; public float p_fHPCurrent { get { return fHP_Current; } }
+		private int iHP_Current; public int p_iHPCurrent { get { return iHP_Current; } }
 		[SerializeField]
-		private float fArmor_Current; public float p_fArmorCurrent { get { return fArmor_Current; } }
+		private int iArmor_Current; public int p_iArmorCurrent { get { return iArmor_Current; } }
 		[SerializeField]
-		private float fDamage_Min_Current; public float p_fDamage_Min_Current { get { return fDamage_Min_Current; } }
+		private int iDamage_Min_Current; public int p_iDamage_Min_Current { get { return iDamage_Min_Current; } }
 		[SerializeField]
-		private float fDamage_Max_Current; public float p_fDamage_Max_Current { get { return fDamage_Max_Current; } }
+		private int iDamage_Max_Current; public int p_iDamage_Max_Current { get { return iDamage_Max_Current; } }
 		[SerializeField]
 		private float fCriticalPercent_Current; public float p_fCriticalPercentCurrent { get { return fCriticalPercent_Current; } }
+		[SerializeField]
+		private int iCriticalDamage_Min_Current; public int p_iCriticalDamage_Min_Current { get { return iCriticalDamage_Min_Current; } }
+		[SerializeField]
+		private int iCriticalDamage_Max_Current; public int p_iCriticalDamage_Max_Current { get { return iCriticalDamage_Max_Current; } }
 
-		public float p_fDamage { get { return Random.Range( fDamage_Min_Current, fDamage_Max_Current ); } }
+		public int p_iDamage { get { return Random.Range( iDamage_Min_Current, iDamage_Max_Current + 1 ); } }
 		public bool p_bIsCritical { get { return Random.Range( 0f, 100f ) <= fCriticalPercent_Current; } }
-		public float p_fCriticalDamage { get { return Random.Range( fCriticalDamage_Min, fCriticalDamage_Max ); } }
+		public int p_iCriticalDamage { get { return (int)Random.Range( iCriticalDamage_Min_Current, iCriticalDamage_Max_Current ); } }
+
+
+		private List<IStat_Buffer> _listStatBuffer = new List<IStat_Buffer>();
+
+		public void AddStatBuffer( IStat_Buffer pStatBuffer)
+		{
+			_listStatBuffer.Add( pStatBuffer );
+		}
+
+		public void RemoveStatBuffer( IStat_Buffer pStatBuffer )
+		{
+			_listStatBuffer.Remove( pStatBuffer );
+		}
+
 
 		private int iID;
 		private GameObject pObjectOwner; public GameObject p_pObjectOwner { get { return pObjectOwner; } }
 
-		public SStat( float fHP, float fArmor, float fDamage_Min, float fDamage_Max, float fCriticalPercent, float fCriticalDamage_Min, float fCriticalDamage_Max )
+		public SStat( int iHP, int iArmor, int iDamage_Min, int iDamage_Max, float fCriticalPercent, int iCriticalDamage_Min, int iCriticalDamage_Max )
 		{
-			this.fHP = fHP;
-			this.fArmor = fArmor;
-			this.fDamage_Min = fDamage_Min;
-			this.fDamage_Max = fDamage_Max;
+			this.iHP = iHP;
+			this.iArmor = iArmor;
+			this.iDamage_Min = iDamage_Min;
+			this.iDamage_Max = iDamage_Max;
 			this.fCriticalPercent = fCriticalPercent;
-			this.fCriticalDamage_Min = fCriticalDamage_Min;
-			this.fCriticalDamage_Max = fCriticalDamage_Max;
+			this.iCriticalDamage_Min = iCriticalDamage_Min;
+			this.iCriticalDamage_Max = iCriticalDamage_Max;
 		}
 
 		public bool CheckIsAlive()
 		{
-			return fHP_Current > 0f;
+			return iHP_Current > 0f;
 		}
 
 		public void DoInit( GameObject pObjectOwner )
 		{
 			this.pObjectOwner = pObjectOwner;
 			iID = pObjectOwner.GetInstanceID();
+			DoReset();
 		}
 
 		public void DoReset()
 		{
-			fHP_Max = fHP;
-			fHP_Current = fHP;
-			fArmor_Current = fArmor;
-			fDamage_Min_Current = fDamage_Min;
-			fDamage_Max_Current = fDamage_Max;
-			fCriticalPercent_Current = fCriticalPercent;
+			int iHP_Result = iHP;
+			int iArmor_Result = iArmor;
+			int iDamage_Min_Result = iDamage_Min;
+			int iDamage_Max_Result = iDamage_Max;
+			float fCriticalPercent_Result = fCriticalPercent;
+			int iCriticalDamage_Min_Result = iCriticalDamage_Min;
+			int iCriticalDamage_Max_Result = iCriticalDamage_Max;
+
+			if(_listStatBuffer != null)
+			{
+				for (int i = 0; i < _listStatBuffer.Count; i++)
+				{
+					iHP_Result += _listStatBuffer[i].GetStat_AddHP();
+					iArmor_Result += _listStatBuffer[i].GetStat_AddArmor();
+					iDamage_Min_Result += _listStatBuffer[i].GetStat_AddDamage();
+					iDamage_Max_Result += _listStatBuffer[i].GetStat_AddDamage();
+					fCriticalPercent_Result += _listStatBuffer[i].GetStat_CriticalPercent();
+					iCriticalDamage_Min_Result += _listStatBuffer[i].GetStat_CriticalDamage();
+					iCriticalDamage_Max_Result += _listStatBuffer[i].GetStat_CriticalDamage();
+				}
+			}
+
+			iHP_Max = iHP_Result;
+			iHP_Current = iHP_Result;
+			iArmor_Current = iArmor_Result;
+			iDamage_Min_Current = iDamage_Min_Result;
+			iDamage_Max_Current = iDamage_Max_Result;
+			fCriticalPercent_Current = fCriticalPercent_Result;
+			iCriticalDamage_Min_Current = iCriticalDamage_Min_Result;
+			iCriticalDamage_Max_Current = iCriticalDamage_Max_Result;
+
 		}
 
-		public void DoDamage( float fDamage, out float fHPDelta, out bool bIsDead )
+		public void DoDamage( int iDamage, out float fHPDelta, out bool bIsDead )
 		{
-			fHP_Current -= fDamage;
-			fHPDelta = fHP_Current / fHP;
-			bIsDead = fHP_Current <= 0f;
+			iHP_Current -= iDamage;
+			fHPDelta = iHP_Current / (float)iHP_Max;
+			bIsDead = iHP_Current < 1;
 		}
 	}
 
 	/* public - Field declaration            */
 
-	public delegate void OnDamage( GameObject pObjectDamager, float fDamage, bool bIsCriticalAttack, float fHPDelta, bool bIsDead );
+	public delegate void OnDamage( GameObject pObjectDamager, int fDamage, bool bIsCriticalAttack, float fHPDelta, bool bIsDead );
+	public delegate void OnDamage_OnDead( GameObject pObjectDamager );
 	public delegate void OnResetStat( SStat pStatTarget );
 
 	public event OnResetStat p_Event_OnResetStat;
 	public event OnDamage p_Event_OnDamage;
+	public event OnDamage_OnDead p_Event_OnDamage_OnDead;
 
 	[SerializeField]
 	protected SStat _pStat; public SStat p_pStat { get { return _pStat; } }
@@ -141,15 +196,27 @@ public class CCompoStat : CObjectBase
 			p_Event_OnResetStat( _pStat );
 	}
 
-	public void DoDamage(float fDamage, bool bIsCriticalAttack, GameObject pObjectDamager, out bool bIsDead)
+	public void DoDamage( int iDamage, bool bIsCriticalAttack, GameObject pObjectDamager )
+	{
+		bool bIsDead;
+		DoDamage( iDamage, bIsCriticalAttack, pObjectDamager, out bIsDead );
+	}
+
+	public void DoDamage(int iDamage, bool bIsCriticalAttack, GameObject pObjectDamager, out bool bIsDead)
 	{
 		float fHPDelta = 0f;
 		bIsDead = !_pStat.CheckIsAlive();
-		if (bIsDead == false)
-			_pStat.DoDamage( fDamage, out fHPDelta, out bIsDead );
-
-		if (p_Event_OnDamage != null)
-			p_Event_OnDamage( pObjectDamager, fDamage, bIsCriticalAttack, fHPDelta, bIsDead );
+		if (bIsDead)
+		{
+			if (p_Event_OnDamage_OnDead != null)
+				p_Event_OnDamage_OnDead( pObjectDamager );
+		}
+		else
+		{
+			_pStat.DoDamage( iDamage, out fHPDelta, out bIsDead );
+			if (p_Event_OnDamage != null)
+				p_Event_OnDamage( pObjectDamager, iDamage, bIsCriticalAttack, fHPDelta, bIsDead );
+		}
 	}
 
 	/* public - [Event] Function             

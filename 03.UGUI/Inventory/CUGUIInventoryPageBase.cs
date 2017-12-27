@@ -88,6 +88,11 @@ public class CUGUIInventoryPageBase<CLASS_DATA> : CUGUIInventoryBase<CLASS_DATA>
 		EventSetPage(iPage);
 	}
 
+	public void DoSetPage_Force(int iPage)
+	{
+		EventSetPage_Force(iPage);
+	}
+
 	/* public - [Event] Function             
        프랜드 객체가 호출(For Friend class call)*/
 
@@ -101,25 +106,29 @@ public class CUGUIInventoryPageBase<CLASS_DATA> : CUGUIInventoryBase<CLASS_DATA>
 		_iMaxPage += iAddMaxPage;
 	}
 
-	protected void EventSetPage(int iPage)
-	{
-		_iCurPage = Mathf.Clamp(iPage, 1, _iMaxPage);
-
-		OnSetPage(_iCurPage, _iMaxPage);
-	}
-
 	protected void EventPrevPage()
 	{
 		_iCurPage--;
 
-		EventSetPage(_iCurPage);
+		EventSetPage(GetPageClamped(_iCurPage));
 	}
 
 	protected void EventNextPage()
 	{
 		_iCurPage++;
+		EventSetPage(GetPageClamped(_iCurPage));
+	}
 
-		EventSetPage(_iCurPage);
+	protected void EventSetPage_Force(int iPage)
+	{
+		ProcSetPage(iPage);
+		OnSetPage(iPage, _iMaxPage);
+	}
+
+	protected void EventSetPage(int iPage)
+	{
+		ProcSetPage(iPage);
+		OnSetPage(_iCurPage, _iMaxPage);
 	}
 
 	#endregion Public
@@ -145,6 +154,16 @@ public class CUGUIInventoryPageBase<CLASS_DATA> : CUGUIInventoryBase<CLASS_DATA>
 
 	/* private - [Proc] Function             
        로직을 처리(Process Local logic)           */
+
+	private int GetPageClamped(int iPage)
+	{
+		return Mathf.Clamp(iPage, 1, _iMaxPage);
+	}
+
+	private void ProcSetPage(int iPage)
+	{
+		_iCurPage = iPage;
+	}
 
 	/* private - Other[Find, Calculate] Func 
        찾기, 계산등 단순 로직(Simpe logic)         */

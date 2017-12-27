@@ -26,6 +26,7 @@ public class CManagerObjectScroll : CObjectBase
 
 	public Camera p_pCameraMain;
 	public Transform p_pTransTarget;
+	[Range(-1f, 1f)]
 	public float p_fScrollingSpeed = 1f;
 	public float p_fGapOffset = 0f;
 	public float p_fStartPosOffset = 0f;
@@ -148,7 +149,7 @@ public class CManagerObjectScroll : CObjectBase
 		CManagerRandomTable<CScrollObject>.instance[iInstanceID].DoClearRandomItemTable();
 		CManagerRandomTable<CScrollObject>.instance[iInstanceID].DoAddRandomItem_Range( _listScrollObject_Origin );
 		CManagerPooling<string, CScrollObject>.DoInitPoolingObject( listObject );
-		CManagerPooling<string, CScrollObject>.instance.DoStartPooling( p_iPoolingCount );
+		CManagerPooling<string, CScrollObject>.instance.DoStartPooling( p_iPoolingCount, _pTransformCached );
 
 		for (int i = 0; i < _listScrollObject_Origin.Count; i++)
 			_listScrollObject_Origin[i].SetActive( false );

@@ -199,8 +199,8 @@ public class SCManagerLogIn : CSingletonBase_Not_UnityComponent<SCManagerLogIn>
         GameObject pObjectDummy = new GameObject("ManagerLogInDummy_ForCoroutine");
         _pObjectDummy_ForCoroutine = pObjectDummy.AddComponent<CCompoTemp>();
 
-        _pManagerJson = SCManagerParserJson.DoMakeClass(_pObjectDummy_ForCoroutine, const_strLocalPath_INI, SCManagerResourceBase<SCManagerParserJson, string, TextAsset>.EResourcePath.PersistentDataPath);
-        if (_pManagerJson.DoReadJson<string, SINI_Account>(const_strLogInFileName, out _pLoginInfo) == false)
+        _pManagerJson = SCManagerParserJson.DoMakeInstance(_pObjectDummy_ForCoroutine, const_strLocalPath_INI, EResourcePath.PersistentDataPath);
+        if (_pManagerJson.DoReadJson_FromResource<string, SINI_Account>(const_strLogInFileName, out _pLoginInfo) == false)
         {
             _pLoginInfo = new SINI_Account();
             _pManagerJson.DoWriteJson<string>(const_strLogInFileName, _pLoginInfo);

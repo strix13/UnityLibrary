@@ -25,6 +25,27 @@ public interface IListItem_HasField<TFieldType>
 
 public static class SCEnumeratorHelper
 {
+	public static TSource[] ToArray<TSource>( this IEnumerable<TSource> source )
+	{
+		int iCapacity = 0;
+		IEnumerator<TSource> pIter = source.GetEnumerator();
+		while (pIter.MoveNext())
+		{
+			iCapacity++;
+		}
+
+		TSource[] arrReturn = new TSource[iCapacity];
+		int iIndex = 0;
+		pIter.Reset();
+		while (pIter.MoveNext())
+		{
+			arrReturn[iIndex++] = pIter.Current;
+		}
+
+		return arrReturn;
+	}
+
+
 	public static List<TSource> ToList<TSource>( this IEnumerable<TSource> source )
 	{
 		List<TSource> listOut = new List<TSource>();
@@ -60,6 +81,7 @@ public static class SCEnumeratorHelper
 	static public void DoAddItem<TKey, TSource>( this Dictionary<TKey, TSource> mapDataTable, IEnumerable<TSource> source )
 		where TSource : IDictionaryItem<TKey>
 	{
+		mapDataTable.Clear();
 		IEnumerator<TSource> pIter = source.GetEnumerator();
 		while (pIter.MoveNext())
 		{

@@ -49,6 +49,8 @@ public class CManagerDoozyUI<CLASS, ENUM_UIELEMENT> : CSingletonBase<CLASS>
 	private static Dictionary<string, UnityAction> _mapRemoveAnimationsStart = new Dictionary<string, UnityAction>();
 	private static Dictionary<string, UnityAction> _mapRemoveAnimationsFinish = new Dictionary<string, UnityAction>();
 
+	//private static Dictionary<string, NavigationPointerData> _mapNavigationData = new Dictionary<string, NavigationPointerData>();
+
 	static private string _strCategory = "";
 
 	#endregion Field
@@ -61,6 +63,7 @@ public class CManagerDoozyUI<CLASS, ENUM_UIELEMENT> : CSingletonBase<CLASS>
      * 외부 객체가 호출(For External class call)*/
 
 	// UIManager 에서 얻어오는건 리스트로 얻어오는데 이건 하나만 얻어오게 한다.
+	// Static 정적 멤버라 Awake 때 초기화 해줘야함...
 	private static Dictionary<string, Component> _mapCachedTypeUIElement = new Dictionary<string, Component>();
 
 	public static COMPONENT GetUITypeByElement<COMPONENT>(ENUM_UIELEMENT eUIElementName)
@@ -114,12 +117,12 @@ public class CManagerDoozyUI<CLASS, ENUM_UIELEMENT> : CSingletonBase<CLASS>
 		return GetUITypeByElement<UITYPE>( eUIElementName);
 	}
 
-	public static UITYPE DoShowUIElementNav<UITYPE>(ENUM_UIELEMENT eUIElementName, UnityAction OnInAnimationsStart = null, UnityAction OnInAnimationsFinish = null, bool bInstant = false)
-		where UITYPE : Component
-	{
-		ProcShowUIElementAndAddNavigation(eUIElementName.ToString(), bInstant, OnInAnimationsStart, OnInAnimationsFinish);
-		return GetUITypeByElement<UITYPE>(eUIElementName);
-	}
+	//public static UITYPE DoShowUIElementNav<UITYPE>(ENUM_UIELEMENT eUIElementName, UnityAction OnInAnimationsStart = null, UnityAction OnInAnimationsFinish = null, bool bInstant = false)
+	//	where UITYPE : Component
+	//{
+	//	ProcShowUIElementAndAddNavigation(eUIElementName.ToString(), bInstant, OnInAnimationsStart, OnInAnimationsFinish);
+	//	return GetUITypeByElement<UITYPE>(eUIElementName);
+	//}
 
 	/* public - [Event] Function             
        프랜드 객체가 호출(For Friend class call)*/
@@ -136,6 +139,18 @@ public class CManagerDoozyUI<CLASS, ENUM_UIELEMENT> : CSingletonBase<CLASS>
        자식 객체가 호출(For Child class call)		*/
 
 	/* protected - Override & Unity API         */
+
+	protected override void OnAwake()
+	{
+		base.OnAwake();
+
+		_mapCachedTypeUIElement.Clear();
+
+		_mapRemoveAnimationsStart.Clear();
+		_mapRemoveAnimationsFinish.Clear();
+
+		//_mapNavigationData.Clear();
+	}
 
 	#endregion Protected
 
@@ -154,18 +169,27 @@ public class CManagerDoozyUI<CLASS, ENUM_UIELEMENT> : CSingletonBase<CLASS>
 
 	private static void ProcHideUIElement(string strElementName, bool bInstant, UnityAction OnOutAnimationsStart, UnityAction OnOutAnimationsFinish)
 	{
+		//if (_mapNavigationData.ContainsKey(strElementName))
+		//{
+		//	_mapNavigationData.Remove(strElementName);
+		//	UINavigation.RemoveLastItemFromHistory();
+		//}
+
 		ProcInitAnimationEvent(strElementName, p_strCategory, Anim.AnimationType.Out, OnOutAnimationsStart, OnOutAnimationsFinish);
 		UIManager.HideUiElement(strElementName, p_strCategory, bInstant);
 	}
 
 	private static void ProcShowUIElementAndAddNavigation(string strElementName, bool bInstant, UnityAction OnOutAnimationsStart, UnityAction OnOutAnimationsFinish)
 	{
-		NavigationPointerData pNavData = new NavigationPointerData();
-		NavigationPointer pNavPointer = new NavigationPointer { category = p_strCategory, name = strElementName };
-		pNavData.addToNavigationHistory = false;
-		pNavData.hide.Add(pNavPointer);
+		//if (_mapNavigationData.ContainsKey(strElementName)) return;
 
-		UINavigation.AddItemToHistory(pNavData);
+		//NavigationPointerData pNavData = new NavigationPointerData();
+		//NavigationPointer pNavPointer = new NavigationPointer { category = p_strCategory, name = strElementName };
+		//pNavData.addToNavigationHistory = false;
+		//pNavData.hide.Add(pNavPointer);
+
+		//UINavigation.AddItemToHistory(pNavData);
+		//_mapNavigationData.Add(strElementName, pNavData);
 
 		ProcShowUIElement(strElementName, bInstant, OnOutAnimationsStart, OnOutAnimationsFinish);
 	}

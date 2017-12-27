@@ -84,6 +84,11 @@ public class CObjectBase : MonoBehaviour
 		return pFindGameObj;
 	}
 	
+	public void EventOnAwake_Force()
+	{
+		OnAwake();
+	}
+
 	public void EventOnAwake()
 	{
 		if (_bIsExcuteAwake == false)

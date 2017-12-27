@@ -70,7 +70,7 @@ public class SGameData
 			}
 			else
 			{
-				Debug.LogWarning( strFieldName + " 이 존재하지 않습니다." );
+				Debug.LogWarning( "GameData에 " + strFieldName + " 이 존재하지 않습니다." );
 				return -1;
 			}
 		}
@@ -91,7 +91,7 @@ public class SGameData
 			}
 			else
 			{
-				Debug.LogWarning( "SGameConfig에 " + strFieldName + " 이 존재하지 않습니다." );
+				Debug.LogWarning( "GameData에 " + strFieldName + " 이 존재하지 않습니다." );
 				return -1;
 			}
 		}

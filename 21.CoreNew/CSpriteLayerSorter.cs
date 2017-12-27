@@ -58,7 +58,10 @@ public class CSpriteLayerSorter : CObjectBase
 
 	public void DoSetSpriteOrder(int iOrderOffset)
 	{
-		for(int i = 0; i < _listSpriteRenderer.Count; i++)
+		if (_listSpriteRenderer.Count == 0)
+			Debug.LogWarning( name + "DoSetSpriteOrder Error _listSpriteRenderer.Count == 0", this );
+
+		for (int i = 0; i < _listSpriteRenderer.Count; i++)
 		{
 			SDataSpriteOrder pDataSpriteOrder = _listSpriteRenderer[i];
 			pDataSpriteOrder.pSpriteRenderer.sortingOrder = pDataSpriteOrder.iSortingOrder_Origin + iOrderOffset;

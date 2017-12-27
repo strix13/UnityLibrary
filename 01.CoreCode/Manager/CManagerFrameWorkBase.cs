@@ -34,12 +34,7 @@ public class SINI_UserSetting
 	public EVolumeOff eVolumeOff = EVolumeOff.None;
 	public bool bVibration;
 	public string ID;
-}
-
-[System.Serializable]
-public class SINI_DeveloperSetting
-{
-	public string strDeveloperName;
+	public string strNickName;
 }
 
 [System.Serializable]
@@ -87,14 +82,13 @@ public class CManagerFrameWorkBase<CLASS_Framework, ENUM_SCENE_NAME, ENUM_SOUND_
 	where ENUM_SCENE_NAME : System.IFormattable, System.IConvertible, System.IComparable
 	where CLASS_SOUNDPLAYER : CSoundPlayerBase<ENUM_SOUND_NAME>
 {
-	private const string const_strLocalPath_INI = "/INI";
+	private const string const_strLocalPath_INI = "INI";
 	private const string const_strEmptySceneName = "Empty";
 
 	public enum EINI_JSON_FileName
 	{
 		Sound,
 		UserSetting,
-		DeveloperSetting,
 		ApplicationSetting,
 	}
 
@@ -130,9 +124,8 @@ public class CManagerFrameWorkBase<CLASS_Framework, ENUM_SCENE_NAME, ENUM_SOUND_
 	static protected string _strCallBackRequest_SceneName;
 	static protected System.Action _OnFinishLoad_Scene;
 
-	protected SINI_UserSetting _sSetting_User; public SINI_UserSetting p_sUserSetting { get { return _sSetting_User; } }
-	protected SINI_DeveloperSetting _sSetting_Developer; public SINI_DeveloperSetting p_sSetting_Developer { get { return _sSetting_Developer; } }
-	protected SINI_ApplicationSetting _sSetting_App; public SINI_ApplicationSetting p_sSetting_App { get { return _sSetting_App; } }
+	protected SINI_UserSetting _pSetting_User; public SINI_UserSetting p_pUserSetting { get { return _pSetting_User; } }
+	protected SINI_ApplicationSetting _pSetting_App; public SINI_ApplicationSetting p_pSetting_App { get { return _pSetting_App; } }
 
 	// ===================================== //
 	// private - Variable declaration        //
@@ -142,6 +135,7 @@ public class CManagerFrameWorkBase<CLASS_Framework, ENUM_SCENE_NAME, ENUM_SOUND_
 	static protected SCSceneLoader<ENUM_SCENE_NAME> _pManagerScene;
 	static protected SCManagerParserJson _pJsonParser_Persistent;
 	static protected SCManagerParserJson _pJsonParser_StreammingAssets;
+	static public SCManagerParserJson _pJsonParser_JsonData;
 
 	static private List<iTween> _listTween = new List<iTween>();
 
@@ -231,11 +225,11 @@ public class CManagerFrameWorkBase<CLASS_Framework, ENUM_SCENE_NAME, ENUM_SOUND_
 	/// <param name="strFieldName">Generic에 있는 필드 명</param>
 	/// <param name="strSetFieldValue">Generic에 있는 필드에 덮어씌울 값</param>
 	/// <param name="OnResult">결과 함수</param>
-	static public void DoNetworkDB_Update_Set<StructDB>( string strFieldName, object strSetFieldValue, System.Action<bool> OnResult )
+	static public void DoNetworkDB_Update_Set<StructDB>( string strFieldName, object strSetFieldValue, System.Action<bool, StructDB> OnResult )
 	{
 		CheckIsContainField<StructDB>( strFieldName );
 
-		instance.StartCoroutine( p_pNetworkDB.CoExcutePHP( instance._strID, EPHPName.Update_Set_ID, typeof( StructDB ).ToString(), OnResult, new StringPair( strFieldName, strSetFieldValue ) ) );
+		instance.StartCoroutine( p_pNetworkDB.CoLoadDataFromServer_Json( instance._strID, EPHPName.Update_Set_ID, OnResult, new StringPair( strFieldName, strSetFieldValue ) ) );
 	}
 
 	static public void DoNetworkDB_Update_Set_DoubleKey<StructDB>( string strFieldName, object strSetFieldValue, System.Action<bool> OnResult, StringPair pDoubleKey )
@@ -290,8 +284,11 @@ public class CManagerFrameWorkBase<CLASS_Framework, ENUM_SCENE_NAME, ENUM_SOUND_
 
 	public void DoShakeMobile()
 	{
-		if (Application.isPlaying && _sSetting_User.bVibration)
+		Debug.Log( "DoShakeMobile - define 확인" );
+#if UNITY_ANDROID
+		if (Application.isPlaying && _pSetting_User.bVibration)
 			Handheld.Vibrate();
+#endif
 	}
 
 	public void DoSetTestMode()
@@ -351,76 +348,102 @@ public class CManagerFrameWorkBase<CLASS_Framework, ENUM_SCENE_NAME, ENUM_SOUND_
 	private IEnumerator CoProcLoadSceneAsync(ENUM_SCENE_NAME[] arrSceneName, bool bManualCall_EventOnFinishLoadScene)
 	{
 		// 로딩전 빈씬으로 메모리를 비워준다. 다음 로딩씬의 메모리가 너무 커서 프리징 걸릴수도있기때문에...
-		AsyncOperation pAsyncOperation_Empty = SceneManager.LoadSceneAsync(const_strEmptySceneName);
-		yield return pAsyncOperation_Empty;
+		yield return SceneManager.LoadSceneAsync(const_strEmptySceneName);
 
-		//System.GC.Collect(System.GC.GetGeneration(this), System.GCCollectionMode.Optimized);
-
-		yield return new WaitForSecondsRealtime(0.5f);
+		System.GC.Collect();
 
 		if (p_EVENT_OnStartLoadScene != null)
 			p_EVENT_OnStartLoadScene();
 
-		List<AsyncOperation> listAsyncLoadScene = new List<AsyncOperation>();
+		yield return null;
+
+		Scene pScene_Empty = SceneManager.GetSceneByName(const_strEmptySceneName);
 
 		int iMaxLoadScene = arrSceneName.Length;
 		for (int i = 0; i < iMaxLoadScene; i++)
 		{
-			AsyncOperation pAsyncOperation = SceneManager.LoadSceneAsync(arrSceneName[i].ToString(), LoadSceneMode.Additive);
-			pAsyncOperation.allowSceneActivation = false;
+			string strSceneName = arrSceneName[i].ToString();
 
-			listAsyncLoadScene.Add(pAsyncOperation);
+			AsyncOperation pAsyncOperation = SceneManager.LoadSceneAsync(strSceneName, LoadSceneMode.Additive);
+			Scene pCurrentLoadScene = SceneManager.GetSceneByName(strSceneName);
 
-			yield return null;
+			while (pAsyncOperation.isDone == false)
+			{
+				float fTotalProgress = pAsyncOperation.progress + i;
+
+				if (p_EVENT_OnLoadSceneProgress != null)
+					p_EVENT_OnLoadSceneProgress(fTotalProgress / iMaxLoadScene);
+
+				SceneManager.SetActiveScene(pCurrentLoadScene);
+
+				yield return null;
+			}
+
+			GameObject[] arrGameObject = pScene_Empty.GetRootGameObjects();
+			int iLen = arrGameObject.Length;
+
+			for (int j = 0; j < iLen; j++)
+			{
+				GameObject pGameObject = arrGameObject[j];
+				if (pGameObject.name.Equals("Main Camera")) continue;
+				print(pGameObject.name);
+				SceneManager.MoveGameObjectToScene(pGameObject, pCurrentLoadScene);
+			}
 		}
 
-		float fStackProgress = 0f;
-		while (fStackProgress < 0.9f * iMaxLoadScene)
-		{
-			float fTotalProgress = 0f;
-			for (int i = 0; i < iMaxLoadScene; i++)
-				fTotalProgress += listAsyncLoadScene[i].progress;
+		yield return SceneManager.UnloadSceneAsync(const_strEmptySceneName);
 
-			if (fStackProgress < fTotalProgress)
-				fStackProgress += Time.unscaledDeltaTime * iMaxLoadScene;
+		//float fStackProgress = 0f;
+		//while (fStackProgress < 0.9f * iMaxLoadScene)
+		//{
+		//	float fTotalProgress = 0f;
+		//	for (int i = 0; i < iMaxLoadScene; i++)
+		//		fTotalProgress += listAsyncLoadScene[i].progress;
 
-			if (p_EVENT_OnLoadSceneProgress != null)
-				p_EVENT_OnLoadSceneProgress(fStackProgress / iMaxLoadScene);
+		//	if (fStackProgress < fTotalProgress)
+		//		fStackProgress += Time.unscaledDeltaTime * iMaxLoadScene;
 
-			yield return null;
-		}
+		//	if (p_EVENT_OnLoadSceneProgress != null)
+		//		p_EVENT_OnLoadSceneProgress(fStackProgress / iMaxLoadScene);
 
-		for (int i = 0; i < iMaxLoadScene; i++)
-		{
-			AsyncOperation pAsyncOperation = listAsyncLoadScene[i];
-			pAsyncOperation.allowSceneActivation = true;
+		//	yield return null;
+		//}
 
-			fStackProgress += 0.1f;
+		//Scene pScene_Empty = SceneManager.GetSceneByName(const_strEmptySceneName);
+		//Scene pScene_First = SceneManager.GetSceneByName(arrSceneName[0].ToString());
 
-			if (p_EVENT_OnLoadSceneProgress != null)
-				p_EVENT_OnLoadSceneProgress(fStackProgress / iMaxLoadScene);
+		//for (int i = 0; i < iMaxLoadScene; i++)
+		//{
+		//	AsyncOperation pAsyncOperation = listAsyncLoadScene[i];
+		//	pAsyncOperation.allowSceneActivation = true;
 
-			yield return pAsyncOperation;
-		}
+		//	yield return pAsyncOperation;
 
-		Scene pScene_Empty = SceneManager.GetSceneByName(const_strEmptySceneName);
-		Scene pScene_First = SceneManager.GetSceneByName(arrSceneName[0].ToString());
+		//	fStackProgress += 0.1f;
 
-		GameObject[] arrGameObject = pScene_Empty.GetRootGameObjects();
-		int iLen = arrGameObject.Length;
-		for (int i = 0; i < iLen; i++)
-		{
-			GameObject pGameObject = arrGameObject[i];
-			if (pGameObject.name.Equals("Camera")) { Destroy(pGameObject); continue; }
-		}
+		//	if (p_EVENT_OnLoadSceneProgress != null)
+		//		p_EVENT_OnLoadSceneProgress(fStackProgress / iMaxLoadScene);
 
-		SceneManager.MergeScenes(pScene_Empty, pScene_First);
+		//	yield return null;
+
+		//	if (i == 0)
+		//	{
+		//		GameObject[] arrGameObject = pScene_Empty.GetRootGameObjects();
+		//		int iLen = arrGameObject.Length;
+		//		for (int j = 0; j < iLen; j++)
+		//		{
+		//			GameObject pGameObject = arrGameObject[j];
+		//			if (pGameObject.name.Equals("Camera")) { Destroy(pGameObject); continue; }
+		//		}
+
+		//		SceneManager.MergeScenes(pScene_Empty, pScene_First);
+		//	}
+		//}
 
 		// 로딩 끝난후 먼저 실행되는 이벤트
 		if (p_EVENT_OnFinishPreLoadScene != null)
 			p_EVENT_OnFinishPreLoadScene();
 
-		// 로딩 끝, 자연스러운 연출을 위해 0.25초 대기
 		yield return new WaitForSecondsRealtime(0.5f);
 
 		if (bManualCall_EventOnFinishLoadScene == false)
@@ -470,14 +493,16 @@ public class CManagerFrameWorkBase<CLASS_Framework, ENUM_SCENE_NAME, ENUM_SOUND_
 
 		_iLocalDataLoadingCount_Request = 0;
 		_iLocalDataLoadingCount_Finish = 0;
-		_pJsonParser_Persistent = SCManagerParserJson.DoMakeClass( this, "", SCManagerResourceBase<SCManagerParserJson, string, TextAsset>.EResourcePath.PersistentDataPath );
-		_pJsonParser_StreammingAssets = SCManagerParserJson.DoMakeClass( this, const_strLocalPath_INI, SCManagerResourceBase<SCManagerParserJson, string, TextAsset>.EResourcePath.StreamingAssets );
+
+		_pJsonParser_Persistent = SCManagerParserJson.DoMakeInstance( this, "", EResourcePath.PersistentDataPath );
+		_pJsonParser_StreammingAssets = SCManagerParserJson.DoMakeInstance( this, const_strLocalPath_INI, EResourcePath.StreamingAssets );
+		_pJsonParser_JsonData = SCManagerParserJson.DoMakeInstance( this, SCManagerParserJson.const_strFolderName, EResourcePath.Resources );
+
 		_pManagerScene = new SCSceneLoader<ENUM_SCENE_NAME>();
 		_pManagerScene.p_EVENT_OnSceneLoaded += ProcOnSceneLoaded;
-		_pManagerSound = SCManagerSound<ENUM_SOUND_NAME>.DoMakeClass( this, "Sound", SCManagerResourceBase<SCManagerSound<ENUM_SOUND_NAME>, ENUM_SOUND_NAME, AudioClip>.EResourcePath.Resources );
+		_pManagerSound = SCManagerSound<ENUM_SOUND_NAME>.DoMakeInstance( this, "Sound", EResourcePath.Resources );
 
 		ProcParse_UserSetting();
-		ProcParse_DevelopSetting();
 
 		_pJsonParser_StreammingAssets.DoStartCo_GetStreammingAssetResource_Array<SINI_Sound>( EINI_JSON_FileName.Sound.ToString(), OnParseComplete_SoundSetting );
 		_iLocalDataLoadingCount_Request++;
@@ -495,29 +520,18 @@ public class CManagerFrameWorkBase<CLASS_Framework, ENUM_SCENE_NAME, ENUM_SOUND_
 
 	private void ProcParse_UserSetting()
 	{
-		if (_pJsonParser_Persistent.DoReadJson( EINI_JSON_FileName.UserSetting, out _sSetting_User ))
+		if (_pJsonParser_Persistent.DoReadJson_FromResource( EINI_JSON_FileName.UserSetting, out _pSetting_User ))
 		{
-			_pManagerSound.DoSetVolumeEffect( _sSetting_User.fVolumeEffect );
-			_pManagerSound.DoSetVolumeBGM( _sSetting_User.fVolumeBGM );
+			_pManagerSound.DoSetVolumeEffect( _pSetting_User.fVolumeEffect );
+			_pManagerSound.DoSetVolumeBGM( _pSetting_User.fVolumeBGM );
 		}
 		else
 		{
 			Debug.Log( "UserInfo - bParsingResult Is Fail" );
 
-			_sSetting_User = new SINI_UserSetting();
-			_pJsonParser_Persistent.DoWriteJson( EINI_JSON_FileName.UserSetting, _sSetting_User );
-			if (Application.isEditor)
-				_pJsonParser_StreammingAssets.DoWriteJsonArray( EINI_JSON_FileName.Sound, new SINI_Sound[] { new SINI_Sound(), new SINI_Sound() } );
+			_pSetting_User = new SINI_UserSetting();
+			_pJsonParser_Persistent.DoWriteJson( EINI_JSON_FileName.UserSetting, _pSetting_User );
 		}
-	}
-
-	private void ProcParse_DevelopSetting()
-	{
-		if (_pJsonParser_Persistent.DoReadJson( EINI_JSON_FileName.DeveloperSetting, out _sSetting_Developer ) == false)
-			_pJsonParser_Persistent.DoWriteJson(EINI_JSON_FileName.DeveloperSetting, new SINI_DeveloperSetting() );
-
-		if (_pJsonParser_Persistent.DoReadJson( EINI_JSON_FileName.DeveloperSetting, out _sSetting_Developer ))
-			OnParseComplete_DevelopSetting( true, _sSetting_Developer );
 	}
 
 	private void CUIManagerLocalize_p_EVENT_OnChangeLocalize()
@@ -525,7 +539,7 @@ public class CManagerFrameWorkBase<CLASS_Framework, ENUM_SCENE_NAME, ENUM_SOUND_
 		SystemLanguage eCurLanguage = SystemLanguage.Unknown; // Application.systemLanguage
 		try
 		{
-			eCurLanguage = (SystemLanguage)System.Enum.Parse( typeof( SystemLanguage ), _sSetting_User.strLanguage );
+			eCurLanguage = (SystemLanguage)System.Enum.Parse( typeof( SystemLanguage ), _pSetting_User.strLanguage );
 		}
 		catch
 		{
@@ -534,10 +548,10 @@ public class CManagerFrameWorkBase<CLASS_Framework, ENUM_SCENE_NAME, ENUM_SOUND_
 			if (listLocale.Contains( eCurLanguage ) == false)
 				eCurLanguage = SystemLanguage.English;
 
-			Debug.LogWarning( "UserSetting에서 Enum 파싱에 실패해서 기본언어로 바꿨다" + _sSetting_User.strLanguage );
+			Debug.LogWarning( "UserSetting에서 Enum 파싱에 실패해서 기본언어로 바꿨다" + _pSetting_User.strLanguage );
 
-			_sSetting_User.strLanguage = eCurLanguage.ToString();
-			_pJsonParser_Persistent.DoWriteJson( EINI_JSON_FileName.UserSetting, _sSetting_User );
+			_pSetting_User.strLanguage = eCurLanguage.ToString();
+			_pJsonParser_Persistent.DoWriteJson( EINI_JSON_FileName.UserSetting, _pSetting_User );
 		}
 
 		Debug.Log( "언어 설정 " + eCurLanguage );
@@ -622,10 +636,11 @@ public class CManagerFrameWorkBase<CLASS_Framework, ENUM_SCENE_NAME, ENUM_SOUND_
 	private void OnParseComplete_SoundSetting( bool bSuccess, SINI_Sound[] arrSound )
 	{
 		if (bSuccess)
-			_pManagerSound.EventSetINI( arrSound, _sSetting_User.fVolumeEffect, _sSetting_User.eVolumeOff );
+			_pManagerSound.EventSetINI( arrSound, _pSetting_User.fVolumeEffect, _pSetting_User.eVolumeOff );
 
 		ENUM_SOUND_NAME[] arrSoundName = PrimitiveHelper.GetEnumArray<ENUM_SOUND_NAME>();
-		if (Application.isEditor && arrSound == null || arrSound.Length < arrSoundName.Length)
+#if UNITY_EDITOR
+		if (arrSound == null || arrSound.Length < arrSoundName.Length)
 		{
 			Debug.Log( "Sound INI의 내용과 Enum SoundName과 길이가 맞지 않아 재조정" );
 
@@ -642,32 +657,14 @@ public class CManagerFrameWorkBase<CLASS_Framework, ENUM_SCENE_NAME, ENUM_SOUND_
 
 			_pJsonParser_StreammingAssets.DoWriteJsonArray( EINI_JSON_FileName.Sound, listINISound.ToArray() );
 		}
+#endif
 
 		CheckLoadFinish_LocalDataAll();
 	}
 
-	private void OnParseComplete_DevelopSetting( bool bSuccess, SINI_DeveloperSetting sDeveloperSetting )
-	{
-		if (bSuccess)
-		{
-			_sSetting_Developer = sDeveloperSetting;
-
-			//if (_sSetting_Developer.bDebugMode)
-			// Application.logMessageReceived += CManagerUIShared.OnHandleLog;
-		}
-		else
-		{
-			_sSetting_Developer = new SINI_DeveloperSetting();
-			Debug.Log( "DevelopSetting Parsing Fail - Check your DevelpSetting" );
-
-			if (Application.isEditor)
-				_pJsonParser_Persistent.DoWriteJson( EINI_JSON_FileName.DeveloperSetting, _sSetting_Developer );
-		}
-	}
-
 	private void OnFinishParse_AppSetting( bool bResult, SINI_ApplicationSetting sAppSetting )
 	{
-		_sSetting_App = sAppSetting;
+		_pSetting_App = sAppSetting;
 		if (bResult == false)
 		{
 			Debug.Log("Error, AppSetting Is Null");
@@ -702,10 +699,10 @@ public class CManagerFrameWorkBase<CLASS_Framework, ENUM_SCENE_NAME, ENUM_SOUND_
 
 #if UNITY_EDITOR
 		int iBundleCode = UnityEditor.PlayerSettings.Android.bundleVersionCode;
-		if (_sSetting_App.iBundleCode != iBundleCode)
+		if (_pSetting_App.iBundleCode != iBundleCode)
 		{
-			_sSetting_App.iBundleCode = iBundleCode;
-			_pJsonParser_StreammingAssets.DoWriteJson( EINI_JSON_FileName.ApplicationSetting, _sSetting_App );
+			_pSetting_App.iBundleCode = iBundleCode;
+			_pJsonParser_StreammingAssets.DoWriteJson( EINI_JSON_FileName.ApplicationSetting, _pSetting_App );
 		}
 #endif
 

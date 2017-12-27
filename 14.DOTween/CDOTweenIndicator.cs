@@ -111,7 +111,7 @@ public class CDOTweenIndicator : CObjectBase
 
 		_pRectTrans_UIText_TMPro.position = v3Pos;
 
-		p_pTransCached.SetAsLastSibling();
+		transform.SetAsLastSibling();
 #endif
 	}
 

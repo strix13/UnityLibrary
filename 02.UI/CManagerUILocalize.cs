@@ -43,9 +43,6 @@ public class CManagerUILocalize : CSingletonBase<CManagerUILocalize>
     private StringBuilder _pStrBuilder = new StringBuilder();
     private System.Action _OnFinishParse_First;
 
-	private int _iAutoIndex;
-	private bool _bAutoIndex;
-
     // ========================================================================== //
 
     /* public - [Do] Function
@@ -77,7 +74,7 @@ public class CManagerUILocalize : CSingletonBase<CManagerUILocalize>
 
     public void DoRegist_CompoLocalize(CUICompoLocalize pCompo)
     {
-		string strKey = pCompo.p_strLangKey;
+		string strKey = pCompo.name;
 		if (_mapCompoLocalizeData.ContainsKey(strKey) == false)
 			_mapCompoLocalizeData.Add(strKey, new List<CUICompoLocalize>());
 
@@ -89,28 +86,27 @@ public class CManagerUILocalize : CSingletonBase<CManagerUILocalize>
 		// 우선 클리어 해준다
 		_mapCompoLocalizeData.Clear();
 
-		// 단일 UI Root에서 다수로 변경
+		// 루트 트랜트폼만 찾는다 그후 하위 컴포넌트 탐색
+		Transform[] arrTransform = FindObjectsOfType<Transform>();
 
-#if NGUI
-		UIRoot[] arrRoot = FindObjectsOfType<UIRoot>();
-
-		int iLen = arrRoot.Length;
+		int iLen = arrTransform.Length;
 		for (int i = 0; i < iLen; i++)
 		{
-			CUICompoLocalize[] arrCompoLocalize = arrRoot[i].transform.GetComponentsInChildren<CUICompoLocalize>(true);
+			Transform pTrans = arrTransform[i];
+			if (pTrans.parent != null) continue;
 
+			CUICompoLocalize[] arrCompoLocalize = pTrans.transform.GetComponentsInChildren<CUICompoLocalize>(true);
 			int iLen_CompoLocalize = arrCompoLocalize.Length;
 			for (int j = 0; j < iLen_CompoLocalize; j++)
 				DoRegist_CompoLocalize(arrCompoLocalize[j]);
 		}
 
-		DebugCustom.Log_ForCore( EDebugFilterDefault.System, "DoSetLocalize_CurrentScene : " + _eCurrentLocalize );
+		Debug.Log( "DoSetLocalize_CurrentScene : " + _eCurrentLocalize );
 
 		if (_eCurrentLocalize != SystemLanguage.Unknown)
 			DoSet_Localize( _eCurrentLocalize );
 		else
-			DebugCustom.Log_ForCore( EDebugFilterDefault.Warning_Core, "현재 지정된 언어를 알수없습니다." );
-#endif
+			Debug.LogWarning( "현재 지정된 언어를 알수없습니다." );
 	}
 
 	public void DoSet_Localize(SystemLanguage eLocalize)
@@ -127,7 +123,7 @@ public class CManagerUILocalize : CSingletonBase<CManagerUILocalize>
         IEnumerator<KeyValuePair<string, List<CUICompoLocalize>>> pIter = _mapCompoLocalizeData.GetEnumerator();
         while(pIter.MoveNext())
         {
-            bool bExistLabel = true;
+            //bool bExistLabel = true;
 
             KeyValuePair<string, List<CUICompoLocalize>> pCurrent = pIter.Current;
 			string strKey = pCurrent.Key;
@@ -140,19 +136,18 @@ public class CManagerUILocalize : CSingletonBase<CManagerUILocalize>
 				for (int i = 0; i < iCount; i++)
 				{
 					CUICompoLocalize pValueCurrent = listValue[i];
-#if NGUI
-					if (pValueCurrent.p_pUILabel == null)
-					{
-						pValueCurrent.EventOnAwake();
-						if (pValueCurrent.p_pUILabel == null)
-							bExistLabel = false;
-					}
+					pValueCurrent.DoChangeText(DoGetCurrentLocalizeValue(strKey));
+					//if (pValueCurrent.p_pUILabel == null)
+					//{
+					//	pValueCurrent.EventOnAwake();
+					//	if (pValueCurrent.p_pUILabel == null)
+					//		bExistLabel = false;
+					//}
 
-					if (bExistLabel)
-						pValueCurrent.p_strText = DoGetCurrentLocalizeValue(strKey);
-					else
-						Debug.LogWarning("UILabel이 없다.." + pValueCurrent.name, pValueCurrent);
-#endif
+					//if (bExistLabel)
+					//	pValueCurrent.DoChangeText(DoGetCurrentLocalizeValue(strKey));
+					//else
+					//	Debug.LogWarning("UILabel이 없다.." + pValueCurrent.name, pValueCurrent);
 				}
             }
         }
@@ -221,7 +216,7 @@ public class CManagerUILocalize : CSingletonBase<CManagerUILocalize>
 
         _pStrBuilder.Append(Application.streamingAssetsPath).Append("/").Append(const_strLocalePath).Append("/")
 					.Append(eLocale.ToString()).Append(const_strLocaleFileExtension);
-
+		
 		WWW pReader = new WWW(_pStrBuilder.ToString());
 		yield return pReader;
 

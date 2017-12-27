@@ -6,6 +6,7 @@ using System.Collections.Generic;
 
 using Spine.Unity;
 using Spine;
+using System;
 
 /* ============================================ 
    Editor      : Strix
@@ -13,13 +14,15 @@ using Spine;
    Version	   :
    ============================================ */
 
-public class CSpineWrapper : CObjectBase
+public class CSpineController : CObjectBase, IAnimationController
 {
 	/* const & readonly declaration             */
 
 	/* enum & struct declaration                */
 
 	/* public - Variable declaration            */
+
+	public event Action<EAnimationEvent> p_Event_OnAnimationEvent;
 
 	/* protected - Variable declaration         */
 
@@ -50,14 +53,14 @@ public class CSpineWrapper : CObjectBase
 		if(_pSkeleton != null)
 			_pSkeleton.a = fAlpha;
 	}
-	
+
 	/// <summary>
 	/// 현재 플레이하는 애니메이션 이름과 재생하고자 할 애니메이션 이름이 같을 경우 안될 수 있음
 	/// </summary>
 	/// <typeparam name="ENUM_ANIM_NAME"></typeparam>
 	/// <param name="eAnimName"></param>
 	/// <returns></returns>
-	public bool DoPlayAnimation<ENUM_ANIM_NAME>( ENUM_ANIM_NAME eAnimName )
+	public bool DoPlayAnimation<ENUM_ANIMATION_NAME>( ENUM_ANIMATION_NAME eAnimName )
 	{
 		string strAnimName = eAnimName.ToString();
 		bool bSuccess = _pSkeletonData.FindAnimation( strAnimName ) != null;
@@ -77,14 +80,13 @@ public class CSpineWrapper : CObjectBase
 	/// <param name="eAnimName"></param>
 	/// <param name="OnFinishAnimation"></param>
 	/// <returns></returns>
-	public bool DoPlayAnimation_Force<ENUM_ANIM_NAME>( ENUM_ANIM_NAME eAnimName, System.Action OnFinishAnimation = null, bool bIsLoop = false )
+	public bool DoPlayAnimation_Force<ENUM_ANIM_NAME>( ENUM_ANIM_NAME eAnimName, System.Action OnFinishAnimation = null )
 	{
 		string strAnimName = eAnimName.ToString();
 		bool bSuccess = _pSkeletonData.FindAnimation( strAnimName ) != null;
 		if (bSuccess)
 		{
 			_iPriorityCurrent = -1;
-			_pAnimation.loop = bIsLoop;
 			_pAnimation.AnimationName = "";
 			_pAnimation.AnimationName = strAnimName;
 			_pAnimation.state.Complete += State_End;
@@ -94,68 +96,74 @@ public class CSpineWrapper : CObjectBase
 		return bSuccess;
 	}
 
-	public bool DoPlayAnimation<ENUM_ANIM_NAME>( ENUM_ANIM_NAME eAnimName, System.Action OnFinishAnimation )
+	public void DoPlayAnimation<ENUM_ANIM_NAME>( ENUM_ANIM_NAME eAnimName, System.Action OnFinishAnimation )
+			where ENUM_ANIM_NAME : System.IConvertible, System.IComparable
 	{
-		if (_pSkeletonData == null) return false;
+		if (_pSkeletonData == null) return;
 
-		string streAnimName = eAnimName.ToString();
-		bool bSuccess = _pSkeletonData.FindAnimation( streAnimName ) != null;
-		if (bSuccess)
-		{
-			_iPriorityCurrent = -1;
-			_pAnimation.loop = false;
-			_pAnimation.AnimationName = streAnimName;
-			_pAnimation.state.Complete += State_End;
-			_OnFinishAnimation = OnFinishAnimation;
-		}
+		string strAnimName = eAnimName.ToString();
+		_iPriorityCurrent = -1;
+		_pAnimation.loop = false;
 
-		return bSuccess;
+		if (_pAnimation.AnimationName == strAnimName)
+			_pAnimation.AnimationName = "";
+
+		_pAnimation.AnimationName = strAnimName;
+		_pAnimation.state.Complete += State_End;
+		_OnFinishAnimation = OnFinishAnimation;
 	}
-
-	public bool DoPlayAnimation<ENUM_ANIM_NAME>( ENUM_ANIM_NAME eAnimName, bool bIsLoop )
+	
+	public void DoPlayAnimation_Loop<ENUM_ANIM_NAME>( ENUM_ANIM_NAME eAnimName )
+		where ENUM_ANIM_NAME : System.IConvertible, System.IComparable
 	{
 		string strAnimName = eAnimName.ToString();
 
 		if(_pSkeletonData == null)
 		{
 			DebugCustom.Log_ForCore(EDebugFilterDefault.Warning_Core, name + " _pSkeletonData == null", this );
-			return false;
+			return;
 		}
+		
+		// 애니메이션이 같으면 루프 설정을 무시하기때문에 일부러 틀린 애니메이션 삽입
+		if(_pAnimation.AnimationName == strAnimName && _pAnimation.loop )
+			_pAnimation.AnimationName = "";
 
-		bool bSuccess = _pSkeletonData.FindAnimation( strAnimName ) != null;
-		if (bSuccess)
-		{
-			// 애니메이션이 같으면 루프 설정을 무시하기때문에 일부러 틀린 애니메이션 삽입
-			if(_pAnimation.AnimationName == strAnimName && _pAnimation.loop != bIsLoop)
-				_pAnimation.AnimationName = "";
-
-			_pAnimation.loop = bIsLoop;
-			_pAnimation.AnimationName = strAnimName;
-			_iPriorityCurrent = -1;
-		}
-
-		return bSuccess;
+		_pAnimation.loop = true;
+		_pAnimation.AnimationName = strAnimName;
+		_iPriorityCurrent = -1;
 	}
 
-	public bool DoPlayAnimation<ENUM_ANIM_NAME>( ENUM_ANIM_NAME eAnimName, int iPriority, bool bIsLoop )
+	public void DoPlayAnimation<ENUM_ANIM_NAME>( ENUM_ANIM_NAME eAnimName, int iPriority, bool bIsLoop )
+		where ENUM_ANIM_NAME : System.IConvertible, System.IComparable
 	{
-		if (_iPriorityCurrent >= iPriority) return false;
+		if (_iPriorityCurrent >= iPriority) return;
 
-		bool bSuccess = DoPlayAnimation( eAnimName, bIsLoop );
-		if (bSuccess)
-		{
-			if(bIsLoop == false)
-				_pAnimation.state.Complete += State_End;
-			_iPriorityCurrent = iPriority;
-		}
-
-		return bSuccess;
+		if(bIsLoop)
+			DoPlayAnimation_Loop( eAnimName );
+		else
+			DoPlayAnimation( eAnimName );
+		
+		if(bIsLoop == false)
+			_pAnimation.state.Complete += State_End;
+		_iPriorityCurrent = iPriority;
 	}
+
+	public bool DoCheckIsPlaying<ENUM_ANIMATION_NAME>( ENUM_ANIMATION_NAME eAnimName )
+		where ENUM_ANIMATION_NAME : IConvertible, IComparable
+	{
+		return _pAnimation.AnimationName == eAnimName.ToString();
+	}
+
 
 	public void DoSetOrderInLayer(int iOrder)
 	{
 		MeshRenderer pRenderer = _pAnimation.GetComponent<MeshRenderer>();
 		pRenderer.sortingOrder = iOrder;
+	}
+
+	public void DoResetAnimationEvent()
+	{
+		p_Event_OnAnimationEvent = null;
 	}
 
 	/* public - [Event] Function             
@@ -213,5 +221,9 @@ public class CSpineWrapper : CObjectBase
 		OnFinishAnimation();
 	}
 
+	public void DoStopAnimation()
+	{
+		_pAnimation.AnimationName = "";
+	}
 }
 #endif

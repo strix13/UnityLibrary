@@ -87,7 +87,7 @@ public class CSoundPlayerBase<ENUM_SOUND_NAME> : CCompoEventTrigger
             _pManagerSound = SCManagerSound<ENUM_SOUND_NAME>.instance;
 
         if(_pManagerSound != null)
-            _pManagerSound.DoPlaySoundEffect(_eSoundName, _fSoundVolume );
+			_pManagerSound.DoPlaySoundEffect(_eSoundName, _fSoundVolume );
     }
 
     // ========================================================================== //

@@ -17,7 +17,7 @@ using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
 
-[RequireComponent( typeof( Canvas ))]
+//[RequireComponent( typeof( Canvas ))]
 public class CUGUIPanelBase : CUIPanelBase
 {
 	/* const & readonly declaration             */
@@ -49,7 +49,10 @@ public class CUGUIPanelBase : CUIPanelBase
 
 	public void DoEditText<T_TextName>( T_TextName tTextName, object strText )
 	{
-		FindUIElement( _mapText, tTextName.ToString() ).text = strText.ToString();
+		if(strText == null)
+			FindUIElement( _mapText, tTextName.ToString() ).text = "";
+		else
+			FindUIElement( _mapText, tTextName.ToString() ).text = strText.ToString();
 	}
 
 	public void DoEditImage<T_ImageName>( T_ImageName tImageName, Sprite pSprite )
