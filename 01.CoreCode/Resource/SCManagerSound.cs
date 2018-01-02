@@ -48,7 +48,7 @@ public class SCManagerSound<ENUM_SOUND_NAME> : SCManagerResourceBase<SCManagerSo
     // ===================================== //
 
     private List<CSoundSlot> _listSoundSlotAll = new List<CSoundSlot>();
-    private LinkedList<CSoundSlot> _linkedListNotUseSlot = new LinkedList<CSoundSlot>();
+    private HashSet<CSoundSlot> _queueNotUseSlot = new HashSet< CSoundSlot >();
 	private Dictionary<string, CSoundSlot> _mapCurrentPlayingSound = new Dictionary<string, CSoundSlot>();
 
     private Dictionary<ENUM_SOUND_NAME, float> _mapSoundVolume = new Dictionary<ENUM_SOUND_NAME, float>();
@@ -116,7 +116,7 @@ public class SCManagerSound<ENUM_SOUND_NAME> : SCManagerResourceBase<SCManagerSo
 		}
 
         //Debug.Log("Play Sound : " + eSound);
-        CSoundSlot pSoundSlot = FindDisableSlot();
+        CSoundSlot pSoundSlot = FindDisableSlot_OrNull();
 		if (pSoundSlot == null) return null;
         //{
         //    MakeSoundSlot();
@@ -273,7 +273,7 @@ public class SCManagerSound<ENUM_SOUND_NAME> : SCManagerResourceBase<SCManagerSo
 
     public void EventOnSlotPlayClip(CSoundSlot pSlot)
     {
-        _linkedListNotUseSlot.Remove(pSlot);
+        _queueNotUseSlot.Remove(pSlot);
 	}
 
     public void EventOnSlotFinishClip(CSoundSlot pSlot)
@@ -289,7 +289,7 @@ public class SCManagerSound<ENUM_SOUND_NAME> : SCManagerResourceBase<SCManagerSo
 		}
 		else
 		{
-			_linkedListNotUseSlot.AddLast( pSlot );
+			_queueNotUseSlot.Add( pSlot );
 			if (pSlot.p_pAudioSource.clip != null)
 			{
 				string strClipName = pSlot.p_pAudioSource.clip.name;
@@ -313,7 +313,7 @@ public class SCManagerSound<ENUM_SOUND_NAME> : SCManagerResourceBase<SCManagerSo
         for (int i = 0; i < _iSlotPoolingCount; i++)
             MakeSoundSlot();
 
-        _pSlotBGM = FindDisableSlot();
+        _pSlotBGM = FindDisableSlot_OrNull();
         EventOnSlotPlayClip(_pSlotBGM);
     }
 
@@ -336,7 +336,7 @@ public class SCManagerSound<ENUM_SOUND_NAME> : SCManagerResourceBase<SCManagerSo
         CSoundSlot pSlot = pObject.AddComponent<CSoundSlot>();
         pSlot.EventInitSoundSlot(_pBase, EventOnSlotPlayClip, EventOnSlotFinishClip);
         _listSoundSlotAll.Add(pSlot);
-        _linkedListNotUseSlot.AddLast(pSlot);
+        _queueNotUseSlot.Add(pSlot);
     }
 
     // ===================================== //
@@ -344,15 +344,16 @@ public class SCManagerSound<ENUM_SOUND_NAME> : SCManagerResourceBase<SCManagerSo
     // 찾기, 계산 등의 비교적 단순 로직      //
     // ===================================== //
 
-    private CSoundSlot FindDisableSlot()
+    private CSoundSlot FindDisableSlot_OrNull()
     {
         CSoundSlot pFindSlot = null;
-        if (_linkedListNotUseSlot.Count != 0)
-        {
-            pFindSlot = _linkedListNotUseSlot.First.Value;
-            _linkedListNotUseSlot.RemoveFirst();
-        }
+		IEnumerator<CSoundSlot> pEnum = _queueNotUseSlot.GetEnumerator();
+		if (pEnum.MoveNext())
+		{
+			pFindSlot = pEnum.Current;
+			_queueNotUseSlot.Remove( pFindSlot );
+		}
 
-        return pFindSlot;
+		return pFindSlot;
     }
 }

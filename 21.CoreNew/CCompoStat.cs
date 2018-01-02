@@ -53,26 +53,28 @@ public class CCompoStat : CObjectBase
 
 		[Header( "디버그용 프린트" )]
 		[SerializeField]
-		private int iHP_Max; public int p_iHPMax { get { return iHP_Max; } }
+		private float iHP_Max; public float p_iHPMax { get { return iHP_Max; } }
 		[SerializeField]
-		private int iHP_Current; public int p_iHPCurrent { get { return iHP_Current; } }
+		private float iHP_Current; public float p_iHPCurrent { get { return iHP_Current; } }
 		[SerializeField]
-		private int iArmor_Current; public int p_iArmorCurrent { get { return iArmor_Current; } }
+		private float iArmor_Current; public float p_iArmorCurrent { get { return iArmor_Current * _fArmor_Weight; } }
 		[SerializeField]
-		private int iDamage_Min_Current; public int p_iDamage_Min_Current { get { return iDamage_Min_Current; } }
+		private float iDamage_Min_Current; public float p_iDamage_Min_Current { get { return iDamage_Min_Current; } }
 		[SerializeField]
-		private int iDamage_Max_Current; public int p_iDamage_Max_Current { get { return iDamage_Max_Current; } }
+		private float iDamage_Max_Current; public float p_iDamage_Max_Current { get { return iDamage_Max_Current; } }
 		[SerializeField]
 		private float fCriticalPercent_Current; public float p_fCriticalPercentCurrent { get { return fCriticalPercent_Current; } }
 		[SerializeField]
-		private int iCriticalDamage_Min_Current; public int p_iCriticalDamage_Min_Current { get { return iCriticalDamage_Min_Current; } }
+		private float iCriticalDamage_Min_Current; public float p_iCriticalDamage_Min_Current { get { return iCriticalDamage_Min_Current; } }
 		[SerializeField]
-		private int iCriticalDamage_Max_Current; public int p_iCriticalDamage_Max_Current { get { return iCriticalDamage_Max_Current; } }
+		private float iCriticalDamage_Max_Current; public float p_iCriticalDamage_Max_Current { get { return iCriticalDamage_Max_Current; } }
 
-		public int p_iDamage { get { return Random.Range( iDamage_Min_Current, iDamage_Max_Current + 1 ); } }
+		public float p_iDamageCurrent { get { return Random.Range( iDamage_Min_Current, iDamage_Max_Current + 1 ); } }
 		public bool p_bIsCritical { get { return Random.Range( 0f, 100f ) <= fCriticalPercent_Current; } }
-		public int p_iCriticalDamage { get { return (int)Random.Range( iCriticalDamage_Min_Current, iCriticalDamage_Max_Current ); } }
+		public float p_iCriticalDamage { get { return Random.Range( iCriticalDamage_Min_Current, iCriticalDamage_Max_Current ); } }
 
+
+		private float _fArmor_Weight = 1f;
 
 		private List<IStat_Buffer> _listStatBuffer = new List<IStat_Buffer>();
 
@@ -84,6 +86,16 @@ public class CCompoStat : CObjectBase
 		public void RemoveStatBuffer( IStat_Buffer pStatBuffer )
 		{
 			_listStatBuffer.Remove( pStatBuffer );
+		}
+
+		public void DoAddCurrentStat_Armor(int fAddArmor)
+		{
+			iArmor_Current += fAddArmor;
+		}
+
+		public void DoSetStatWeight_Armor( float fWeight )
+		{
+			_fArmor_Weight = fWeight;
 		}
 
 
@@ -111,6 +123,13 @@ public class CCompoStat : CObjectBase
 			this.pObjectOwner = pObjectOwner;
 			iID = pObjectOwner.GetInstanceID();
 			DoReset();
+		}
+		
+		public void DoIncrease_HP(float fPercent_0_100)
+		{
+			iHP_Current += iHP_Max * fPercent_0_100;
+			if (iHP_Current > iHP_Max)
+				iHP_Current = iHP_Max;
 		}
 
 		public void DoReset()
@@ -148,20 +167,32 @@ public class CCompoStat : CObjectBase
 
 		}
 
-		public void DoDamage( int iDamage, out float fHPDelta, out bool bIsDead )
+		public void DoKill()
+		{
+			iHP_Current = 0;
+		}
+
+		public void DoDamage( float iDamage, out float fHPDelta, out bool bIsDead )
 		{
 			iHP_Current -= iDamage;
-			fHPDelta = iHP_Current / (float)iHP_Max;
+			fHPDelta = GetHPDelta_0_1();
 			bIsDead = iHP_Current < 1;
+		}
+
+		public float GetHPDelta_0_1()
+		{
+			return iHP_Current / iHP_Max; ;
 		}
 	}
 
 	/* public - Field declaration            */
 
-	public delegate void OnDamage( GameObject pObjectDamager, int fDamage, bool bIsCriticalAttack, float fHPDelta, bool bIsDead );
+	public delegate void OnChangeStat( SStat pStatTarget );
+	public delegate void OnDamage( GameObject pObjectDamager, float fDamage, bool bIsCriticalAttack, float fHPDelta, bool bIsDead );
 	public delegate void OnDamage_OnDead( GameObject pObjectDamager );
 	public delegate void OnResetStat( SStat pStatTarget );
 
+	public event OnChangeStat p_Event_OnChangeStat;
 	public event OnResetStat p_Event_OnResetStat;
 	public event OnDamage p_Event_OnDamage;
 	public event OnDamage_OnDead p_Event_OnDamage_OnDead;
@@ -188,6 +219,13 @@ public class CCompoStat : CObjectBase
 		_pStat.DoInit(gameObject);
 	}
 
+	public void DoIncreaseStat_HP(float fPercent_0_100 )
+	{
+		_pStat.DoIncrease_HP( fPercent_0_100  );
+		if(p_Event_OnChangeStat != null)
+			p_Event_OnChangeStat( _pStat );
+	}
+
 	public void DoResetStat()
 	{
 		_pStat.DoReset();
@@ -196,13 +234,21 @@ public class CCompoStat : CObjectBase
 			p_Event_OnResetStat( _pStat );
 	}
 
-	public void DoDamage( int iDamage, bool bIsCriticalAttack, GameObject pObjectDamager )
+	public void DoKill()
+	{
+
+
+		if (p_Event_OnDamage_OnDead != null)
+			p_Event_OnDamage_OnDead( null );
+	}
+
+	public void DoDamage( float iDamage, bool bIsCriticalAttack, GameObject pObjectDamager )
 	{
 		bool bIsDead;
 		DoDamage( iDamage, bIsCriticalAttack, pObjectDamager, out bIsDead );
 	}
 
-	public void DoDamage(int iDamage, bool bIsCriticalAttack, GameObject pObjectDamager, out bool bIsDead)
+	public void DoDamage( float iDamage, bool bIsCriticalAttack, GameObject pObjectDamager, out bool bIsDead)
 	{
 		float fHPDelta = 0f;
 		bIsDead = !_pStat.CheckIsAlive();

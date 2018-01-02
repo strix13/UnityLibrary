@@ -76,11 +76,12 @@ public struct StringPair
 }
 
 [RequireComponent( typeof( CCompoDontDestroyObj ) )]
-public class CManagerFrameWorkBase<CLASS_Framework, ENUM_SCENE_NAME, ENUM_SOUND_NAME, CLASS_SOUNDPLAYER> : CSingletonBase<CLASS_Framework>
-	where CLASS_Framework : CManagerFrameWorkBase<CLASS_Framework, ENUM_SCENE_NAME, ENUM_SOUND_NAME, CLASS_SOUNDPLAYER>
-	where ENUM_SOUND_NAME : System.IFormattable, System.IConvertible, System.IComparable
-	where ENUM_SCENE_NAME : System.IFormattable, System.IConvertible, System.IComparable
-	where CLASS_SOUNDPLAYER : CSoundPlayerBase<ENUM_SOUND_NAME>
+public class CManagerFrameWorkBase<CLASS_Framework, ENUM_Scene_Name, ENUM_Sound_Name, ENUM_DataField, CLASS_SoundPlayer> : CSingletonBase<CLASS_Framework>
+	where CLASS_Framework : CManagerFrameWorkBase<CLASS_Framework, ENUM_Scene_Name, ENUM_Sound_Name, ENUM_DataField, CLASS_SoundPlayer>
+	where ENUM_Sound_Name : System.IFormattable, System.IConvertible, System.IComparable
+	where ENUM_Scene_Name : System.IFormattable, System.IConvertible, System.IComparable
+	where CLASS_SoundPlayer : CSoundPlayerBase<ENUM_Sound_Name>
+	where ENUM_DataField : System.IFormattable, System.IConvertible, System.IComparable
 {
 	private const string const_strLocalPath_INI = "INI";
 	private const string const_strEmptySceneName = "Empty";
@@ -104,8 +105,8 @@ public class CManagerFrameWorkBase<CLASS_Framework, ENUM_SCENE_NAME, ENUM_SOUND_
 	// ===================================== //
 
 	static public CManagerNetworkDB_Project p_pNetworkDB { get { return CManagerNetworkDB_Project.instance; } }
-	static public SCManagerSound<ENUM_SOUND_NAME> p_pManagerSound { get { return _pManagerSound; } }
-	static public SCSceneLoader<ENUM_SCENE_NAME> p_pManagerScene { get { return _pManagerScene; } }
+	static public SCManagerSound<ENUM_Sound_Name> p_pManagerSound { get { return _pManagerSound; } }
+	static public SCSceneLoader<ENUM_Scene_Name> p_pManagerScene { get { return _pManagerScene; } }
 	static public SCManagerParserJson p_pManagerJsonINI { get { return _pJsonParser_Persistent; } }
 
 	public static event System.Action<float> p_EVENT_OnLoadSceneProgress;
@@ -131,8 +132,8 @@ public class CManagerFrameWorkBase<CLASS_Framework, ENUM_SCENE_NAME, ENUM_SOUND_
 	// private - Variable declaration        //
 	// ===================================== //
 
-	static protected SCManagerSound<ENUM_SOUND_NAME> _pManagerSound;
-	static protected SCSceneLoader<ENUM_SCENE_NAME> _pManagerScene;
+	static protected SCManagerSound<ENUM_Sound_Name> _pManagerSound;
+	static protected SCSceneLoader<ENUM_Scene_Name> _pManagerScene;
 	static protected SCManagerParserJson _pJsonParser_Persistent;
 	static protected SCManagerParserJson _pJsonParser_StreammingAssets;
 	static public SCManagerParserJson _pJsonParser_JsonData;
@@ -157,6 +158,21 @@ public class CManagerFrameWorkBase<CLASS_Framework, ENUM_SCENE_NAME, ENUM_SOUND_
 	// public - [Do] Function                //
 	// 외부 객체가 요청                      //
 	// ===================================== //
+
+	static public float GetFloat_InGameData( ENUM_DataField eDataField)
+	{
+		return SGameData.GetFloat( eDataField );
+	}
+
+	static public int GetInt_InGameData( ENUM_DataField eDataField )
+	{
+		return SGameData.GetInt( eDataField );
+	}
+
+	static public string GetString_GameData( ENUM_DataField eDataField )
+	{
+		return SGameData.GetString( eDataField );
+	}
 
 	static public void DoNetworkDB_CheckCount_IsEqualOrGreater<StructDB>( string strFieldName, object iCheckFieldCount, System.Action<bool> OnResult )
 	{
@@ -269,6 +285,12 @@ public class CManagerFrameWorkBase<CLASS_Framework, ENUM_SCENE_NAME, ENUM_SOUND_
 		instance.StartCoroutine( p_pNetworkDB.CoExcutePHP( instance._strID, EPHPName.Insert, typeof( StructDB ).ToString(), OnResult, pStructDB.IDB_Insert_GetField() ) );
 	}
 
+	static public void DoNetworkDB_Insert_Get_InsertData<StructDB>( System.Action<bool, StructDB> OnResult, StructDB pStructDB )
+		where StructDB : IDB_Insert
+	{
+		instance.StartCoroutine( p_pNetworkDB.CoLoadDataFromServer_Json( instance._strID, EPHPName.Insert, OnResult, pStructDB.IDB_Insert_GetField() ) );
+	}
+
 	static public void DoNetworkDB_Delete<StructDB>( System.Action<bool> OnResult, params StringPair[] arrParam )
 	{
 		if (instance._strID != null)
@@ -282,14 +304,13 @@ public class CManagerFrameWorkBase<CLASS_Framework, ENUM_SCENE_NAME, ENUM_SOUND_
 		instance.StartCoroutine( p_pNetworkDB.CoExcutePHP( instance._strID, EPHPName.Insert, typeof( StructDB ).ToString(), OnResult, arrParam ) );
 	}
 
+#if UNITY_ANDROID
 	public void DoShakeMobile()
 	{
-		Debug.Log( "DoShakeMobile - define 확인" );
-#if UNITY_ANDROID
 		if (Application.isPlaying && _pSetting_User.bVibration)
 			Handheld.Vibrate();
-#endif
 	}
+#endif
 
 	public void DoSetTestMode()
 	{
@@ -323,7 +344,7 @@ public class CManagerFrameWorkBase<CLASS_Framework, ENUM_SCENE_NAME, ENUM_SOUND_
 		Time.timeScale = fTimeScale;
 	}
 
-	static public void DoLoadScene(ENUM_SCENE_NAME eSceneName, LoadSceneMode eLoadSceneMode, System.Action OnFinishLoading = null)
+	static public void DoLoadScene(ENUM_Scene_Name eSceneName, LoadSceneMode eLoadSceneMode, System.Action OnFinishLoading = null)
 	{
 		SceneManager.LoadScene(eSceneName.ToString(), eLoadSceneMode);
 		if (_OnFinishLoad_Scene == null && OnFinishLoading != null)
@@ -333,19 +354,19 @@ public class CManagerFrameWorkBase<CLASS_Framework, ENUM_SCENE_NAME, ENUM_SOUND_
 		}
 	}
 
-	public void DoLoadSceneAsync( params ENUM_SCENE_NAME[] arrSceneName )
+	public void DoLoadSceneAsync( params ENUM_Scene_Name[] arrSceneName )
 	{
 		StartCoroutine(CoProcLoadSceneAsync(arrSceneName, false));
 	}
 
-	public void DoLoadSceneAsync( System.Action OnFinishLoadScene, params ENUM_SCENE_NAME[] arrSceneName )
+	public void DoLoadSceneAsync( System.Action OnFinishLoadScene, params ENUM_Scene_Name[] arrSceneName )
 	{
 		p_EVENT_OnFinishLoadScene = OnFinishLoadScene;
 
 		StartCoroutine(CoProcLoadSceneAsync(arrSceneName, false));
 	}
 
-	private IEnumerator CoProcLoadSceneAsync(ENUM_SCENE_NAME[] arrSceneName, bool bManualCall_EventOnFinishLoadScene)
+	private IEnumerator CoProcLoadSceneAsync(ENUM_Scene_Name[] arrSceneName, bool bManualCall_EventOnFinishLoadScene)
 	{
 		// 로딩전 빈씬으로 메모리를 비워준다. 다음 로딩씬의 메모리가 너무 커서 프리징 걸릴수도있기때문에...
 		yield return SceneManager.LoadSceneAsync(const_strEmptySceneName);
@@ -498,9 +519,9 @@ public class CManagerFrameWorkBase<CLASS_Framework, ENUM_SCENE_NAME, ENUM_SOUND_
 		_pJsonParser_StreammingAssets = SCManagerParserJson.DoMakeInstance( this, const_strLocalPath_INI, EResourcePath.StreamingAssets );
 		_pJsonParser_JsonData = SCManagerParserJson.DoMakeInstance( this, SCManagerParserJson.const_strFolderName, EResourcePath.Resources );
 
-		_pManagerScene = new SCSceneLoader<ENUM_SCENE_NAME>();
+		_pManagerScene = new SCSceneLoader<ENUM_Scene_Name>();
 		_pManagerScene.p_EVENT_OnSceneLoaded += ProcOnSceneLoaded;
-		_pManagerSound = SCManagerSound<ENUM_SOUND_NAME>.DoMakeInstance( this, "Sound", EResourcePath.Resources );
+		_pManagerSound = SCManagerSound<ENUM_Sound_Name>.DoMakeInstance( this, "Sound", EResourcePath.Resources );
 
 		ProcParse_UserSetting();
 
@@ -520,18 +541,16 @@ public class CManagerFrameWorkBase<CLASS_Framework, ENUM_SCENE_NAME, ENUM_SOUND_
 
 	private void ProcParse_UserSetting()
 	{
-		if (_pJsonParser_Persistent.DoReadJson_FromResource( EINI_JSON_FileName.UserSetting, out _pSetting_User ))
-		{
-			_pManagerSound.DoSetVolumeEffect( _pSetting_User.fVolumeEffect );
-			_pManagerSound.DoSetVolumeBGM( _pSetting_User.fVolumeBGM );
-		}
-		else
+		if (_pJsonParser_Persistent.DoReadJson_FromResource( EINI_JSON_FileName.UserSetting, out _pSetting_User ) == false)
 		{
 			Debug.Log( "UserInfo - bParsingResult Is Fail" );
 
 			_pSetting_User = new SINI_UserSetting();
 			_pJsonParser_Persistent.DoWriteJson( EINI_JSON_FileName.UserSetting, _pSetting_User );
 		}
+
+		_pManagerSound.DoSetVolumeEffect( _pSetting_User.fVolumeEffect );
+		_pManagerSound.DoSetVolumeBGM( _pSetting_User.fVolumeBGM );
 	}
 
 	private void CUIManagerLocalize_p_EVENT_OnChangeLocalize()
@@ -638,7 +657,7 @@ public class CManagerFrameWorkBase<CLASS_Framework, ENUM_SCENE_NAME, ENUM_SOUND_
 		if (bSuccess)
 			_pManagerSound.EventSetINI( arrSound, _pSetting_User.fVolumeEffect, _pSetting_User.eVolumeOff );
 
-		ENUM_SOUND_NAME[] arrSoundName = PrimitiveHelper.GetEnumArray<ENUM_SOUND_NAME>();
+		ENUM_Sound_Name[] arrSoundName = PrimitiveHelper.GetEnumArray<ENUM_Sound_Name>();
 #if UNITY_EDITOR
 		if (arrSound == null || arrSound.Length < arrSoundName.Length)
 		{

@@ -89,7 +89,12 @@ abstract public class CNGUITweenExtendBase<TEMPLATE> : UITweener
 
 	private void OnEnable()
 	{
-		DoPlayTween_Forward( _iLastPlayIndex );
+		if(_bPlayOnEnable)
+		{
+			ResetToBeginning();
+			ResetToFactor();
+			DoPlayTween_Forward( _iLastPlayIndex );
+		}
 	}
 
 	private void OnDisable()
@@ -280,15 +285,6 @@ abstract public class CNGUITweenExtendBase<TEMPLATE> : UITweener
 			EventDelegate.Add( onFinished, m_pCurrentTweenInfo.listOnFinished[i], true );
 			if (m_pCurrentTweenInfo.listOnFinished[i].oneShot)
 				EventDelegate.Remove( m_pCurrentTweenInfo.listOnFinished, m_pCurrentTweenInfo.listOnFinished[i] );
-		}
-
-		if(m_pCurrentTweenInfo.bAutoDisableThis)
-		{
-			CNGUIPanelBase pUIFrameOwner = GetComponentInParent<CNGUIPanelBase>();
-			if (pUIFrameOwner != null)
-				EventDelegate.Add( onFinished, pUIFrameOwner.DoHide, true );
-			else
-				EventDelegate.Add( onFinished, DoObjectActiveFalse, true );
 		}
 	}
 

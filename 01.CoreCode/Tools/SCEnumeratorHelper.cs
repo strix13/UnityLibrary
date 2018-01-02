@@ -78,10 +78,12 @@ public static class SCEnumeratorHelper
 	}
 
 
-	static public void DoAddItem<TKey, TSource>( this Dictionary<TKey, TSource> mapDataTable, IEnumerable<TSource> source )
+	static public void DoAddItem<TKey, TSource>( this Dictionary<TKey, TSource> mapDataTable, IEnumerable<TSource> source, bool bIsClear = true )
 		where TSource : IDictionaryItem<TKey>
 	{
-		mapDataTable.Clear();
+		if(bIsClear)
+			mapDataTable.Clear();
+
 		IEnumerator<TSource> pIter = source.GetEnumerator();
 		while (pIter.MoveNext())
 		{

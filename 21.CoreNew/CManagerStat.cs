@@ -41,6 +41,8 @@ public class CManagerStat : CSingletonBase<CManagerStat>
 	[SerializeField]
 	private int _iDamageMin = 0;
 
+	private HashSet<GameObject> _setUnTouchable = new HashSet<GameObject>();
+
 	/* protected - Field declaration         */
 
 	/* private - Field declaration           */
@@ -51,6 +53,45 @@ public class CManagerStat : CSingletonBase<CManagerStat>
 
 	/* public - [Do] Function
      * 외부 객체가 호출(For External class call)*/
+
+	public bool DoCheckIs_ContainStat(GameObject pObjectTarget)
+	{
+		return _mapObjectStat.ContainsKey( pObjectTarget.GetInstanceID() );
+	}
+
+	public void DoSet_UnTouchableObject( GameObject pObjectUnTouchable, bool bIsUnTouchable )
+	{
+		int iID_UnTouchable = pObjectUnTouchable.GetInstanceID();
+		if (_mapObjectStat.ContainsKey( iID_UnTouchable ) == false)
+		{
+			Debug.Log( "[Error] ManagerStat - Not Contain Stat" + pObjectUnTouchable.name, pObjectUnTouchable );
+			return;
+		}
+
+		if(bIsUnTouchable)
+		{
+			if (_setUnTouchable.Contains( pObjectUnTouchable ) == false)
+				_setUnTouchable.Add( pObjectUnTouchable );
+		}
+		else
+		{
+			if (_setUnTouchable.Contains( pObjectUnTouchable ))
+				_setUnTouchable.Remove( pObjectUnTouchable );
+		}
+	}
+
+	public void DoKillObject( GameObject pObjectVictim )
+	{
+		int iID_Victim = pObjectVictim.GetInstanceID();
+		if(_mapObjectStat.ContainsKey( iID_Victim ) == false)
+		{
+			Debug.Log( "[Error] ManagerStat - Not Contain Stat" + pObjectVictim.name, pObjectVictim );
+			return;
+		}
+
+		CCompoStat pStat_Victim = _mapObjectStat[iID_Victim];
+		pStat_Victim.DoKill();
+	}
 
 	public void DoDamageObject( GameObject pObjectDamager, GameObject pObjectVictim )
 	{
@@ -72,7 +113,7 @@ public class CManagerStat : CSingletonBase<CManagerStat>
 		}
 
 		CCompoStat pStat_Victim = _mapObjectStat[iID_Victim];
-		if (pStat_Victim.p_bIsAlive == false)
+		if (pStat_Victim.p_bIsAlive == false || _setUnTouchable.Contains( pObjectVictim ))
 		{
 			pStat_Victim.DoDamage( 0, false, pObjectDamager );
 			return;
@@ -80,7 +121,8 @@ public class CManagerStat : CSingletonBase<CManagerStat>
 
 		CCompoStat pStat_Damager = _mapObjectStat[iID_Damager];
 		bool bIsCriticalAttack = pStat_Damager.p_pStat.p_bIsCritical;
-		int iDamage = CalculateDamage( pStat_Damager.p_pStat, pStat_Victim.p_pStat, bIsCriticalAttack );
+
+		float iDamage = CalculateDamage( pStat_Damager.p_pStat, pStat_Victim.p_pStat, bIsCriticalAttack );
 		pStat_Victim.DoDamage( iDamage, bIsCriticalAttack, pStat_Damager.gameObject, out bIsDead );
 
 		if (bIsDead && p_Event_OnDead != null)
@@ -130,9 +172,9 @@ public class CManagerStat : CSingletonBase<CManagerStat>
 	/* private - Other[Find, Calculate] Func 
        찾기, 계산등 단순 로직(Simpe logic)         */
 
-	private int CalculateDamage(CCompoStat.SStat pStatAttacker, CCompoStat.SStat pStatVictim, bool bIsCritical )
+	private float CalculateDamage(CCompoStat.SStat pStatAttacker, CCompoStat.SStat pStatVictim, bool bIsCritical )
 	{
-		int iDamageCalculated = pStatAttacker.p_iDamage_Max_Current;
+		float iDamageCalculated = pStatAttacker.p_iDamageCurrent;
 		switch (_eDamageCalculateOption)
 		{
 			case EDamageCalculateOption.Percentage:

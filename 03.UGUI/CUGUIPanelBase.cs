@@ -16,9 +16,10 @@ using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
+using System;
 
 //[RequireComponent( typeof( Canvas ))]
-public class CUGUIPanelBase : CUIPanelBase
+public class CUGUIPanelBase : CUGUIObjectBase, IUIPanel
 {
 	/* const & readonly declaration             */
 
@@ -28,13 +29,28 @@ public class CUGUIPanelBase : CUIPanelBase
 
 	/* public - Field declaration            */
 
-	/* protected - Field declaration         */
+	[SerializeField]
+	private bool _bIsAlwaysShow;
+	[SerializeField]
+	private bool _bIsFixedSortOrder;
+	
+	bool IUIPanel.p_bIsAlwaysShow
+	{
+		get
+		{
+			return _bIsAlwaysShow;
+		}
+	}
 
-	protected Dictionary<string, Text> _mapText = null;
-	protected Dictionary<string, Image> _mapImage = null;
-	protected Dictionary<string, Slider> _mapSlider = null;
-	protected Dictionary<string, Dropdown> _mapDropdown = null;
-	protected Dictionary<string, CUGUIDropDown> _mapDropdownExtension = null;
+	bool IUIPanel.p_bIsFixedSortOrder
+	{
+		get
+		{
+			return _bIsFixedSortOrder;
+		}
+	}
+
+	/* protected - Field declaration         */
 
 	/* private - Field declaration           */
 
@@ -47,44 +63,21 @@ public class CUGUIPanelBase : CUIPanelBase
 	/* public - [Do] Function
      * 외부 객체가 호출(For External class call)*/
 
-	public void DoEditText<T_TextName>( T_TextName tTextName, object strText )
+	public void IUIPanel_SetOrder( int iSortOrder )
 	{
-		if(strText == null)
-			FindUIElement( _mapText, tTextName.ToString() ).text = "";
-		else
-			FindUIElement( _mapText, tTextName.ToString() ).text = strText.ToString();
+		transform.SetSiblingIndex( iSortOrder );
 	}
 
-	public void DoEditImage<T_ImageName>( T_ImageName tImageName, Sprite pSprite )
+	public IEnumerator IUIPanel_OnShowPanel_PlayingAnimation( int iSortOrder )
 	{
-		FindUIElement( _mapImage, tImageName.ToString() ).sprite = pSprite;
+		yield return StartCoroutine( OnShowPanel_PlayingAnimation( iSortOrder ) );
 	}
 
-	public Text GetText<T_TextName>( T_TextName tTextName , bool bIgnoreError = false )
+	public IEnumerator IUIPanel_OnHidePanel_PlayingAnimation()
 	{
-		return FindUIElement( _mapText, tTextName.ToString(), bIgnoreError );
+		yield return StartCoroutine( OnHidePanel_PlayingAnimation() );
 	}
-
-	public Image GetImage<T_ImageName>(T_ImageName tImageName, bool bIgnoreError = false )
-	{
-		return FindUIElement( _mapImage, tImageName.ToString(), bIgnoreError );
-	}
-
-	public Slider GetSlider<T_Slider>(T_Slider tSlider, bool bIgnoreError = false)
-	{
-		return FindUIElement(_mapSlider, tSlider.ToString(), bIgnoreError);
-	}
-
-	public Dropdown GetDropdown<T_Dropdown>(T_Dropdown tDropdownName, bool bIgnoreError = false )
-	{
-		return FindUIElement(_mapDropdown, tDropdownName.ToString(), bIgnoreError );
-	}
-
-	public CUGUIDropDown GetDropdown_Extension<T_Dropdown>(T_Dropdown tDropdownName, bool bIgnoreError = false)
-	{
-		return FindUIElement(_mapDropdownExtension, tDropdownName.ToString(), bIgnoreError );
-	}
-
+	
 	/* public - [Event] Function             
        프랜드 객체가 호출(For Friend class call)*/
 
@@ -96,21 +89,13 @@ public class CUGUIPanelBase : CUIPanelBase
 
 	/* protected - [abstract & virtual]         */
 
+	virtual protected IEnumerator OnShowPanel_PlayingAnimation( int iSortOrder ) { yield return null; }
+	virtual protected IEnumerator OnHidePanel_PlayingAnimation() { yield return null; }
+
 	/* protected - [Event] Function           
        자식 객체가 호출(For Child class call)		*/
 
 	/* protected - Override & Unity API         */
-
-	protected override void OnSetSortOrder( int iSortOrder )
-	{
-		if (iSortOrder < 0)
-			iSortOrder = 0;
-
-		if (_bAlwaysShow)
-			iSortOrder = 100;
-
-		transform.SetSiblingIndex( iSortOrder );
-	}
 
 	#endregion Protected
 

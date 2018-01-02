@@ -41,7 +41,7 @@ public static class SCEnumHelper
 		{
 			eEnum = default(TENUM);
 			if(bIgnoreError == false)
-				Debug.LogWarning( typeof(TENUM).ToString() + " 에 " + strText + "이 존재하지 않습니다.", null);
+				Debug.LogWarning( typeof(TENUM).ToString() + " 에 [" + strText + "] 이 존재하지 않습니다.", null);
 		}
 
 		return eEnum;

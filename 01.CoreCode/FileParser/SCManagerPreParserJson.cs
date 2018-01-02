@@ -18,6 +18,7 @@ using System.Collections.Generic;
 
 public class SCManagerPreParserJson<T_Key, Class_PreParsingType>
 	where T_Key : System.IConvertible,  System.IComparable
+	where Class_PreParsingType : class
 {
 	/* const & readonly declaration             */
 

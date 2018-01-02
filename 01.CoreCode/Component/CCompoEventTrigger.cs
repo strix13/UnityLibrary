@@ -3,6 +3,7 @@ using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine.Events;
 
 /* ============================================ 
    Editor      : Strix                               
@@ -43,7 +44,7 @@ public class CCompoEventTrigger : CObjectBase, IPointerDownHandler, IPointerUpHa
 
 	public EInputType p_eInputType_Main = EInputType.None;
 	public float p_fDelayTrigger = 0f;
-	public List<System.Action> p_listEvent_Main = new List<System.Action>();
+	public UnityEngine.Events.UnityEvent p_listEvent_Main = new UnityEvent();
 
 	/* protected - Field declaration         */
 
@@ -66,9 +67,9 @@ public class CCompoEventTrigger : CObjectBase, IPointerDownHandler, IPointerUpHa
 			DoPlayEvent_Main();
 	}
 	
-	public void DoAddEvent_Main( System.Action CallBack )
+	public void DoAddEvent_Main( UnityAction CallBack )
 	{
-		p_listEvent_Main.Add( CallBack );
+		p_listEvent_Main.AddListener( CallBack );
 	}
 	
 	public void DoPlayEvent_Main()
@@ -189,8 +190,7 @@ public class CCompoEventTrigger : CObjectBase, IPointerDownHandler, IPointerUpHa
 
 	private void ProcPlayEvent()
 	{
-		for (int i = 0; i < p_listEvent_Main.Count; i++)
-			p_listEvent_Main[i]();
+		p_listEvent_Main.Invoke();
 
 		OnPlayEventMain();
 	}

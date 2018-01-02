@@ -86,7 +86,7 @@ public class CUIPopupShared_DebugConsole_UGUI : CUGUIPanelHasInputBase<CUIPopupS
 		switch (eButtonName)
 		{
 			case EUIInput.Button_Close:
-				DoHide();
+				CManagerUIShared_UGUI.instance.DoShowHide_Panel(CManagerUIShared_UGUI.EFrame.CUIPopupShared_DebugConsole_UGUI, false);
 				break;
 		}
 	}
@@ -95,7 +95,7 @@ public class CUIPopupShared_DebugConsole_UGUI : CUGUIPanelHasInputBase<CUIPopupS
 	{
 		_pScrollView.verticalNormalizedPosition = 0f;
 
-		return base.OnShowPanel_PlayingAnimation( iSortOrder );
+		yield break;
 	}
 
 	// ========================================================================== //

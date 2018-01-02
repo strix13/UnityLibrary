@@ -95,20 +95,55 @@ public class CEditorWindow_SpriteEditor : CEditorWindowBase<CEditorWindow_Sprite
 
 		for (int i = 0; i < listTexture.Count; i++)
 		{
+			bool bIsChange = false;
+
 			TextureImporter pImporter = listTexture[i];
 			if (pImporter.textureType != TextureImporterType.Sprite)
+			{
 				pImporter.textureType = TextureImporterType.Sprite;
-			pImporter.spritePackingTag = _strSpriteTag;
+				bIsChange = true;
+			}
 
+			if (pImporter.spritePackingTag.Equals( _strSpriteTag ) == false)
+			{
+				pImporter.spritePackingTag = _strSpriteTag;
+				bIsChange = true;
+			}
+
+			if (pImporter.spriteImportMode != SpriteImportMode.Single)
+			{
+				pImporter.spriteImportMode = SpriteImportMode.Single;
+				bIsChange = true;
+			}
+
+
+			bool bIsChangeTextureImporter = false;
 			TextureImporterSettings pTextureSettings = new TextureImporterSettings();
 			pImporter.ReadTextureSettings( pTextureSettings );
-			pTextureSettings.spriteMeshType = _eSpriteMeshType;
-			pTextureSettings.spriteExtrude = (uint)_iSpriteExtrude;
-			pImporter.SetTextureSettings( pTextureSettings );
 
-			pImporter.SaveAndReimport();
-			AssetDatabase.Refresh( ImportAssetOptions.ForceUpdate );
+			if(pTextureSettings.spriteMeshType.Equals( _eSpriteMeshType ) == false)
+			{
+				pTextureSettings.spriteMeshType = _eSpriteMeshType;
+				bIsChangeTextureImporter = true;
+			}
+
+			if(pTextureSettings.spriteExtrude.Equals( (uint)_iSpriteExtrude ) == false)
+			{
+				pTextureSettings.spriteExtrude = (uint)_iSpriteExtrude;
+				bIsChangeTextureImporter = true;
+			}
+
+			if(bIsChangeTextureImporter)
+				pImporter.SetTextureSettings( pTextureSettings );
+
+			if (bIsChange || bIsChangeTextureImporter)
+			{
+				Debug.Log( "Change :" + pImporter.assetPath, pImporter );
+				pImporter.SaveAndReimport();
+			}
 		}
+
+		AssetDatabase.Refresh( ImportAssetOptions.ForceUpdate );
 	}
 
 	private void ProcAddTextureImporter_InDirectory( DirectoryInfo pDirectory, List<TextureImporter> listTexture )

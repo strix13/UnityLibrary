@@ -1,6 +1,8 @@
 ﻿using UnityEngine;
 using UnityEditor;
 #if NGUI
+
+//[CanEditMultipleObjects]
 [CustomEditor(typeof(CNGUITweenPositionExtend))]
 public class CNGUITweenPositionExtendEditor : CNGUITweenExtendBaseEditor<CNGUITweenPositionExtend.STweenPositionInfo>
 {

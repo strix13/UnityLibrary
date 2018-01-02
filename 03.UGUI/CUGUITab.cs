@@ -31,7 +31,6 @@ public class CUGUITab<ENUM_TAB> : CUGUIPanelHasInputBase<ENUM_TAB>
 	private Button[] _arrButtonTab;
 
 	private int _iCountTabs;
-	private bool _bIsFirstShow;
 
 	private ENUM_TAB _eCurrentShowTab;
 
@@ -87,15 +86,9 @@ public class CUGUITab<ENUM_TAB> : CUGUIPanelHasInputBase<ENUM_TAB>
 		_iCountTabs = _arrButtonTab.Length;
 	}
 
-	protected override void OnEnableObject()
+	protected override void OnEnableSecond()
 	{
-		base.OnEnableObject();
-
-		if (_bIsFirstShow == false)
-		{
-			_bIsFirstShow = true;
-			return;
-		}
+		base.OnEnableSecond();
 
 		EventSetTab_Force(_eFirstShowTab);
 	}

@@ -6,7 +6,7 @@
  *	관련 링크 :
  *	
  *	설계자 : 
- *	작성자 : KJH
+ *	작성자 : Strix
  *	
  *	기능 : 
    ============================================ */
@@ -16,45 +16,29 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 
-public class CResourceImage : CSingletonBase<CResourceImage>
+public class CCompoEffectPlayerBase<ENUM_EffectName, CLASS_Effect> : CCompoEventTrigger
+	where ENUM_EffectName : System.IConvertible, System.IComparable
+	where CLASS_Effect : CEffectBase<CLASS_Effect, ENUM_EffectName>
 {
 	/* const & readonly declaration             */
 
 	/* enum & struct declaration                */
 
-	#region Field
-
 	/* public - Field declaration            */
+
+	public ENUM_EffectName _eEffectPlay;
 
 	/* protected - Field declaration         */
 
 	/* private - Field declaration           */
-
-	[SerializeField] private Sprite[] _arrSprite;
-
-	private Dictionary<string, Sprite> _mapSprite = new Dictionary<string, Sprite>();
-
-	#endregion Field
-
-	#region Public
 
 	// ========================================================================== //
 
 	/* public - [Do] Function
      * 외부 객체가 호출(For External class call)*/
 
-	public Sprite GetSpriteByName(string strSpriteName)
-	{
-		if (_mapSprite.ContainsKey(strSpriteName))
-			return _mapSprite[strSpriteName];
-
-		return null;
-	}
-
 	/* public - [Event] Function             
        프랜드 객체가 호출(For Friend class call)*/
-
-	#endregion Public
 
 	// ========================================================================== //
 
@@ -67,16 +51,11 @@ public class CResourceImage : CSingletonBase<CResourceImage>
 
 	/* protected - Override & Unity API         */
 
-	protected override void OnAwake()
+	protected override void OnPlayEventMain()
 	{
-		base.OnAwake();
+		base.OnPlayEventMain();
 
-		int iLen = _arrSprite.Length;
-		for (int i = 0; i < iLen; i++)
-		{
-			Sprite pSprite = _arrSprite[i];
-			_mapSprite[pSprite.name] = pSprite;
-		}
+		SCManagerEffect<ENUM_EffectName, CLASS_Effect>.DoPlayEffect( _eEffectPlay, transform.position );
 	}
 
 	#endregion Protected

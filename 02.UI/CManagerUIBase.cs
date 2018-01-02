@@ -1,13 +1,29 @@
-﻿using UnityEngine;
+﻿#region Header
+/* ============================================ 
+ *			    Strix Unity Library
+ *		https://github.com/strix13/UnityLibrary
+ *	============================================ 	
+ *	관련 링크 :
+ *	
+ *	설계자 : 
+ *	작성자 : Strix
+ *	
+ *	기능 : NGUI와 UGUI를 병합하려다 보니
+ *	관리하는 객체인 Panel의 변수는 매니져가 관리하고, 함수는 인터페이스로 빼야 했다.
+ *	
+   ============================================ */
+#endregion Header
+
+using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 
-abstract public class CManagerUIBase<Class_Instance, ENUM_Panel_Name, Class_Panel, Class_Button> : CSingletonBase<Class_Instance>
-	where Class_Instance : CManagerUIBase<Class_Instance, ENUM_Panel_Name, Class_Panel, Class_Button>
+abstract public partial class CManagerUIBase<CLASS_Instance, ENUM_Panel_Name, CLASS_Panel, Class_Button> : CSingletonBase<CLASS_Instance>
+	where CLASS_Instance : CManagerUIBase<CLASS_Instance, ENUM_Panel_Name, CLASS_Panel, Class_Button>
     where ENUM_Panel_Name : System.IFormattable, System.IConvertible, System.IComparable
-	where Class_Panel : CUIPanelBase
+	where CLASS_Panel : CObjectBase, IUIPanel
 {
-	private CDictionary_ForEnumKey<ENUM_Panel_Name, Class_Panel> _mapPanelInstance = new CDictionary_ForEnumKey<ENUM_Panel_Name, Class_Panel>();
+	protected CDictionary_ForEnumKey<ENUM_Panel_Name, CUIPanelData> _mapPanelData = new CDictionary_ForEnumKey<ENUM_Panel_Name, CUIPanelData>();
 
     private Camera _pUIcamera;  public Camera p_pUICamera {  get { return _pUIcamera; } }
     private int _iSortOrderTop; public int p_iSortOrderTop { get { return _iSortOrderTop; } }
@@ -19,9 +35,9 @@ abstract public class CManagerUIBase<Class_Instance, ENUM_Panel_Name, Class_Pane
     /// </summary>
     public void DoShowDefaultPanel()
     {
-        List<Class_Panel> listPanelAll = _mapPanelInstance.Values.ToList();
-        for (int i = 0; i < listPanelAll.Count; i++)
-			listPanelAll[i].gameObject.SetActive( listPanelAll[i].p_bAlwaysShow );
+        List<CUIPanelData> listPanelDataAll = _mapPanelData.Values.ToList();
+        for (int i = 0; i < listPanelDataAll.Count; i++)
+			listPanelDataAll[i].SetActive( listPanelDataAll[i].p_pPanel.p_bIsAlwaysShow );
 
 		OnDefaultPanelShow();
     }
@@ -31,9 +47,9 @@ abstract public class CManagerUIBase<Class_Instance, ENUM_Panel_Name, Class_Pane
 	/// </summary>
 	/// <param name="ePanel">Panel 이름의 Enum</param>
 	/// <param name="bShow"></param>
-	public Class_Panel DoShowHide_Panel(ENUM_Panel_Name ePanel, bool bShow)
+	public CLASS_Panel DoShowHide_Panel(ENUM_Panel_Name ePanel, bool bShow)
     {
-		Class_Panel pPanel = _mapPanelInstance[ePanel];
+		CUIPanelData pPanel = _mapPanelData[ePanel];
 		if(pPanel == null)
 		{
 			Debug.LogWarning( ePanel + "이 없습니다.. 하이어라키를 확인해주세요" );
@@ -43,7 +59,7 @@ abstract public class CManagerUIBase<Class_Instance, ENUM_Panel_Name, Class_Pane
         if (bShow)
         {
             int iSortOrder = 0;
-			if (pPanel.p_bFixedSortOrder == false)
+			if (pPanel.p_pPanel.p_bIsFixedSortOrder == false)
 				iSortOrder = CaculateSortOrder_Top();
 
 			pPanel.DoShow(iSortOrder);
@@ -51,12 +67,12 @@ abstract public class CManagerUIBase<Class_Instance, ENUM_Panel_Name, Class_Pane
 		else
             pPanel.DoHide();
 
-		return pPanel;
+		return pPanel.p_pPanel;
 	}
 
-	public Class_Panel DoShowHide_Panel_Force( ENUM_Panel_Name ePanel, bool bShow )
+	public CLASS_Panel DoShowHide_Panel_Force( ENUM_Panel_Name ePanel, bool bShow )
 	{
-		Class_Panel pPanel = _mapPanelInstance[ePanel];
+		CUIPanelData pPanel = _mapPanelData[ePanel];
 		if (pPanel == null)
 		{
 			Debug.LogWarning( ePanel + "이 없습니다.. 하이어라키를 확인해주세요" );
@@ -64,12 +80,12 @@ abstract public class CManagerUIBase<Class_Instance, ENUM_Panel_Name, Class_Pane
 		}
 		pPanel.SetActive( bShow );
 
-		return pPanel;
+		return pPanel.p_pPanel;
 	}
 
 	public bool DoCheckIsActive(ENUM_Panel_Name ePanel)
 	{
-		Class_Panel pPanel = _mapPanelInstance[ePanel];
+		CUIPanelData pPanel = _mapPanelData[ePanel];
 		if (pPanel == null)
 		{
 			Debug.LogWarning( ePanel + "이 없습니다.. 하이어라키를 확인해주세요" );
@@ -81,7 +97,7 @@ abstract public class CManagerUIBase<Class_Instance, ENUM_Panel_Name, Class_Pane
 
 	public bool DoCheckIsPlayAnimation( ENUM_Panel_Name ePanel )
 	{
-		Class_Panel pPanel = _mapPanelInstance[ePanel];
+		CUIPanelData pPanel = _mapPanelData[ePanel];
 		if (pPanel == null)
 		{
 			Debug.LogWarning( ePanel + "이 없습니다.. 하이어라키를 확인해주세요" );
@@ -93,32 +109,32 @@ abstract public class CManagerUIBase<Class_Instance, ENUM_Panel_Name, Class_Pane
 
 	public void DoChangePanel_FadeInout(ENUM_Panel_Name ePanelHide, ENUM_Panel_Name ePanelShow, float fFadeTime = 1f)
 	{
-		Class_Panel pPanelHide = _mapPanelInstance[ePanelHide];
-		Class_Panel pPanelShow = _mapPanelInstance[ePanelShow];
+		CUIPanelData pPanelHide = _mapPanelData[ePanelHide];
+		CUIPanelData pPanelShow = _mapPanelData[ePanelShow];
 		int iSortOrder = 0;
-		if (pPanelShow.p_bFixedSortOrder == false)
+		if (pPanelShow.p_pPanel.p_bIsFixedSortOrder == false)
 			iSortOrder = CaculateSortOrder_Top();
 
-		pPanelShow.EventUIPanel_SetOrder( iSortOrder );
+		pPanelShow.EventSetOrder( iSortOrder );
 		AutoFade.DoStartFade( fFadeTime, Color.black, pPanelHide.DoHide, pPanelShow.DoShow );
 	}
 
-	public void DoShowPanel_FadeIn(ENUM_Panel_Name ePanelShow, float fFadeTime = 1f)
+	public void DoShowPanel_FadeIn(ENUM_Panel_Name ePanel, float fFadeTime = 1f)
 	{
-		Class_Panel pPanelShow = _mapPanelInstance[ePanelShow];
+		CUIPanelData pPanel = _mapPanelData[ePanel];
 
 		int iSortOrder = 0;
-		if (pPanelShow.p_bFixedSortOrder == false)
+		if (pPanel.p_pPanel.p_bIsFixedSortOrder == false)
 			iSortOrder = CaculateSortOrder_Top();
 
-		pPanelShow.EventUIPanel_SetOrder( iSortOrder);
-		AutoFade.DoStartFade(fFadeTime, Color.black, pPanelShow.DoShow);
+		pPanel.EventSetOrder( iSortOrder);
+		AutoFade.DoStartFade(fFadeTime, Color.black, pPanel.DoShow);
 	}
 
-	public void DoHidePanel_FadeOut(ENUM_Panel_Name ePanelShow, float fFadeTime = 1f)
+	public void DoHidePanel_FadeOut(ENUM_Panel_Name ePanel, float fFadeTime = 1f)
 	{
-		Class_Panel pPanelShow = _mapPanelInstance[ePanelShow];
-		AutoFade.DoStartFade(fFadeTime, Color.black, pPanelShow.DoHide);
+		CUIPanelData pPanel = _mapPanelData[ePanel];
+		AutoFade.DoStartFade(fFadeTime, Color.black, pPanel.DoHide);
 	}
 	
 	/// <summary>
@@ -126,15 +142,15 @@ abstract public class CManagerUIBase<Class_Instance, ENUM_Panel_Name, Class_Pane
 	/// </summary>
 	/// <typeparam name="CUIPanel">얻고자 하는 Panel 타입</typeparam>
 	/// <returns></returns>
-	public CUIPanel GetUIPanel<CUIPanel>() where CUIPanel : CUIPanelBase
+	public CUIPanel GetUIPanel<CUIPanel>() where CUIPanel : CLASS_Panel
 	{
-		Class_Panel pFindPanel = null;
+		CUIPanelData pFindPanel = null;
 		ENUM_Panel_Name strKey = typeof( CUIPanel ).ToString().ConvertEnum<ENUM_Panel_Name>();
-		bool bResult = _mapPanelInstance.TryGetValue( strKey, out pFindPanel );
+		bool bResult = _mapPanelData.TryGetValue( strKey, out pFindPanel );
 		if (bResult == false)
 			Debug.LogWarning( string.Format( "{0}을 찾을 수 없습니다.", strKey ) );
 
-		return pFindPanel as CUIPanel;
+		return pFindPanel.p_pPanel as CUIPanel;
 	}
 
 	/// <summary>
@@ -142,11 +158,11 @@ abstract public class CManagerUIBase<Class_Instance, ENUM_Panel_Name, Class_Pane
 	/// </summary>
 	/// <typeparam name="CUIPanel">얻고자 하는 Panel 타입</typeparam>
 	/// <returns></returns>
-	public bool GetUIPanel<CUIPanel>(out CUIPanel pUIPanelOut) where CUIPanel : CUIPanelBase
+	public bool GetUIPanel<CUIPanel>(out CUIPanel pUIPanelOut) where CUIPanel : CLASS_Panel
     {
-		Class_Panel pFindPanel = null;
+		CUIPanelData pFindPanel = null;
         ENUM_Panel_Name strKey = typeof(CUIPanel).ToString().ConvertEnum<ENUM_Panel_Name>();
-		bool bResult = _mapPanelInstance.TryGetValue(strKey, out pFindPanel);
+		bool bResult = _mapPanelData.TryGetValue( strKey, out pFindPanel );
 		if (bResult == false)
 		{
 			pUIPanelOut = null;
@@ -199,32 +215,33 @@ abstract public class CManagerUIBase<Class_Instance, ENUM_Panel_Name, Class_Pane
 
     private void InitUIPanelInstance()
     {
-		Class_Panel[] arrPanelInstance = GetComponentsInChildren<Class_Panel>(true);
+		CLASS_Panel[] arrPanelInstance = GetComponentsInChildren<CLASS_Panel>(true);
         for (int i = 0; i < arrPanelInstance.Length; i++)
         {
-			Class_Panel pPanel = arrPanelInstance[i];
+			CLASS_Panel pPanel = arrPanelInstance[i];
 			pPanel.EventOnAwake();
 
 			string strComponentName = pPanel.GetType().Name;
 			ENUM_Panel_Name ePanelName;
 			if (strComponentName.ConvertEnum_IgnoreError( out ePanelName ))
-				_mapPanelInstance.Add( ePanelName, pPanel );
+				_mapPanelData.Add( ePanelName, new CUIPanelData( ePanelName , pPanel ) );
 		}
     }
 
     private int CaculateSortOrder_Top()
     {
         _iSortOrderTop = 0;
-        List<Class_Panel> listUIPanel = _mapPanelInstance.Values.ToList();
+        List<CUIPanelData> listUIPanel = _mapPanelData.Values.ToList();
 
         for (int i = 0; i < listUIPanel.Count; i++)
         {
-            if (listUIPanel[i].isActiveAndEnabled)
+			CUIPanelData pUIPanelData = listUIPanel[i];
+			if (pUIPanelData.p_pPanel.isActiveAndEnabled)
             {
-                if (listUIPanel[i].p_bFixedSortOrder)
+                if (pUIPanelData.p_pPanel.p_bIsFixedSortOrder)
                     ++_iSortOrderTop;
                 else
-                    listUIPanel[i].DoShow(++_iSortOrderTop);
+					pUIPanelData.DoShow(++_iSortOrderTop);
             }
         }
 

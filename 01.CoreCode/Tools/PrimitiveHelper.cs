@@ -168,22 +168,17 @@ public static class PrimitiveHelper
 		return strText;
 	}
 
-	public static string CommaString(this string strText)
+	public static string CommaString(this int iValue)
 	{
-		if (strText.Equals("0")) return "0";
-
-		int iResult = 0;
-		bool bSuccess = int.TryParse(strText, out iResult);
-		if (bSuccess == false)
-		{
-			Debug.LogWarning("int 파싱 에러 : " + strText);
-
-			return "Int Parse Error!";
-		}
-
-		return string.Format("{0:#,###}", iResult);
+		if (iValue.Equals(0)) return "0";
+		return string.Format("{0:#,###}", iValue );
 	}
 
+	public static string CommaString(this float fValue)
+	{
+		if (fValue.Equals( 0f )) return "0";
+		return string.Format( "{0:#,###.#}", fValue );
+	}
 
 	public static string CommaString(this object pObject)
 	{

@@ -11,7 +11,7 @@
  *	기능 : 
    ============================================ */
 #endregion Header
-#if DoozyUI
+#if dUI_DoozyUI
 using UnityEngine;
 using UnityEngine.Events;
 using System.Collections;
@@ -64,32 +64,15 @@ public class CManagerDoozyUI<CLASS, ENUM_UIELEMENT> : CSingletonBase<CLASS>
 
 	// UIManager 에서 얻어오는건 리스트로 얻어오는데 이건 하나만 얻어오게 한다.
 	// Static 정적 멤버라 Awake 때 초기화 해줘야함...
-	private static Dictionary<string, Component> _mapCachedTypeUIElement = new Dictionary<string, Component>();
+	private static Dictionary<ENUM_UIELEMENT, Component> _mapCachedTypeUIElement = new Dictionary<ENUM_UIELEMENT, Component>();
 
 	public static COMPONENT GetUITypeByElement<COMPONENT>(ENUM_UIELEMENT eUIElementName)
 		where COMPONENT : Component
 	{
-		string strUIElementName = eUIElementName.ToString();
 		COMPONENT pCompo = null;
 
-		if (_mapCachedTypeUIElement.ContainsKey(strUIElementName))
-			return _mapCachedTypeUIElement[strUIElementName] as COMPONENT;
-		else
-		{
-			List<UIElement> listUIElement = UIManager.GetUiElements(strUIElementName, p_strCategory );
-			if (listUIElement.Count > 0)
-			{
-				UIElement pUIElement = listUIElement[0];
-				pCompo = pUIElement.GetComponent<COMPONENT>();
-
-				if (pCompo == null)
-					Debug.LogError(strUIElementName + " 의 UI 타입을 찾을 수 없습니다!");
-
-				_mapCachedTypeUIElement.Add(strUIElementName, pCompo);
-
-				return pCompo;
-			}
-		}
+		if (_mapCachedTypeUIElement.ContainsKey(eUIElementName))
+			return _mapCachedTypeUIElement[eUIElementName] as COMPONENT;
 
 		return pCompo;
 	}
@@ -148,6 +131,8 @@ public class CManagerDoozyUI<CLASS, ENUM_UIELEMENT> : CSingletonBase<CLASS>
 
 		_mapRemoveAnimationsStart.Clear();
 		_mapRemoveAnimationsFinish.Clear();
+
+		ProcRegisterUIElement();
 
 		//_mapNavigationData.Clear();
 	}
@@ -251,6 +236,33 @@ public class CManagerDoozyUI<CLASS, ENUM_UIELEMENT> : CSingletonBase<CLASS>
 						_mapRemoveAnimationsFinish.Add(strUIElementName, OnAnimationsFinish);
 					}
 					break;
+			}
+		}
+	}
+
+	private void ProcRegisterUIElement()
+	{
+		UIElement[] arrUIElement = GetComponentsInChildren<UIElement>(true);
+
+		int iLen = arrUIElement.Length;
+		for (int i = 0; i < iLen; i++)
+		{
+			UIElement pUIElement = arrUIElement[i];
+			CUGUIPanelBase pPanel = pUIElement.GetComponent<CUGUIPanelBase>();
+
+			if (pPanel == null) continue;
+
+			string strUIElementName = pUIElement.elementName;
+			ENUM_UIELEMENT eUIElement = strUIElementName.ConvertEnum<ENUM_UIELEMENT>();
+
+			if (_mapCachedTypeUIElement.ContainsKey(eUIElement))
+			{
+				Debug.LogWarning("이미 _mapCachedTypeUIElement 에 " + eUIElement + " 가 있습니다...");
+			}
+			else
+			{
+				_mapCachedTypeUIElement.Add(eUIElement, pPanel as Component);
+				pUIElement.RegisterToUIManager();
 			}
 		}
 	}

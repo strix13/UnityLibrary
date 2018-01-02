@@ -42,7 +42,7 @@ public class CManagerUIShared_NGUI : CManagerNGUIBase<CManagerUIShared_NGUI, CMa
 
     public bool CheckIsAlreadyShowConsole()
     {
-		return _pUIPopup_DebugConsole.p_bIsShowCurrent;
+		return _pUIPopup_DebugConsole.isActiveAndEnabled;
     }
 
 	/* public - [Event] Function             

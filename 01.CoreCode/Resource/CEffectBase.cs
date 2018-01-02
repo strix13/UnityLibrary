@@ -26,6 +26,10 @@ abstract public class CEffectBase<CLASS_EFFECT, ENUM_EFFECT_NAME> : CObjectBase
 
 	/* public - Variable declaration            */
 
+	public delegate void OnEventEffect( ENUM_EFFECT_NAME eEffect, CLASS_EFFECT pEffect, bool bEffectIsPlay);
+
+	public event OnEventEffect p_Event_Effect_OnPlayStop;
+
 	/* protected - Variable declaration         */
 
 	protected EEffectType _eEffectType = EEffectType.None;
@@ -70,8 +74,8 @@ abstract public class CEffectBase<CLASS_EFFECT, ENUM_EFFECT_NAME> : CObjectBase
 
 		OnPlayEffectAfter( _eEffectName );
 	}
-
-	public void DoPlayEffect( ENUM_EFFECT_NAME _eEffectName, Transform pTransParents, Vector3 vecWorldPos )
+	
+	public void DoPlayEffect( Transform pTransParents, Vector3 vecWorldPos )
 	{
 		_pTransformCached.SetParent( pTransParents );
 		OnPlayEffectBefore( _eEffectName, ref vecWorldPos );
@@ -94,20 +98,13 @@ abstract public class CEffectBase<CLASS_EFFECT, ENUM_EFFECT_NAME> : CObjectBase
 
 	virtual protected void OnDefineEffect()
 	{
-		if (_pParticleSystem != null)
-			_eEffectType = EEffectType.Particle;
-
+		_eEffectType = EEffectType.None;
 #if NGUI
-		else if (_p2DSpriteAnimation != null)
+		if (_eEffectType == EEffectType.None && _p2DSpriteAnimation != null)
 			_eEffectType = EEffectType.TwoD;
 #endif
-
-		else
-		{
-			_eEffectType = EEffectType.None;
-			//if(GetComponent<TrailRenderer>() == null)
-			//    Debug.LogWarning("이펙트가 ParticleSystem 또는 2D2priteAnimation을 가지고 있지 않습니다." + name, this);
-		}
+		if (_eEffectType == EEffectType.None && _pParticleSystem != null)
+			_eEffectType = EEffectType.Particle;
 	}
 
 	virtual protected void ProcPlayEffect()
@@ -123,6 +120,9 @@ abstract public class CEffectBase<CLASS_EFFECT, ENUM_EFFECT_NAME> : CObjectBase
 				StartCoroutine( CoPlay2DSpriteAnimation() );
 				break;
 		}
+
+		if (p_Event_Effect_OnPlayStop != null)
+			p_Event_Effect_OnPlayStop( _eEffectName, _pInstance, true );
 	}
 
 	/* protected - [Event] Function           
@@ -145,7 +145,8 @@ abstract public class CEffectBase<CLASS_EFFECT, ENUM_EFFECT_NAME> : CObjectBase
 	protected override void OnDisableObject()
 	{
 		base.OnDisableObject();
-
+		
+		p_Event_Effect_OnPlayStop = null;
 		CManagerPooling<ENUM_EFFECT_NAME, CLASS_EFFECT>.instance.DoPush( _pInstance );
 	}
 
@@ -162,7 +163,7 @@ abstract public class CEffectBase<CLASS_EFFECT, ENUM_EFFECT_NAME> : CObjectBase
 			while (_pParticleSystem.isPlaying)
 				yield return null;
 
-			DisableParticleSystem();
+			ProcOnFinishEffect();
 		}
 	}
 
@@ -172,32 +173,18 @@ abstract public class CEffectBase<CLASS_EFFECT, ENUM_EFFECT_NAME> : CObjectBase
 		if (_p2DSpriteAnimation.frames.Length == 0)
 		{
 			Debug.LogWarning( "Effect Sprite Frame Length가 0입니다" );
-			Disable2DSpriteAnimation();
+			ProcOnFinishEffect();
 			yield break;
 		}
 
 		if (_p2DSpriteAnimation.loop)
 			_p2DSpriteAnimation.Play();
 		else
-			_p2DSpriteAnimation.Play( Disable2DSpriteAnimation );
+			_p2DSpriteAnimation.Play( ProcOnFinishEffect );
 #endif
 		yield return null;
 	}
-
-	private void DisableParticleSystem()
-	{
-		_pParticleSystem.Stop();
-
-		_pGameObjectCached.SetActive( false );
-		ProcOnFinishEffect();
-	}
-
-	private void Disable2DSpriteAnimation()
-	{
-		_pGameObjectCached.SetActive( false );
-		ProcOnFinishEffect();
-	}
-
+	
 	private void ProcOnFinishEffect()
 	{
 		if (_OnFinishEffect != null)
@@ -205,7 +192,13 @@ abstract public class CEffectBase<CLASS_EFFECT, ENUM_EFFECT_NAME> : CObjectBase
 			_OnFinishEffect();
 			_OnFinishEffect = null;
 		}
+
+		if (p_Event_Effect_OnPlayStop != null)
+			p_Event_Effect_OnPlayStop( _eEffectName, _pInstance, false );
+
+		_pGameObjectCached.SetActive( false );
 	}
+
 	/* private - Other[Find, Calculate] Func 
        찾기, 계산 등의 비교적 단순 로직         */
 

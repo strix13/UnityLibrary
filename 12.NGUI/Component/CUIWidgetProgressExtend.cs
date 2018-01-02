@@ -32,7 +32,7 @@ public class CUIWidgetProgressExtend : CNGUIPanelBase
     private UILabel _pLabelUnit = null;
 
     private CNGUITweenProgress _pTweenProgress;
-    private CUILabelAnimation _pLabelAnimation;
+    private CUITextAnimation _pLabelAnimation;
 
 	private float _fLastValue;
 
@@ -43,9 +43,9 @@ public class CUIWidgetProgressExtend : CNGUIPanelBase
 
 	public void DoSetUILabel(UILabel pUILabel)
 	{
-		_pLabelAnimation = pUILabel.GetComponent<CUILabelAnimation>();
+		_pLabelAnimation = pUILabel.GetComponent<CUITextAnimation>();
 		if (_pLabelAnimation == null)
-			_pLabelAnimation = pUILabel.gameObject.AddComponent<CUILabelAnimation>();
+			_pLabelAnimation = pUILabel.gameObject.AddComponent<CUITextAnimation>();
 
 		_pLabelUnit = pUILabel;
 	}

@@ -16,7 +16,7 @@ using System.Collections.Generic;
    ============================================ */
 #endregion Header
 
-public class CDialogueNPCBase : CObjectBase
+public class CDialogueBase : CObjectBase
 {
 	/* const & readonly declaration             */
 

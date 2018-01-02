@@ -78,7 +78,7 @@ public class CUGUIDropDown : Dropdown
 		if (listData == null) return;
 
 		_listData.AddRange(listData);
-		_mapData.DoAddItem(listData);
+		_mapData.DoAddItem(listData, false);
 
 		List<string> listText = new List<string>();
 		for(int i = 0; i < listData.Count; i++)

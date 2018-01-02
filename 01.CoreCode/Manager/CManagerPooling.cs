@@ -159,7 +159,16 @@ public class CManagerPooling<ENUM_Resource_Name, Class_Resource> : CSingletonBas
 	/// 사용했던 오브젝트를 반환합니다. 자동으로 GameObject가 Disable 됩니다.
 	/// </summary>
 	/// <param name="pResource">사용한 리소스</param>
-	public void DoPush(Class_Resource pResource, bool bSetPaents_ManagerObject = false)
+	public void DoPush( Class_Resource pResource )
+	{
+		ProcReturnResource( pResource, false);
+	}
+
+	/// <summary>
+	/// 사용했던 오브젝트를 반환합니다. 자동으로 GameObject가 Disable 됩니다.
+	/// </summary>
+	/// <param name="pResource">사용한 리소스</param>
+	public void DoPush(Class_Resource pResource, bool bSetPaents_ManagerObject)
 	{
 		ProcReturnResource(pResource, bSetPaents_ManagerObject );
 	}

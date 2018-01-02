@@ -13,25 +13,33 @@ public class SCManagerEffect<ENUM_EFFECT_NAME, CLASS_EFFECT> : CManagerPooling<E
     where ENUM_EFFECT_NAME : System.IConvertible, System.IComparable
     where CLASS_EFFECT : CEffectBase<CLASS_EFFECT, ENUM_EFFECT_NAME>
 {
-    /* const & readonly declaration             */
+	/* const & readonly declaration             */
 
-    /* enum & struct declaration                */
+	/* enum & struct declaration                */
 
-    /* public - Variable declaration            */
+	/* public - Variable declaration            */
 
-    /* protected - Variable declaration         */
+	/* protected - Variable declaration         */
 
-    /* private - Variable declaration           */
-    
-    // ========================================================================== //
+	/* private - Variable declaration           */
 
-    /* public - [Do] Function
+	// ========================================================================== //
+
+	/* public - [Do] Function
      * 외부 객체가 호출                         */
 
-    static public CLASS_EFFECT DoPlayEffect(ENUM_EFFECT_NAME eEffect, Vector3 vecPos)
+	static public CLASS_EFFECT DoPop( ENUM_EFFECT_NAME eEffect )
+	{
+		CLASS_EFFECT pEffect = instance.DoPop( eEffect );
+		pEffect.p_eEffectName = eEffect;
+		return pEffect;
+	}
+
+	static public CLASS_EFFECT DoPlayEffect(ENUM_EFFECT_NAME eEffect, Vector3 vecPos)
     {
         CLASS_EFFECT pEffect = instance.DoPop(eEffect);
-        pEffect.DoPlayEffect(vecPos);
+		pEffect.p_eEffectName = eEffect;
+		pEffect.DoPlayEffect(vecPos);
 
 		//Debug.Log( eEffect, pEffect);
 
@@ -41,15 +49,17 @@ public class SCManagerEffect<ENUM_EFFECT_NAME, CLASS_EFFECT> : CManagerPooling<E
 	static public CLASS_EFFECT DoPlayEffect(ENUM_EFFECT_NAME eEffect, Transform pTransParents, Vector3 vecPos)
 	{
 		CLASS_EFFECT pEffect = instance.DoPop( eEffect);
-		pEffect.DoPlayEffect(eEffect, pTransParents, vecPos);
+		pEffect.p_eEffectName = eEffect;
+		pEffect.DoPlayEffect(pTransParents, vecPos);
 
 		return pEffect;
 	}
-
+	
 	static public CLASS_EFFECT DoPlayEffect(ENUM_EFFECT_NAME eEffect, Vector3 vecPos, Quaternion quatRot)
     {
         CLASS_EFFECT pEffect = instance.DoPop( eEffect);
-        pEffect.DoPlayEffect(vecPos);
+		pEffect.p_eEffectName = eEffect;
+		pEffect.DoPlayEffect(vecPos);
         pEffect.p_pTransCached.rotation = quatRot;
 
         return pEffect;
@@ -59,7 +69,8 @@ public class SCManagerEffect<ENUM_EFFECT_NAME, CLASS_EFFECT> : CManagerPooling<E
 	static public CLASS_EFFECT DoPlayEffect(ENUM_EFFECT_NAME eEffect, Vector3 vecPos, Vector3 vecRot)
     {
         CLASS_EFFECT pEffect = instance.DoPop( eEffect);
-        pEffect.DoPlayEffect(vecPos);
+		pEffect.p_eEffectName = eEffect;
+		pEffect.DoPlayEffect(vecPos);
         pEffect.p_pTransCached.rotation = Quaternion.LookRotation(vecRot);
 
         return pEffect;

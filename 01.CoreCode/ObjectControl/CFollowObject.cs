@@ -179,10 +179,9 @@ public class CFollowObject : CObjectBase
 			else
 			{
 				Vector3 vecShakePos = PrimitiveHelper.RandomRange( vecFollowPos.AddFloat( -_fRemainShakePow ), vecFollowPos.AddFloat( _fRemainShakePow ) );
-
-				if (_bFollowX) vecShakePos.x = vecFollowPos.x;
-				if (_bFollowY) vecShakePos.y = vecFollowPos.y;
-				if (_bFollowZ) vecShakePos.z = vecFollowPos.z;
+				//if (_bFollowX) vecFollowPos.x = vecShakePos.x;
+				//if (_bFollowY) vecFollowPos.y = vecShakePos.y;
+				//if (_bFollowZ) vecFollowPos.z = vecShakePos.z;
 
 				vecFollowPos = vecShakePos;
 			}

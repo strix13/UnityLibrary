@@ -239,6 +239,15 @@ public class CAnimatorController : CObjectBase, IAnimationController
 			StartCoroutine( CoDelayPlayAnimation( eAnimName.ToString(), bIsLoop, iAnimationLayer ) );
 			return;
 		}
+
+		// for debug
+		//if(GetComponentInParent<SGEnemy>() != null)
+		//{
+		//	if(GetComponentInParent<CCompoStat>().p_bIsAlive == false)
+		//	{
+		//		Debug.Log( "Play Anim!!" + eAnimName );
+		//	}
+		//}
 		
 		_strCurrentAnimName = eAnimName.ToString();
 		_pAnimator.Play( _strCurrentAnimName, iAnimationLayer, 0f );

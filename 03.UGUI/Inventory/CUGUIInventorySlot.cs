@@ -18,12 +18,7 @@ using UnityEngine.EventSystems;
 using System.Collections;
 using System.Collections.Generic;
 
-public interface IInventoryEquipSlot<CLASS_DATA>
-{
-	bool CheckSlotType(CLASS_DATA pData);
-}
-
-public abstract class CUGUIInventoryEquipSlotBase<ENUM_TYPE, CLASS_DATA> : CUGUIInventorySlotBase, IInventoryEquipSlot<CLASS_DATA>
+public abstract class CUGUIInventorySlot : CUGUIObjectBase, IInventorySlot, IPointerClickHandler
 {
 	/* const & readonly declaration             */
 
@@ -37,8 +32,10 @@ public abstract class CUGUIInventoryEquipSlotBase<ENUM_TYPE, CLASS_DATA> : CUGUI
 
 	/* private - Field declaration           */
 
-	[SerializeField]
-	private ENUM_TYPE _eSlotType; public ENUM_TYPE p_eSlotType { get { return _eSlotType; } }
+	private IInventory _IInventory;
+
+	private Image _pImage_Icon;
+	private GameObject _pGoImage_Icon;
 
 	#endregion Field
 
@@ -49,12 +46,29 @@ public abstract class CUGUIInventoryEquipSlotBase<ENUM_TYPE, CLASS_DATA> : CUGUI
 	/* public - [Do] Function
      * 외부 객체가 호출(For External class call)*/
 
+	public void DoInit(IInventory IInventory)
+	{
+		EventOnAwake();
+
+		_IInventory = IInventory;
+	}
+
 	/* public - [Event] Function             
        프랜드 객체가 호출(For Friend class call)*/
 
-	public bool CheckSlotType(CLASS_DATA pData)
+	public void OnSetSprite(string strSpriteName)
 	{
-		return OnCheckSlotType(pData);
+		EventSetImage(GetSprite(strSpriteName));
+	}
+
+	public void OnEnableSlot(bool bEnable)
+	{
+		EventEnableImage(bEnable);
+	}
+
+	public void OnPointerClick(PointerEventData pEventData)
+	{
+		_IInventory.OnClickSlot(this);
 	}
 
 	#endregion Public
@@ -65,12 +79,35 @@ public abstract class CUGUIInventoryEquipSlotBase<ENUM_TYPE, CLASS_DATA> : CUGUI
 
 	/* protected - [abstract & virtual]         */
 
-	protected abstract bool OnCheckSlotType(CLASS_DATA pData);
+	protected abstract string GetImageName();
+
+	protected abstract Sprite GetSprite(string strSpriteName);
 
 	/* protected - [Event] Function           
        자식 객체가 호출(For Child class call)		*/
 
-	/* protected - Override & Unity API         */
+	private void EventSetImage(Sprite pSprite)
+	{
+		_pImage_Icon.sprite = pSprite;
+		_pImage_Icon.SetNativeSize();
+	}
+
+	private void EventEnableImage(bool bEnable)
+	{
+		_pGoImage_Icon.SetActive(bEnable);
+	}
+	
+	protected override void OnAwake()
+	{
+		base.OnAwake();
+
+		string strImageName = GetImageName();
+
+		_pImage_Icon = GetImage(strImageName);
+		_pImage_Icon.raycastTarget = false;
+
+		_pGoImage_Icon = _pImage_Icon.gameObject;
+	}
 
 	#endregion Protected
 

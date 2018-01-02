@@ -113,7 +113,8 @@ public class SCManagerParserJson : SCManagerResourceBase<SCManagerParserJson, st
 
     public bool DoReadJson_FromResource<ENUM_FILE_NAME, T>(ENUM_FILE_NAME eFileName, out T sData)
         where ENUM_FILE_NAME : System.IConvertible, System.IComparable
-    {
+		where T : class
+	{
         bool bSuccess = true;
         try
         {
@@ -129,7 +130,7 @@ public class SCManagerParserJson : SCManagerResourceBase<SCManagerParserJson, st
 
             sData = JsonUtility.FromJson<T>(strText);
         }
-        catch { sData = default(T); bSuccess = false; }
+        catch { sData = null; bSuccess = false; }
 
         if (sData == null)
             bSuccess = false;

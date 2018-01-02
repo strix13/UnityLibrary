@@ -10,18 +10,12 @@ using System.Collections.Generic;
    Edit Log    : 
    ============================================ */
 
-public class CNGUITweenPlayGroup : CObjectBase
+public class CNGUITweenPlayGroup : CCompoEventTrigger
 {
 	/* const & readonly declaration             */
 
 	/* enum & struct declaration                */
-
-	private enum EEventType
-	{
-		None,
-		OnEnable
-	}
-
+	
 	private enum ETweenPlay
 	{
 		Forward,
@@ -29,8 +23,7 @@ public class CNGUITweenPlayGroup : CObjectBase
 	}
 
 	/* public - Variable declaration            */
-
-	[Header("이벤트 타입")] [SerializeField] private EEventType p_eEventType;
+	
 	[Header("플레이 방향")] [SerializeField] private ETweenPlay p_eTweenPlay;
 	[Header("플레이 대상 그룹ID")] [SerializeField] private int p_iTweenGroupID;
 
@@ -77,13 +70,13 @@ public class CNGUITweenPlayGroup : CObjectBase
 	/* protected - [Event] Function           
        자식 객체가 호출                         */
 
-	private void OnEnable()
+	protected override void OnPlayEventMain()
 	{
-		if (p_eEventType != EEventType.OnEnable) return;
+		base.OnPlayEventMain();
 
-		ProcPlayTweenGroup(p_iTweenGroupID, 0f, p_eTweenPlay);
+		ProcPlayTweenGroup( p_iTweenGroupID, 0f, p_eTweenPlay );
 	}
-
+	
 	/* protected - Override & Unity API         */
 
 	protected override void OnAwake()
@@ -94,9 +87,7 @@ public class CNGUITweenPlayGroup : CObjectBase
 
 		iCachedTweenCount = _listTween.Count;
 		for (int i = 0; i < iCachedTweenCount; i++)
-		{
 			_listTween[i].enabled = false;
-		}
 	}
 
 	// ========================================================================== //

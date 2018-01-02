@@ -19,6 +19,7 @@ using System.Collections.Generic;
 public class CObjectBase : MonoBehaviour
 {
     protected bool _bIsExcuteAwake = false;	public bool p_bIsExcuteAwake {  get { return _bIsExcuteAwake; } }
+	private bool _bIsExcuteEnable = false;
 
     protected Transform _pTransformCached; public Transform p_pTransCached { get { return _pTransformCached; } }
     protected GameObject _pGameObjectCached; public GameObject p_pGameObjectCached { get { return _pGameObjectCached; } }
@@ -54,10 +55,21 @@ public class CObjectBase : MonoBehaviour
         }
 	}
 
+	virtual protected void OnEnableObject()
+	{
+		if (_bIsExcuteEnable == false)
+		{
+			_bIsExcuteEnable = true;
+			return;
+		}
+
+		OnEnableSecond();
+	}
+
 	virtual protected void OnStart() { }
-	virtual protected void OnEnableObject() { }
     virtual protected void OnUpdate() { }
-    virtual protected void OnDisableObject() { }
+	protected virtual void OnEnableSecond() { }
+	virtual protected void OnDisableObject() { }
 
 	protected virtual void LateUpdate() { }
 	
@@ -110,9 +122,9 @@ public class CObjectBase : MonoBehaviour
 	}
 
 	public bool GetComponentInChildren<COMPONENT>( out COMPONENT pComponent )
-	where COMPONENT : UnityEngine.Component
+		where COMPONENT : UnityEngine.Component
 	{
-		pComponent = GetComponentInChildren<COMPONENT>();
+		pComponent = GetComponentInChildren<COMPONENT>(true);
 
 		return pComponent != null;
 	}
@@ -171,9 +183,7 @@ public class CObjectBase : MonoBehaviour
 
 	protected void EventDelayExcuteCallBack(System.Action OnAfterDelayAction, float fDelaySec)
 	{
-#if UNITY_EDITOR
-		if(Application.isEditor && gameObject.activeInHierarchy)
-#endif
+		if(gameObject.activeInHierarchy)
 			StartCoroutine(CoDelayAction(OnAfterDelayAction, fDelaySec));
 	}
 
@@ -222,5 +232,10 @@ public class CObjectBase : MonoBehaviour
 		yield return SCManagerYield.GetWaitForSecond( fDelaySec );
 
 		pObjectDisable.SetActive( false );
+	}
+
+	public int GetSiblingIndex()
+	{
+		return p_pTransCached.GetSiblingIndex();
 	}
 }

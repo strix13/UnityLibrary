@@ -41,7 +41,6 @@ public class SGameData
 
 	static public void SetData( SGameData[] arrData )
 	{
-		_mapDataConfig_String.Clear();
 		for (int i = 0; i < arrData.Length; i++)
 			_mapDataConfig_String.Add( arrData[i].strKey, arrData[i].strValue );
 	}

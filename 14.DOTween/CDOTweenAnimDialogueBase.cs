@@ -34,7 +34,7 @@ public class CDOTweenAnimDialogueBase<ENUM_BUTTON> : CUGUIPanelHasInputBase<ENUM
 
 	/* private - Field declaration           */
 
-	private CDialogueNPCBase _pDialogue;
+	private CDialogueBase _pDialogue;
 
 	[SerializeField] private Text _pText_NPCName;
 	[SerializeField] private Text _pText_Dialogue;
@@ -126,7 +126,7 @@ public class CDOTweenAnimDialogueBase<ENUM_BUTTON> : CUGUIPanelHasInputBase<ENUM
 
 		GetComponent(out _pDialogue);
 		if (_pDialogue == null)
-			_pDialogue = gameObject.AddComponent<CDialogueNPCBase>();
+			_pDialogue = gameObject.AddComponent<CDialogueBase>();
 
 		_pDialogue.p_EVENT_OnChange_DialogueScene += OnChange_DialogueScene;
 		_pDialogue.p_EVENT_OnFirst_DialogueScene += OnFirst_DialogueScene;

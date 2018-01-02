@@ -33,7 +33,6 @@ public class CSpineController : CObjectBase, IAnimationController
 	private Skeleton _pSkeleton;
 
 	private System.Action _OnFinishAnimation;
-	private int _iPriorityCurrent = -1;
 
 	// ========================================================================== //
 
@@ -66,8 +65,9 @@ public class CSpineController : CObjectBase, IAnimationController
 		bool bSuccess = _pSkeletonData.FindAnimation( strAnimName ) != null;
 		if (bSuccess)
 		{
-			_iPriorityCurrent = -1;
+			_pAnimation.AnimationName = "";
 			_pAnimation.AnimationName = strAnimName;
+			_pAnimation.state.Event += State_Event;
 		}
 
 		return bSuccess;
@@ -82,13 +82,9 @@ public class CSpineController : CObjectBase, IAnimationController
 	/// <returns></returns>
 	public bool DoPlayAnimation_Force<ENUM_ANIM_NAME>( ENUM_ANIM_NAME eAnimName, System.Action OnFinishAnimation = null )
 	{
-		string strAnimName = eAnimName.ToString();
-		bool bSuccess = _pSkeletonData.FindAnimation( strAnimName ) != null;
+		bool bSuccess = DoPlayAnimation( eAnimName );
 		if (bSuccess)
 		{
-			_iPriorityCurrent = -1;
-			_pAnimation.AnimationName = "";
-			_pAnimation.AnimationName = strAnimName;
 			_pAnimation.state.Complete += State_End;
 			_OnFinishAnimation = OnFinishAnimation;
 		}
@@ -99,18 +95,13 @@ public class CSpineController : CObjectBase, IAnimationController
 	public void DoPlayAnimation<ENUM_ANIM_NAME>( ENUM_ANIM_NAME eAnimName, System.Action OnFinishAnimation )
 			where ENUM_ANIM_NAME : System.IConvertible, System.IComparable
 	{
-		if (_pSkeletonData == null) return;
+		bool bSuccess = DoPlayAnimation( eAnimName );
 
-		string strAnimName = eAnimName.ToString();
-		_iPriorityCurrent = -1;
-		_pAnimation.loop = false;
-
-		if (_pAnimation.AnimationName == strAnimName)
-			_pAnimation.AnimationName = "";
-
-		_pAnimation.AnimationName = strAnimName;
-		_pAnimation.state.Complete += State_End;
-		_OnFinishAnimation = OnFinishAnimation;
+		if(bSuccess)
+		{
+			_pAnimation.state.Complete += State_End;
+			_OnFinishAnimation = OnFinishAnimation;
+		}
 	}
 	
 	public void DoPlayAnimation_Loop<ENUM_ANIM_NAME>( ENUM_ANIM_NAME eAnimName )
@@ -130,22 +121,6 @@ public class CSpineController : CObjectBase, IAnimationController
 
 		_pAnimation.loop = true;
 		_pAnimation.AnimationName = strAnimName;
-		_iPriorityCurrent = -1;
-	}
-
-	public void DoPlayAnimation<ENUM_ANIM_NAME>( ENUM_ANIM_NAME eAnimName, int iPriority, bool bIsLoop )
-		where ENUM_ANIM_NAME : System.IConvertible, System.IComparable
-	{
-		if (_iPriorityCurrent >= iPriority) return;
-
-		if(bIsLoop)
-			DoPlayAnimation_Loop( eAnimName );
-		else
-			DoPlayAnimation( eAnimName );
-		
-		if(bIsLoop == false)
-			_pAnimation.state.Complete += State_End;
-		_iPriorityCurrent = iPriority;
 	}
 
 	public bool DoCheckIsPlaying<ENUM_ANIMATION_NAME>( ENUM_ANIMATION_NAME eAnimName )
@@ -193,6 +168,19 @@ public class CSpineController : CObjectBase, IAnimationController
 		_pSkeleton = _pAnimation.skeleton;
 	}
 
+	private void State_Event( TrackEntry trackEntry, Spine.Event e )
+	{
+		string strKeyName = e.data.name;
+		EAnimationEvent eAnimationEvent;
+		if (strKeyName.ConvertEnum(out eAnimationEvent ))
+		{
+			if (p_Event_OnAnimationEvent != null)
+				p_Event_OnAnimationEvent( eAnimationEvent );
+		}
+		else
+			Debug.Log( name + e.data.name, this );
+	}
+
 	// ========================================================================== //
 
 	/* private - [Proc] Function             
@@ -206,8 +194,7 @@ public class CSpineController : CObjectBase, IAnimationController
 			StartCoroutine( CoDealyCallBack(_OnFinishAnimation ));
 			_OnFinishAnimation = null;
 		}
-
-		_iPriorityCurrent = -1;
+		
 		_pAnimation.state.Complete -= State_End;
 	}
 

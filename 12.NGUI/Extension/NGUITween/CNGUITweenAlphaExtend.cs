@@ -23,7 +23,10 @@ public class CNGUITweenAlphaExtend : CNGUITweenExtendBase<CNGUITweenAlphaExtend.
     private UIRect m_pRect;
     private Material m_pMaterialTarget;
     private SpriteRenderer m_pSpriteRenderer;
-    private bool m_bCached = false;
+	private UnityEngine.UI.MaskableGraphic _pImage;
+	private UnityEngine.UI.MaskableGraphic[] _arrImage_UGUI;
+
+	private bool m_bCached = false;
 
 
     [System.Obsolete("Use 'value' instead")]
@@ -36,7 +39,9 @@ public class CNGUITweenAlphaExtend : CNGUITweenExtendBase<CNGUITweenAlphaExtend.
             if (!m_bCached) Cache();
             if (m_pRect != null) return m_pRect.alpha;
             if (m_pSpriteRenderer != null) return m_pSpriteRenderer.color.a;
-            return m_pMaterialTarget != null ? m_pMaterialTarget.color.a : 1f;
+			if (_pImage != null) return _pImage.color.a;
+
+			return m_pMaterialTarget != null ? m_pMaterialTarget.color.a : 1f;
         }
         set
         {
@@ -58,7 +63,23 @@ public class CNGUITweenAlphaExtend : CNGUITweenExtendBase<CNGUITweenAlphaExtend.
                 c.a = value;
                 m_pMaterialTarget.color = c;
             }
-        }
+			else if(_pImage != null)
+			{
+				Color c = _pImage.color;
+				c.a = value;
+				_pImage.color = c;
+
+				if(_arrImage_UGUI != null)
+				{
+					for (int i = 0; i < _arrImage_UGUI.Length; i++)
+					{
+						Color cChildren = _arrImage_UGUI[i].color;
+						cChildren.a = value;
+						_arrImage_UGUI[i].color = cChildren;
+					}
+				}
+			}
+		}
     }
 
     protected virtual void Cache()
@@ -66,8 +87,10 @@ public class CNGUITweenAlphaExtend : CNGUITweenExtendBase<CNGUITweenAlphaExtend.
         m_bCached = true;
         m_pRect = GetComponent<UIRect>();
         m_pSpriteRenderer = GetComponent<SpriteRenderer>();
+		_pImage = GetComponent<UnityEngine.UI.MaskableGraphic>();
+		_arrImage_UGUI = GetComponentsInChildren<UnityEngine.UI.MaskableGraphic>();
 
-        if (m_pRect == null && m_pSpriteRenderer == null)
+		if (m_pRect == null && m_pSpriteRenderer == null)
         {
             Renderer ren = GetComponent<Renderer>();
             if (ren != null) m_pMaterialTarget = ren.material;

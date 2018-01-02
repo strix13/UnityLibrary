@@ -97,6 +97,8 @@ abstract public class CUGUIPanelHasInputBase<Enum_InputName> : CUGUIPanelBase, I
 	/* protected - [abstract & virtual]         */
 
 	abstract public void OnClick_Buttons( Enum_InputName eButtonName );
+	protected virtual void OnClick_Buttons(Enum_InputName eButtonName, Button pButton) { OnClick_Buttons(eButtonName); }
+
 	virtual public void OnPress_And_Hold_Buttons( Enum_InputName eButtonName, bool bPress ) { }
 	virtual public void OnScrollView_ClickItem( CUGUIScrollItem pScrollItem, IUGUIScrollItemData pScrollData, Enum_InputName eButtonName ) { }
 	virtual public void OnDropDown_SelectItem( Enum_InputName eDropDownName, CUGUIDropDown.SDropDownData pData, string strItemText) { }
@@ -120,7 +122,7 @@ abstract public class CUGUIPanelHasInputBase<Enum_InputName> : CUGUIPanelBase, I
 			Enum_InputName eButtonName;
 			if (strButtonName.ConvertEnum( out eButtonName ))
 			{
-				pButton.onClick.AddListener(() => { OnClick_Buttons(eButtonName); });
+				pButton.onClick.AddListener(() => { OnClick_Buttons(eButtonName, pButton); });
 				_mapButton.Add(strButtonName, pButton);
 
 				CUGUIButton_Press pButtonPress = pButton.GetComponent<CUGUIButton_Press>();

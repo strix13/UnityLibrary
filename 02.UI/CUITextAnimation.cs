@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Text;
-#if NGUI
+
 /* ============================================ 
    Editor      : Strix                               
    Date        : 2017-04-09 오후 11:11:22
@@ -10,8 +10,7 @@ using System.Text;
    Edit Log    : 
    ============================================ */
 
-[RequireComponent(typeof(UILabel))]
-public class CUILabelAnimation : CObjectBase
+public class CUITextAnimation : CObjectBase
 {
     /* const & readonly declaration             */
 
@@ -22,17 +21,34 @@ public class CUILabelAnimation : CObjectBase
     public event System.Action p_EVENT_OnAnimationFinish;
     public event System.Action<int> p_EVENT_OnChangeNumber;
 
-    public string p_pText { get { return _pLabel.text; } set { _pLabel.text = value; } }
+    public string p_pCurrentText { get { return GetCurrentText(); } set { ProcEditText(value); } }
+	
+	[SerializeField]
+	private bool _bIgnoreTimeScale = true;
 
-    /* protected - Variable declaration         */
+	[Header( "테스트 옵션" )]
+	[SerializeField]
+	private bool p_bExcuteTest = false;
+	[SerializeField]
+	private int p_iNum_Start_Test = 0;
+	[SerializeField]
+	private int p_iNum_Dest_Test = 100000;
+	[SerializeField]
+	private float p_fDuration_Test = 3;
+	[SerializeField]
+	private float p_fStartDelay_Test = 0;
 
-    /* private - Variable declaration           */
+	/* protected - Variable declaration         */
 
-    [SerializeField]
-    private bool _bIgnoreTimeScale = true;
+	/* private - Variable declaration           */
 
-    private UILabel _pLabel;
-    private CSoundSlot _pSoundSlot_OnChangeText;
+
+#if NGUI
+	private UILabel _pLabel;
+#endif
+	private UnityEngine.UI.Text _pText;
+
+	private CSoundSlot _pSoundSlot_OnChangeText;
 
     private string _strLabelContent;
     private float _fCharPerSec;
@@ -70,14 +86,14 @@ public class CUILabelAnimation : CObjectBase
 
         _strLabelContent = strLabelContent;
         _fCharPerSec = fDurationSec / _strLabelContent.Length;
-        _pLabel.text = "";
+		ProcEditText("");
         _iCharLengthIndex = 0;
         _fPrevTime = _bIgnoreTimeScale ? RealTime.time : Time.time;
 
         StartCoroutine(CoPlayUILabelAnimation());
     }
 
-    public void DoPlayAnimation_Number(int iStartNubmer, int iDestNumber, string strNumberFormat, float fDurationSec, CSoundSlot pSoundSlot_OnChangeText = null)
+    public void DoPlayAnimation_Number(int iStartNubmer, int iDestNumber, string strNumberFormat, float fDurationSec, CSoundSlot pSoundSlot_OnChangeText = null, float fStartDelaySec = 0f)
     {
         if (_bIsExcuteAwake == false)
             OnAwake();
@@ -90,13 +106,12 @@ public class CUILabelAnimation : CObjectBase
 
         _strLabelContent = strNumberFormat;
         _iCharLengthIndex = iStartNubmer;
-        _pLabel.text = string.Format(strNumberFormat, iStartNubmer);
-        _fPrevTime = _bIgnoreTimeScale ? RealTime.time : Time.time;
+		ProcEditText(string.Format(strNumberFormat, iStartNubmer));
         _iStartNumber = iStartNubmer;
         _iDestNumber = iDestNumber;
         _fCharPerSec = fDurationSec;
 
-        StartCoroutine(CoPlayUILabelAnimation_Number());
+        StartCoroutine(CoPlayUILabelAnimation_Number( fStartDelaySec ) );
     }
 
 	public void DoPlayAnimation_Float(float fFrom, float fTo, float fDuration, int iMaxFloat = 0, string strFormat = "")
@@ -110,19 +125,19 @@ public class CUILabelAnimation : CObjectBase
 	private IEnumerator CoProcAnimateNumberSmooth(float fFrom, float fDuration, int iMaxFloat, string strFormat = "")
 	{
 		string fMaxFloatFormat = string.Format("{0}0:f{1}{2}{3}", "{", iMaxFloat, "}", strFormat);
-		_pLabel.text = string.Format(fMaxFloatFormat, _fSmoothNumber);
+		ProcEditText(string.Format(fMaxFloatFormat, _fSmoothNumber));
 
 		if (_fSmoothTo <= 0)
-			_pLabel.text = string.Format(fMaxFloatFormat, 0f);
+			ProcEditText(string.Format(fMaxFloatFormat, 0f));
 
 		while (true)
 		{
 			_fSmoothNumber = Mathf.SmoothStep(_fSmoothNumber, _fSmoothTo, Time.deltaTime * fDuration * 15f);
-			_pLabel.text = string.Format(fMaxFloatFormat, _fSmoothNumber);
+			ProcEditText(string.Format(fMaxFloatFormat, _fSmoothNumber));
 
 			if (_fSmoothNumber == _fSmoothTo)
 			{
-				_pLabel.text = string.Format(fMaxFloatFormat, _fSmoothTo);
+				ProcEditText(string.Format(fMaxFloatFormat, _fSmoothTo));
 				pCoProcAnimateNumberSmooth = null;
 				yield break;
 			}
@@ -147,15 +162,35 @@ public class CUILabelAnimation : CObjectBase
     {
         base.OnAwake();
 
-        _pLabel = GetComponent<UILabel>();
-    }
+		_pText = GetComponent<UnityEngine.UI.Text>();
+#if NGUI
+		_pLabel = GetComponent<UILabel>();
+#endif
+	}
 
-    // ========================================================================== //
+	protected override void OnEnableObject()
+	{
+		base.OnEnableObject();
 
-    /* private - [Proc] Function             
+#if UNITY_EDITOR
+		if (p_bExcuteTest)
+			StartCoroutine( CoPlayTest() );
+#endif
+	}
+
+	// ========================================================================== //
+
+	/* private - [Proc] Function             
        중요 로직을 처리                         */
 
-    private IEnumerator CoPlayUILabelAnimation()
+	private IEnumerator CoPlayTest()
+	{
+		yield return new WaitForSeconds( p_fStartDelay_Test );
+
+		DoPlayAnimation_Number( p_iNum_Start_Test, p_iNum_Dest_Test, "{0:#,###,###,###}", p_fDuration_Test );
+	}
+
+	private IEnumerator CoPlayUILabelAnimation()
     {
         while (true)
         {
@@ -166,7 +201,7 @@ public class CUILabelAnimation : CObjectBase
 
             if (fTimeSec > _fCharPerSec)
             {
-                _pLabel.text = _strLabelContent.Substring(0, _iCharLengthIndex);
+				ProcEditText(_strLabelContent.Substring(0, _iCharLengthIndex));
                 _fPrevTime = fTime;
 
                 if (_pSoundSlot_OnChangeText != null)
@@ -177,7 +212,7 @@ public class CUILabelAnimation : CObjectBase
                     if (_pSoundSlot_OnChangeText != null)
                         _pSoundSlot_OnChangeText.DoStopSound();
 
-                    _pLabel.text = _strLabelContent;
+					ProcEditText(_strLabelContent);
                     if (p_EVENT_OnAnimationFinish != null)
                         p_EVENT_OnAnimationFinish();
 
@@ -187,9 +222,15 @@ public class CUILabelAnimation : CObjectBase
         }
     }
 
-    private IEnumerator CoPlayUILabelAnimation_Number()
+    private IEnumerator CoPlayUILabelAnimation_Number(float fStartDelaySec)
     {
-        while (true)
+		if(_bIgnoreTimeScale)
+			yield return new WaitForSecondsRealtime( fStartDelaySec );
+		else
+			yield return new WaitForSeconds( fStartDelaySec );
+
+		_fPrevTime = _bIgnoreTimeScale ? RealTime.time : Time.time;
+		while (true)
         {
             yield return null;
 
@@ -197,7 +238,7 @@ public class CUILabelAnimation : CObjectBase
             float fTimeSec = fTime - _fPrevTime;
 
             _iCharLengthIndex = (int)(Mathf.Lerp(_iStartNumber, _iDestNumber, fTimeSec / _fCharPerSec));
-            _pLabel.text = string.Format(_strLabelContent, _iCharLengthIndex);
+			ProcEditText(string.Format(_strLabelContent, _iCharLengthIndex));
 
             if (p_EVENT_OnChangeNumber != null)
                 p_EVENT_OnChangeNumber(_iCharLengthIndex);
@@ -210,7 +251,7 @@ public class CUILabelAnimation : CObjectBase
                 if (_pSoundSlot_OnChangeText != null)
                     _pSoundSlot_OnChangeText.DoStopSound();
 
-                _pLabel.text = string.Format(_strLabelContent, _iDestNumber);
+				ProcEditText(string.Format(_strLabelContent, _iDestNumber));
                 if (p_EVENT_OnAnimationFinish != null)
                     p_EVENT_OnAnimationFinish();
 
@@ -222,5 +263,23 @@ public class CUILabelAnimation : CObjectBase
     /* private - Other[Find, Calculate] Func 
        찾기, 계산 등의 비교적 단순 로직         */
 
-}
+	private string GetCurrentText()
+	{
+#if NGUI
+		if (_pLabel != null)
+			return _pLabel.text;
 #endif
+		return "";
+	}
+
+	private void ProcEditText(string strText)
+	{
+		if (_pText != null)
+			_pText.text = strText;
+#if NGUI
+		if (_pLabel != null)
+			_pLabel.text = strText;
+#endif
+	}
+
+}
