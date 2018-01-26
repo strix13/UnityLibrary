@@ -13,6 +13,8 @@ using System.Security.Cryptography.X509Certificates;
    Edit Log    : 
    ============================================ */
 
+#pragma warning disable 0618
+
 public class SCManagerSMTP : CSingletonBase_Not_UnityComponent<SCManagerSMTP>
 {
     /* const & readonly declaration             */
@@ -43,14 +45,14 @@ public class SCManagerSMTP : CSingletonBase_Not_UnityComponent<SCManagerSMTP>
         mail.Subject = strHeader;
         mail.Body = strSendMessage;
 
-        SmtpClient smtpServer = new SmtpClient("smtp.gmail.com");
-        smtpServer.Port = 587;
-        smtpServer.Credentials = new System.Net.NetworkCredential(_strMyEmail_Adress, _strMyEmail_Password) as ICredentialsByHost;
-        smtpServer.EnableSsl = true;
+        SmtpClient smtpClient = new SmtpClient("smtp.gmail.com");
+        smtpClient.Port = 587;
+        smtpClient.Credentials = new System.Net.NetworkCredential(_strMyEmail_Adress, _strMyEmail_Password) as ICredentialsByHost;
+        smtpClient.EnableSsl = true;
         ServicePointManager.ServerCertificateValidationCallback =
         delegate (object s, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors)
         { return true; };
-        smtpServer.Send(mail);
+        smtpClient.Send(mail);
     }
 
     /* public - [Event] Function             

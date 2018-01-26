@@ -88,6 +88,11 @@ abstract public class CEffectBase<CLASS_EFFECT, ENUM_EFFECT_NAME> : CObjectBase
 	/* public - [Event] Function             
        프랜드 객체가 호출                       */
 
+	public void DoResetEvent()
+	{
+		p_Event_Effect_OnPlayStop = null;
+	}
+
 	// ========================================================================== //
 
 	/* protected - [abstract & virtual]         */
@@ -129,6 +134,7 @@ abstract public class CEffectBase<CLASS_EFFECT, ENUM_EFFECT_NAME> : CObjectBase
        자식 객체가 호출                         */
 
 	/* protected - Override & Unity API         */
+
 	protected override void OnAwake()
 	{
 		base.OnAwake();
@@ -145,8 +151,8 @@ abstract public class CEffectBase<CLASS_EFFECT, ENUM_EFFECT_NAME> : CObjectBase
 	protected override void OnDisableObject()
 	{
 		base.OnDisableObject();
-		
-		p_Event_Effect_OnPlayStop = null;
+
+		DoResetEvent();
 		CManagerPooling<ENUM_EFFECT_NAME, CLASS_EFFECT>.instance.DoPush( _pInstance );
 	}
 

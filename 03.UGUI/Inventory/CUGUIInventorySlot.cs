@@ -17,8 +17,11 @@ using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using System.Collections;
 using System.Collections.Generic;
+using System;
 
-public abstract class CUGUIInventorySlot : CUGUIObjectBase, IInventorySlot, IPointerClickHandler
+public class CUGUIInventorySlot<Class_Slot, Class_Data> : CUGUIObjectBase, IInventorySlot<Class_Slot, Class_Data>, IPointerClickHandler
+	where Class_Slot : CUGUIInventorySlot<Class_Slot, Class_Data>
+	where Class_Data : IInventoryData<Class_Data>
 {
 	/* const & readonly declaration             */
 
@@ -32,10 +35,17 @@ public abstract class CUGUIInventorySlot : CUGUIObjectBase, IInventorySlot, IPoi
 
 	/* private - Field declaration           */
 
-	private IInventory _IInventory;
+	private IInventory<Class_Data, Class_Slot> _pInventory;	public IInventory<Class_Data, Class_Slot> p_pIventoryOwner {  get { return _pInventory; } }
+	private Class_Slot _pSlot;
+	private Class_Data _pData;
 
-	private Image _pImage_Icon;
-	private GameObject _pGoImage_Icon;
+	public Class_Data p_pInventoryData
+	{
+		get
+		{
+			return _pData;
+		}
+	}
 
 	#endregion Field
 
@@ -46,29 +56,25 @@ public abstract class CUGUIInventorySlot : CUGUIObjectBase, IInventorySlot, IPoi
 	/* public - [Do] Function
      * 외부 객체가 호출(For External class call)*/
 
-	public void DoInit(IInventory IInventory)
-	{
-		EventOnAwake();
-
-		_IInventory = IInventory;
-	}
-
 	/* public - [Event] Function             
        프랜드 객체가 호출(For Friend class call)*/
 
-	public void OnSetSprite(string strSpriteName)
+	public void IInventorySlot_DoInit( IInventory<Class_Data, Class_Slot> pInventoryOwner )
 	{
-		EventSetImage(GetSprite(strSpriteName));
+		EventOnAwake();
+
+		_pInventory = pInventoryOwner;
 	}
 
-	public void OnEnableSlot(bool bEnable)
+	public void IInventorySlot_OnSetData( Class_Data pData, string strImageName )
 	{
-		EventEnableImage(bEnable);
+		if(OnSetDataOrNull_And_CheckHasData( pData ))
+			_pData = pData;
 	}
 
 	public void OnPointerClick(PointerEventData pEventData)
 	{
-		_IInventory.OnClickSlot(this);
+		_pInventory.IInventory_OnClickSlot( _pSlot );
 	}
 
 	#endregion Public
@@ -78,36 +84,20 @@ public abstract class CUGUIInventorySlot : CUGUIObjectBase, IInventorySlot, IPoi
 	#region Protected
 
 	/* protected - [abstract & virtual]         */
-
-	protected abstract string GetImageName();
-
-	protected abstract Sprite GetSprite(string strSpriteName);
-
-	/* protected - [Event] Function           
-       자식 객체가 호출(For Child class call)		*/
-
-	private void EventSetImage(Sprite pSprite)
-	{
-		_pImage_Icon.sprite = pSprite;
-		_pImage_Icon.SetNativeSize();
-	}
-
-	private void EventEnableImage(bool bEnable)
-	{
-		_pGoImage_Icon.SetActive(bEnable);
-	}
 	
+	public virtual void IInventorySlot_OnEnableSlot( bool bEnable ) { }
+	public virtual void IInventorySlot_OnClickSlot( bool bIsCurrentSelectedSlot ) { }
+	protected virtual bool OnSetDataOrNull_And_CheckHasData( Class_Data pData ) { return true; }
+
 	protected override void OnAwake()
 	{
 		base.OnAwake();
 
-		string strImageName = GetImageName();
-
-		_pImage_Icon = GetImage(strImageName);
-		_pImage_Icon.raycastTarget = false;
-
-		_pGoImage_Icon = _pImage_Icon.gameObject;
+		_pSlot = this as Class_Slot;
 	}
+
+	/* protected - [Event] Function           
+       자식 객체가 호출(For Child class call)		*/
 
 	#endregion Protected
 

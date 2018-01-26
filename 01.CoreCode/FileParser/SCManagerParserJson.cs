@@ -89,7 +89,28 @@ public class SCManagerParserJson : SCManagerResourceBase<SCManagerParserJson, st
         return bSuccess;
     }
 
-    static public bool DoReadJsonArray<T>(WWW www, ref List<T> listOutData)
+	static public bool DoReadJsonArray<T>( UnityEngine.Networking.UnityWebRequest www, out T[] arrData )
+	{
+		bool bSuccess = true;
+		try
+		{
+			string encodedString = www.downloadHandler.text;
+			if (www.downloadHandler.data.Length >= 3 &&
+			   www.downloadHandler.data[0] == 239 && www.downloadHandler.data[1] == 187 && www.downloadHandler.data[2] == 191)   // UTF8 코드 확인
+			{
+				encodedString = Encoding.UTF8.GetString( www.downloadHandler.data, 3, www.downloadHandler.data.Length - 3 );
+			}
+
+			Wrapper_ForArray<T> wrapper = JsonUtility.FromJson<Wrapper_ForArray<T>>( encodedString );
+			arrData = wrapper.array;
+		}
+		catch { arrData = null; bSuccess = false; }
+
+		return bSuccess;
+	}
+
+
+	static public bool DoReadJsonArray<T>(WWW www, ref List<T> listOutData)
     {
         bool bSuccess = true;
         listOutData.Clear();

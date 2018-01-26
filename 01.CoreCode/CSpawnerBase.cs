@@ -33,8 +33,10 @@ public partial class CSpawnerBase<Enum_Key, Class_Resource> : CObjectBase
 	[Header( "패턴 옵션" )]
 	[SerializeField]
 	public float _fDelaySec_Pattern = 0f;
-	[SerializeField]
-	public float _fDelaySec_Generate = 0.2f;
+	[Rename_Inpector("최소 랜덤 딜레이")]
+	public float _fDelaySec_GenerateMin = 0.2f;
+	[Rename_Inpector( "최대 랜덤 딜레이" )]
+	public float _fDelaySec_Generate_Max = 0.2f;
 	[SerializeField]
 	private EMissionPatternName _ePattern = EMissionPatternName.Line;
 	[SerializeField]
@@ -217,7 +219,8 @@ public partial class CSpawnerBase<Enum_Key, Class_Resource> : CObjectBase
 	{
 		_iGenerateRemainCount = Random.Range( _iGenerateCount_Min, _iGenerateCount_Max );
 		StopAllCoroutines();
-		StartCoroutine( CoPlayPattern( _bIsLoop ) );
+		if(gameObject.activeInHierarchy)
+			StartCoroutine( CoPlayPattern( _bIsLoop ) );
 	}
 
 	private IEnumerator CoGenerateSomthing()
@@ -230,7 +233,8 @@ public partial class CSpawnerBase<Enum_Key, Class_Resource> : CObjectBase
 				ProcShotGenerate(_pTransformCached.position, _pTransformCached.rotation);
 			}
 
-			yield return SCManagerYield.GetWaitForSecond( _fDelaySec_Generate * _fAdjust_GenerateDelay );
+			float fDelaySecRandom = Random.Range( _fDelaySec_GenerateMin, _fDelaySec_Generate_Max );
+			yield return SCManagerYield.GetWaitForSecond( fDelaySecRandom );
 		}
 	}
 
@@ -244,7 +248,8 @@ public partial class CSpawnerBase<Enum_Key, Class_Resource> : CObjectBase
 				ProcShotGenerate(_pTransformCached.position + vecPosGap, Quaternion.Euler(_pTransformCached.rotation.eulerAngles + vecAngleGap));
 			}
 
-			yield return SCManagerYield.GetWaitForSecond( _fDelaySec_Generate * _fAdjust_GenerateDelay );
+			float fDelaySecRandom = Random.Range( _fDelaySec_GenerateMin, _fDelaySec_Generate_Max );
+			yield return SCManagerYield.GetWaitForSecond( fDelaySecRandom );
 		}
 	}
 

@@ -18,10 +18,13 @@ public class CManagerUILocalize : CSingletonBase<CManagerUILocalize>
 	private const string const_strLocalePath = "Locale";
 	private const string const_strLocaleFileExtension = ".loc";
 
-    /* enum & struct declaration                */
+	private static readonly char[] const_arrChrTrim = new char[] { '\t', '\r', ' ' };
 
-    /* public - Variable declaration            */
-    public static Dictionary<SystemLanguage, Dictionary<string, List<string>>> p_mapLocaleData { get { return _mapLocaleData; } }
+
+	/* enum & struct declaration                */
+
+	/* public - Variable declaration            */
+	public static Dictionary<SystemLanguage, Dictionary<string, List<string>>> p_mapLocaleData { get { return _mapLocaleData; } }
     public static List<SystemLanguage> p_listLocale { get { return _listLocale; } }
 
     public static SystemLanguage p_eCurrentLocalize { get { return _eCurrentLocalize; } }
@@ -101,7 +104,7 @@ public class CManagerUILocalize : CSingletonBase<CManagerUILocalize>
 				DoRegist_CompoLocalize(arrCompoLocalize[j]);
 		}
 
-		Debug.Log( "DoSetLocalize_CurrentScene : " + _eCurrentLocalize );
+		//Debug.Log( "DoSetLocalize_CurrentScene : " + _eCurrentLocalize );
 
 		if (_eCurrentLocalize != SystemLanguage.Unknown)
 			DoSet_Localize( _eCurrentLocalize );
@@ -170,7 +173,7 @@ public class CManagerUILocalize : CSingletonBase<CManagerUILocalize>
 		return _mapLocaleData[_eCurrentLocalize][strKey][iIndex];
 	}
 
-	public static string DoGetLocalizeRandomText(string strKey)
+	public static string DoGetLocalizeRandomText_OrNull(string strKey)
 	{
 		List<string> listLocalizeValue = DoGetLocalizeValueContains(strKey);
 		if (listLocalizeValue == null)
@@ -250,7 +253,6 @@ public class CManagerUILocalize : CSingletonBase<CManagerUILocalize>
 			strText = Encoding.UTF8.GetString(pReader.bytes, 3, pReader.bytes.Length - 3);
 
 		string[] arrStr = strText.Split('\n');
-		char[] arrChrTrim = new char[] { '\t', '\r', ' ' };
 
 		int iLen = arrStr.Length;
 		for (int i = 0; i < iLen; i++)
@@ -258,15 +260,23 @@ public class CManagerUILocalize : CSingletonBase<CManagerUILocalize>
 			string strLine = arrStr[i];
 			if (string.IsNullOrEmpty(strLine) || strLine.StartsWith("//")) continue;
 
-			string[] arrLang = strLine.Split('=');
-			if (arrLang.Length < 2) continue;
-
-			string strLocKey = arrLang[0].TrimStart(arrChrTrim).TrimEnd(arrChrTrim);
-			string strLocValue = arrLang[1].TrimStart(arrChrTrim).TrimEnd(arrChrTrim).Replace("\\n", "\n");
-
-			DoRegist_Localize(eLocale, strLocKey, strLocValue);
+			StringPair pStringPair = DoSplitText_OrEmpty( strLine );
+			if(StringPair.IsEmpty(pStringPair) == false)
+				DoRegist_Localize(eLocale, pStringPair.strKey, pStringPair .strValue);
 		}
 	}
+
+	static public StringPair DoSplitText_OrEmpty(string strText, char chSplit = '=')
+	{
+		string[] arrLang = strText.Split( '=' );
+		if (arrLang.Length < 2) return StringPair.Empty;
+
+		string strLocKey = arrLang[0].TrimStart( const_arrChrTrim ).TrimEnd( const_arrChrTrim );
+		string strLocValue = arrLang[1].TrimStart( const_arrChrTrim ).TrimEnd( const_arrChrTrim ).Replace( "\\n", "\n" );
+
+		return new StringPair( strLocKey, strLocValue );
+	}
+
 
 	private static bool ProcCheckValidLocalizeValue(string strKey)
 	{

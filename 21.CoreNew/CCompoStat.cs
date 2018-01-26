@@ -18,11 +18,11 @@ using System.Collections.Generic;
 
 public interface IStat_Buffer
 {
-	int GetStat_AddHP();
-	int GetStat_AddArmor();
-	int GetStat_AddDamage();
-	int GetStat_CriticalPercent();
-	int GetStat_CriticalDamage();
+	CCompoStat.SBuffType IStat_Buffer_GetStat_AddHP();
+	CCompoStat.SBuffType IStat_Buffer_GetStat_AddArmor();
+	CCompoStat.SBuffType IStat_Buffer_GetStat_AddDamage();
+	CCompoStat.SBuffType IStat_Buffer_GetStat_CriticalPercent();
+	CCompoStat.SBuffType IStat_Buffer_GetStat_CriticalDamage();
 }
 
 public class CCompoStat : CObjectBase
@@ -30,6 +30,52 @@ public class CCompoStat : CObjectBase
 	/* const & readonly declaration             */
 
 	/* enum & struct declaration                */
+
+	public enum EBuffType
+	{
+		Plus,
+		Multipleication,
+	}
+
+
+	public struct SBuffType
+	{
+		EBuffType eBufftype;
+		int iValue;
+
+		static SBuffType g_sByffTypeEmpty = new SBuffType(EBuffType.Plus, 0);
+
+		static public SBuffType CreateEmpty()
+		{
+			return g_sByffTypeEmpty;
+		}
+
+		public SBuffType( EBuffType eBufftype , int iValue )
+		{
+			this.eBufftype = eBufftype;
+			this.iValue = iValue;
+		}
+
+		static public int operator +( int iValue, SBuffType sBuffType )
+		{
+			switch (sBuffType.eBufftype)
+			{
+				case EBuffType.Plus: iValue += sBuffType.iValue; break;
+				case EBuffType.Multipleication: iValue *= sBuffType.iValue; break;
+			}
+			return iValue;
+		}
+
+		static public float operator +( float fValue, SBuffType sBuffType )
+		{
+			switch (sBuffType.eBufftype)
+			{
+				case EBuffType.Plus: fValue += sBuffType.iValue; break;
+				case EBuffType.Multipleication: fValue *= sBuffType.iValue; break;
+			}
+			return fValue;
+		}
+	}
 
 	[System.Serializable]
 	public class SStat
@@ -73,7 +119,6 @@ public class CCompoStat : CObjectBase
 		public bool p_bIsCritical { get { return Random.Range( 0f, 100f ) <= fCriticalPercent_Current; } }
 		public float p_iCriticalDamage { get { return Random.Range( iCriticalDamage_Min_Current, iCriticalDamage_Max_Current ); } }
 
-
 		private float _fArmor_Weight = 1f;
 
 		private List<IStat_Buffer> _listStatBuffer = new List<IStat_Buffer>();
@@ -98,9 +143,12 @@ public class CCompoStat : CObjectBase
 			_fArmor_Weight = fWeight;
 		}
 
-
-		private int iID;
 		private GameObject pObjectOwner; public GameObject p_pObjectOwner { get { return pObjectOwner; } }
+
+		public SStat( )
+		{
+
+		}
 
 		public SStat( int iHP, int iArmor, int iDamage_Min, int iDamage_Max, float fCriticalPercent, int iCriticalDamage_Min, int iCriticalDamage_Max )
 		{
@@ -121,7 +169,6 @@ public class CCompoStat : CObjectBase
 		public void DoInit( GameObject pObjectOwner )
 		{
 			this.pObjectOwner = pObjectOwner;
-			iID = pObjectOwner.GetInstanceID();
 			DoReset();
 		}
 		
@@ -146,13 +193,13 @@ public class CCompoStat : CObjectBase
 			{
 				for (int i = 0; i < _listStatBuffer.Count; i++)
 				{
-					iHP_Result += _listStatBuffer[i].GetStat_AddHP();
-					iArmor_Result += _listStatBuffer[i].GetStat_AddArmor();
-					iDamage_Min_Result += _listStatBuffer[i].GetStat_AddDamage();
-					iDamage_Max_Result += _listStatBuffer[i].GetStat_AddDamage();
-					fCriticalPercent_Result += _listStatBuffer[i].GetStat_CriticalPercent();
-					iCriticalDamage_Min_Result += _listStatBuffer[i].GetStat_CriticalDamage();
-					iCriticalDamage_Max_Result += _listStatBuffer[i].GetStat_CriticalDamage();
+					iHP_Result += _listStatBuffer[i].IStat_Buffer_GetStat_AddHP();
+					iArmor_Result += _listStatBuffer[i].IStat_Buffer_GetStat_AddArmor();
+					iDamage_Min_Result += _listStatBuffer[i].IStat_Buffer_GetStat_AddDamage();
+					iDamage_Max_Result += _listStatBuffer[i].IStat_Buffer_GetStat_AddDamage();
+					fCriticalPercent_Result += _listStatBuffer[i].IStat_Buffer_GetStat_CriticalPercent();
+					iCriticalDamage_Min_Result += _listStatBuffer[i].IStat_Buffer_GetStat_CriticalDamage();
+					iCriticalDamage_Max_Result += _listStatBuffer[i].IStat_Buffer_GetStat_CriticalDamage();
 				}
 			}
 
@@ -164,7 +211,6 @@ public class CCompoStat : CObjectBase
 			fCriticalPercent_Current = fCriticalPercent_Result;
 			iCriticalDamage_Min_Current = iCriticalDamage_Min_Result;
 			iCriticalDamage_Max_Current = iCriticalDamage_Max_Result;
-
 		}
 
 		public void DoKill()
@@ -181,7 +227,7 @@ public class CCompoStat : CObjectBase
 
 		public float GetHPDelta_0_1()
 		{
-			return iHP_Current / iHP_Max; ;
+			return iHP_Current / iHP_Max;
 		}
 	}
 
@@ -198,7 +244,7 @@ public class CCompoStat : CObjectBase
 	public event OnDamage_OnDead p_Event_OnDamage_OnDead;
 
 	[SerializeField]
-	protected SStat _pStat; public SStat p_pStat { get { return _pStat; } }
+	protected SStat _pStat = new SStat(); public SStat p_pStat { get { return _pStat; } }
 
 	public bool p_bIsAlive {  get { return _pStat.CheckIsAlive(); } }
 
@@ -229,14 +275,13 @@ public class CCompoStat : CObjectBase
 	public void DoResetStat()
 	{
 		_pStat.DoReset();
-
 		if(p_Event_OnResetStat != null)
 			p_Event_OnResetStat( _pStat );
 	}
 
 	public void DoKill()
 	{
-
+		_pStat.DoKill();
 
 		if (p_Event_OnDamage_OnDead != null)
 			p_Event_OnDamage_OnDead( null );
@@ -250,6 +295,8 @@ public class CCompoStat : CObjectBase
 
 	public void DoDamage( float iDamage, bool bIsCriticalAttack, GameObject pObjectDamager, out bool bIsDead)
 	{
+		float fHP = p_pStat.p_iHPCurrent;
+
 		float fHPDelta = 0f;
 		bIsDead = !_pStat.CheckIsAlive();
 		if (bIsDead)
@@ -283,8 +330,7 @@ public class CCompoStat : CObjectBase
 	{
 		base.OnAwake();
 
-		_pStat.DoInit(gameObject);
-
+		_pStat.DoInit( gameObject );
 		_pManagerStat = CManagerStat.instance;
 	}
 

@@ -37,7 +37,7 @@ public class CUGUIInventoryCursor : CObjectBase
 
 	private Image _pImage;
 
-	private Vector3 _vecInitPos;
+	// private Vector3 _vecInitPos;
 
 	#endregion Field
 

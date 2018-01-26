@@ -78,7 +78,8 @@ public partial class CSpawnerBase<Enum_Key, Class_Resource> : CObjectBase
 					fStartAngle += _fAngleMuzzle;
 					vecStartPos += (Vector3)_vecPosGap;
 				}
-				yield return SCManagerYield.GetWaitForSecond(_fDelaySec_Generate);
+				float fDelaySecRandom = Random.Range( _fDelaySec_GenerateMin, _fDelaySec_Generate_Max );
+				yield return SCManagerYield.GetWaitForSecond( fDelaySecRandom );
 			}
 		}
 		else
@@ -117,7 +118,8 @@ public partial class CSpawnerBase<Enum_Key, Class_Resource> : CObjectBase
 				fAngle += fAngleGap;
 			}
 
-			yield return SCManagerYield.GetWaitForSecond( _fDelaySec_Generate );
+			float fDelaySecRandom = Random.Range( _fDelaySec_GenerateMin, _fDelaySec_Generate_Max );
+			yield return SCManagerYield.GetWaitForSecond( fDelaySecRandom );
 		}
 	}
 
@@ -150,7 +152,8 @@ public partial class CSpawnerBase<Enum_Key, Class_Resource> : CObjectBase
 				fAngle += fAngleGap;
 			}
 
-			yield return SCManagerYield.GetWaitForSecond(_fDelaySec_Generate);
+			float fDelaySecRandom = Random.Range( _fDelaySec_GenerateMin, _fDelaySec_Generate_Max );
+			yield return SCManagerYield.GetWaitForSecond( fDelaySecRandom );
 		}
 #endif
 		yield return null;

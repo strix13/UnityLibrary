@@ -6,7 +6,6 @@ using UnityEditor;
 
 public class CEditorProjectView_CSV_To_Json : Editor
 {
-
 	static private LinkedList<DirectoryInfo> _listDirectoryInfo = new LinkedList<DirectoryInfo>();
 	static private StringBuilder _pStrBuilder = new StringBuilder();
 
@@ -35,7 +34,11 @@ public class CEditorProjectView_CSV_To_Json : Editor
 
 			if (pEncodingCurrent == pEncoding_UTF8) continue;
 
-			using (StreamReader pStreamReader = new StreamReader( strPath, Encoding.Default, true ))
+			// .net framework 3.5에서는 됐었던 버젼, 근데 .net 올리면서 안된다..
+			// using (StreamReader pStreamReader = new StreamReader( strPath, Encoding.Default, true ))
+
+			// 참조 링크 http://www.solarview.net/archives/94
+			using (StreamReader pStreamReader = new StreamReader( strPath, System.Text.Encoding.GetEncoding( 949 ) ))
 			{
 				string strText = pStreamReader.ReadToEnd();
 				pStreamReader.Close();
@@ -215,5 +218,39 @@ public class CEditorProjectView_CSV_To_Json : Editor
 		if (bom[0] == 0xfe && bom[1] == 0xff) return Encoding.BigEndianUnicode; //UTF-16BE
 		if (bom[0] == 0 && bom[1] == 0 && bom[2] == 0xfe && bom[3] == 0xff) return Encoding.UTF32;
 		return Encoding.ASCII;
+	}
+
+	private static System.Data.Odbc.OdbcConnection dbConnection;
+	private static void openSqlConnection()
+	{
+		string connectionString = "Server=xxx.xxx.xxx.xxx;" +
+			"Port=xxxx" +
+			"Database=xxx;" +
+			"User ID=xxx;" +
+			"Password=xxx;";
+
+		dbConnection = new System.Data.Odbc.OdbcConnection( connectionString );
+		dbConnection.Open();
+		Debug.Log( "Connected to database." );
+	}
+
+	// Disconnect from database
+	private static void closeSqlConnection()
+	{
+		dbConnection.Close();
+		dbConnection = null;
+		Debug.Log( "Disconnected from database." );
+	}
+
+	// MySQL Query
+	public static void doQuery( string sqlQuery )
+	{
+		System.Data.Odbc.OdbcCommand dbCommand = dbConnection.CreateCommand();
+		dbCommand.CommandText = sqlQuery;
+		System.Data.Odbc.OdbcDataReader reader = dbCommand.ExecuteReader();
+		reader.Close();
+		reader = null;
+		dbCommand.Dispose();
+		dbCommand = null;
 	}
 }

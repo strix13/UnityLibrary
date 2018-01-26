@@ -10,6 +10,7 @@ using System.Text;
    Edit Log    : 
    ============================================ */
 
+#if NGUI
 public class CUITextAnimation : CObjectBase
 {
     /* const & readonly declaration             */
@@ -283,3 +284,4 @@ public class CUITextAnimation : CObjectBase
 	}
 
 }
+#endif

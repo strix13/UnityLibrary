@@ -37,7 +37,7 @@ public class CSoundSlot : CObjectBase
     private float _fVolumeNext;
     private bool _bLoopSound;
 
-    private bool _bIsFadeIn;
+    // private bool _bIsFadeIn;
 
     // ========================================================================== //
 

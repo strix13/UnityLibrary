@@ -43,7 +43,7 @@ public class CManagerObjectScroll : CObjectBase
 	private CScrollObject _pScrollObject_Old;
 	private CScrollObject _pScrollObject_Last;
 
-	private float _fTargetPos_Last;
+	//private float _fTargetPos_Last;
 	private float _fTargetPos_Origin;
 
 	private float _fObjectWidth_Old;
@@ -176,7 +176,7 @@ public class CManagerObjectScroll : CObjectBase
 		float fTargetPos = p_pTransTarget.position.x;
 		//if (_fTargetPos_Last == fTargetPos) return;
 
-		_fTargetPos_Last = fTargetPos;
+		//_fTargetPos_Last = fTargetPos;
 
 		float fMoveTargetGap = _fTargetPos_Origin - fTargetPos;
 		float fMoveAmount = _fOriginPosX + fMoveTargetGap * p_fScrollingSpeed;

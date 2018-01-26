@@ -281,4 +281,14 @@ public struct SHugeNumber
 
 		return Mathf.FloorToInt( (float)sNumberA._dNumber ) != iNumber;
 	}
+
+	public override bool Equals( object obj )
+	{
+		return base.Equals( obj );
+	}
+
+	public override int GetHashCode()
+	{
+		return base.GetHashCode();
+	}
 }

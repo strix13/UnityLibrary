@@ -12,6 +12,12 @@ using System.Text;
    
 public static class PrimitiveHelper
 {
+	static public bool IsSimilar(this float fValueTarget, float fValue, float fProximityDelta_0_1 = 0.1f)
+	{
+		float fProximityValue = fValueTarget * fProximityDelta_0_1;
+		return System.Math.Abs( fValueTarget - fValue ) < fProximityValue;
+	}
+
 	static public Vector3 Inverse(this Vector3 vecTarget)
 	{
 		return vecTarget * -1;
@@ -171,7 +177,11 @@ public static class PrimitiveHelper
 	public static string CommaString(this int iValue)
 	{
 		if (iValue.Equals(0)) return "0";
-		return string.Format("{0:#,###}", iValue );
+
+		if (iValue < 1000)
+			return iValue.ToString();
+		else
+			return string.Format("{0:#,###}", iValue );
 	}
 
 	public static string CommaString(this float fValue)
@@ -237,7 +247,7 @@ public static class PrimitiveHelper
 		return (T[])System.Enum.GetValues( typeof( T ) );
 	}
 
-	static public void DoShuffleList<Compo>( this List<Compo> list )
+	static public void DoShuffleList<Compo>( this List<Compo> list, int iShuffleStartIndex = 0)
 	{
 		if (list == null)
 		{
@@ -245,7 +255,7 @@ public static class PrimitiveHelper
 			return;
 		}
 
-		for (int i = 0; i < list.Count; i++)
+		for (int i = iShuffleStartIndex; i < list.Count; i++)
 		{
 			int RandomIndex = Random.Range( i, list.Count );
 			Compo temp = list[RandomIndex];
@@ -473,5 +483,59 @@ public static class PrimitiveHelper
 			pTransform.SetAsFirstSibling();
 		else if (eTransformSibling == ETransformSibling.Last)
 			pTransform.SetAsLastSibling();
+	}
+
+    static public Camera GetCameraMainOrNull_SameScene( MonoBehaviour pObjectTarget )
+    {
+        UnityEngine.SceneManagement.Scene pCurrentScene = pObjectTarget.gameObject.scene;
+        Camera pMainCamera = null;
+        Camera[] arrCamera = Camera.allCameras;
+        for (int i = 0; i < arrCamera.Length; i++)
+        {
+            if (arrCamera[i].gameObject.scene == pCurrentScene)
+            {
+                pMainCamera = arrCamera[i];
+                break;
+            }
+        }
+
+        return pMainCamera;
+    }
+
+	static List<string> _listDigitNote = new List<string>();
+	static List<int> _listDigit_NumberNote = new List<int>();
+
+	static public List<int> CutDigitString_Number( this int iTarget )
+	{
+		_listDigit_NumberNote.Clear();
+		string strTargetString = iTarget.ToString();
+		for (int i = 0; i < strTargetString.Length; i++)
+			_listDigit_NumberNote.Add( int.Parse( strTargetString[i].ToString()) );
+
+		return _listDigit_NumberNote;
+	}
+
+	static public List<string> CutDigitString(this int iTarget)
+	{
+		_listDigitNote.Clear();
+		string strTargetString = iTarget.ToString();
+		for (int i = 0; i < strTargetString.Length; i++)
+			_listDigitNote.Add( strTargetString[i].ToString() );
+
+		return _listDigitNote;
+	}
+
+	static public List<string> CutDigitString_WithComma( this int iTarget )
+	{
+		_listDigitNote.Clear();
+		string strTargetString = iTarget.ToString();
+		for (int i = 0; i < strTargetString.Length; i++)
+		{
+			_listDigitNote.Add( strTargetString[i].ToString() );
+			if (i != (strTargetString.Length - 1) && ( strTargetString.Length - (i + 1)) % 3 == 0)
+				_listDigitNote.Add( "," );
+		}
+
+		return _listDigitNote;
 	}
 }

@@ -61,7 +61,7 @@ public class CFollowObject : CObjectBase
         if(_fRemainShakePow <= 0f)
         {
             //Debug.Log("Shake Start CurrentPos : "  + _pTransformCashed.position + " Offset : " + _vecTargetOffset);
-            _vecOriginPos = _pTransformCached.position;
+            _vecOriginPos = transform.position;
         }
 
         _fRemainShakePow = fShakePow;
@@ -77,7 +77,7 @@ public class CFollowObject : CObjectBase
 	{
 		if (_pTransTarget == null) return;
 
-		_vecTargetOffset = _pTransTarget.position - _pTransformCached.position;
+		_vecTargetOffset = _pTransTarget.position - transform.position;
 
 		_bFollowX = _eFollowPos == EFollowPos.All || _eFollowPos == EFollowPos.X || _eFollowPos == EFollowPos.XY || _eFollowPos == EFollowPos.XZ;
 		_bFollowY = _eFollowPos == EFollowPos.All || _eFollowPos == EFollowPos.Y || _eFollowPos == EFollowPos.XY || _eFollowPos == EFollowPos.YZ;
@@ -94,7 +94,7 @@ public class CFollowObject : CObjectBase
 		if (_bIsFollow == false) return;
 		if (_pTransTarget == null) return;
 
-        Vector3 vecFollowPos = _pTransformCached.position;
+        Vector3 vecFollowPos = transform.position;
         Vector3 vecTargetPos = _pTransTarget.position;
 
 		if(_bIsSmoothFollow)

@@ -43,7 +43,7 @@ public class CIndicator : CObjectBase
 	/* private - Field declaration           */
 
 	private Text _pUIText;	public Text p_pUIText {  get { return _pUIText; } }
-	private RectTransform _pRectTrans;
+	//private RectTransform _pRectTrans;
 
 #if TMPro
 	private TMPro.TextMeshPro _pUIText_TMPro;	public TMPro.TextMeshPro p_pUIText_TMPro { get { return _pUIText_TMPro; } }
@@ -126,7 +126,7 @@ public class CIndicator : CObjectBase
 		if(GetComponentInChildren(out _pUIText ))
 		{
 			_eIndicatorType = EIndicatorType.UGUI;
-			_pRectTrans = _pUIText.GetComponent<RectTransform>();
+			//_pRectTrans = _pUIText.GetComponent<RectTransform>();
 			return;
 		}
 
@@ -134,7 +134,7 @@ public class CIndicator : CObjectBase
 		if (GetComponentInChildren( out _pUIText_TMPro ))
 		{
 			_eIndicatorType = EIndicatorType.TextMeshPro;
-			_pRectTrans = _pUIText_TMPro.GetComponent<RectTransform>();
+			//_pRectTrans = _pUIText_TMPro.GetComponent<RectTransform>();
 			return;
 		}
 #endif

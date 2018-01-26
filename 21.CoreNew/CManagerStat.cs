@@ -101,6 +101,12 @@ public class CManagerStat : CSingletonBase<CManagerStat>
 
 	public void DoDamageObject( GameObject pObjectDamager, GameObject pObjectVictim, out bool bIsDead)
 	{
+		if (pObjectDamager == null)
+		{
+			bIsDead = false;
+			return;
+		}
+
 		bIsDead = false;
 		int iID_Damager = pObjectDamager.GetInstanceID();
 		int iID_Victim = pObjectVictim.GetInstanceID();
@@ -108,7 +114,7 @@ public class CManagerStat : CSingletonBase<CManagerStat>
 		if (_mapObjectStat.ContainsKey( iID_Damager ) == false ||
 			_mapObjectStat.ContainsKey( iID_Victim ) == false)
 		{
-			Debug.Log( "[Error] ManagerStat - Not Contain Stat" );
+			//Debug.LogWarning( "[Error] ManagerStat - Not Contain Stat" );
 			return;
 		}
 
@@ -123,6 +129,9 @@ public class CManagerStat : CSingletonBase<CManagerStat>
 		bool bIsCriticalAttack = pStat_Damager.p_pStat.p_bIsCritical;
 
 		float iDamage = CalculateDamage( pStat_Damager.p_pStat, pStat_Victim.p_pStat, bIsCriticalAttack );
+
+
+		float fHP = pStat_Victim.p_pStat.p_iHPCurrent;
 		pStat_Victim.DoDamage( iDamage, bIsCriticalAttack, pStat_Damager.gameObject, out bIsDead );
 
 		if (bIsDead && p_Event_OnDead != null)
@@ -172,7 +181,7 @@ public class CManagerStat : CSingletonBase<CManagerStat>
 	/* private - Other[Find, Calculate] Func 
        찾기, 계산등 단순 로직(Simpe logic)         */
 
-	private float CalculateDamage(CCompoStat.SStat pStatAttacker, CCompoStat.SStat pStatVictim, bool bIsCritical )
+	public float CalculateDamage(CCompoStat.SStat pStatAttacker, CCompoStat.SStat pStatVictim, bool bIsCritical )
 	{
 		float iDamageCalculated = pStatAttacker.p_iDamageCurrent;
 		switch (_eDamageCalculateOption)

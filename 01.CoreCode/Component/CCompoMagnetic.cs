@@ -152,7 +152,7 @@ public class CCompoMagnetic : CObjectBase
 				sInfoMagnetic.eStateMagnetic = EStateMagnetic.Reaction;
 
 			Vector3 v3Direction = (pTrans.position - _pTransformCached.position);
-			float fLastDistance = sInfoMagnetic.fLastDistance;
+			//float fLastDistance = sInfoMagnetic.fLastDistance;
 			float fRealDistance = v3Direction.sqrMagnitude;
 			float fCurrentDistance = PrimitiveHelper.GetCalcReverseFloat(sInfoMagnetic.fLastDistance, fRealDistance) * p_fMagnetReactMultiplier;
 

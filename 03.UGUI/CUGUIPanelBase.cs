@@ -30,9 +30,9 @@ public class CUGUIPanelBase : CUGUIObjectBase, IUIPanel
 	/* public - Field declaration            */
 
 	[SerializeField]
-	private bool _bIsAlwaysShow;
+	private bool _bIsAlwaysShow = false;
 	[SerializeField]
-	private bool _bIsFixedSortOrder;
+	private bool _bIsFixedSortOrder = false;
 	
 	bool IUIPanel.p_bIsAlwaysShow
 	{

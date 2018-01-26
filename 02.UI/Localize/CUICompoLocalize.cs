@@ -38,6 +38,11 @@ public class CUICompoLocalize : CObjectBase
 
 	public void DoChangeText(string strText)
 	{
+		if(_EVENT_OnChangeText == null)
+		{
+			Debug.LogWarning( name + " _EVENT_OnChangeText == null", this );
+			return;
+		}
 		_EVENT_OnChangeText(strText);
 	}
 

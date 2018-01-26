@@ -24,6 +24,12 @@ public class SDBInfoBase
 	
 	public void DoCopyDBInfo( SDBInfoBase pDBInfo )
 	{
+		if(pDBInfo == null)
+		{
+			Debug.LogWarning( strNickName + "DoCopyDBInfo == null" );
+			return;
+		}
+
 		ID = pDBInfo.ID;
 		strNickName = pDBInfo.strNickName;
 	}

@@ -389,6 +389,12 @@ public class CManagerPooling<ENUM_Resource_Name, Class_Resource> : CSingletonBas
 		if(_mapResourceOriginCopy.ContainsKey(eResourceName) == false)
 			ProcPooling_From_ResourcesFolder();
 
+		if(_mapResourceOriginCopy.ContainsKey( eResourceName ) == false)
+		{
+			Debug.LogError( "ManagerPool " + eResourceName );
+			return null;
+		}
+
 		Class_Resource pObjectMake = null;
 		pObjectMake = Object.Instantiate( _mapResourceOriginCopy[eResourceName] );
 		ProcSetChild( eResourceName, pObjectMake );

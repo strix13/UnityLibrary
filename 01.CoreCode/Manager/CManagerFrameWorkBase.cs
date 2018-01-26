@@ -59,6 +59,13 @@ public struct StringPair
 	public string strKey;
 	public string strValue;
 
+	static public StringPair Empty {  get { return new StringPair(); } }
+
+	static public bool IsEmpty(StringPair pPair)
+	{
+		return string.IsNullOrEmpty( pPair.strKey ) && string.IsNullOrEmpty( pPair.strValue );
+	}
+
 	public StringPair( string strKey, string strValue )
 	{
 		this.strKey = strKey; this.strValue = strValue;
@@ -109,6 +116,18 @@ public class CManagerFrameWorkBase<CLASS_Framework, ENUM_Scene_Name, ENUM_Sound_
 	static public SCSceneLoader<ENUM_Scene_Name> p_pManagerScene { get { return _pManagerScene; } }
 	static public SCManagerParserJson p_pManagerJsonINI { get { return _pJsonParser_Persistent; } }
 
+	static public event delDBDelgate p_Event_DB_OnRequest_Start
+	{
+		add { p_pNetworkDB.p_Event_DB_OnRequest_Start += value; }
+		remove { p_pNetworkDB.p_Event_DB_OnRequest_Start -= value; }
+	}
+
+	static public event delDBDelgate p_Event_DB_OnRequest_Finish
+	{
+		add { p_pNetworkDB.p_Event_DB_OnRequest_Finish += value; }
+		remove { p_pNetworkDB.p_Event_DB_OnRequest_Finish -= value; }
+	}
+
 	public static event System.Action<float> p_EVENT_OnLoadSceneProgress;
 	public static event System.Action p_EVENT_OnStartLoadScene;
 	public static event System.Action p_EVENT_OnFinishLoadScene;
@@ -116,7 +135,7 @@ public class CManagerFrameWorkBase<CLASS_Framework, ENUM_Scene_Name, ENUM_Sound_
 
 	public static System.Action p_EVENT_OnLoadFinish_LocalData;
 
-	private bool _bSuccessLoadScene; public bool p_bSuccessLoadScene { get { return _bSuccessLoadScene; } }
+	//private bool _bSuccessLoadScene; public bool p_bSuccessLoadScene { get { return _bSuccessLoadScene; } }
 
 	// ===================================== //
 	// protected - Variable declaration      //
@@ -138,16 +157,16 @@ public class CManagerFrameWorkBase<CLASS_Framework, ENUM_Scene_Name, ENUM_Sound_
 	static protected SCManagerParserJson _pJsonParser_StreammingAssets;
 	static public SCManagerParserJson _pJsonParser_JsonData;
 
-	static private List<iTween> _listTween = new List<iTween>();
+	//static private List<iTween> _listTween = new List<iTween>();
 
 	protected string _strID; public string p_strID { get { return _strID; } }
 
 	static private List<AsyncOperation> _listAsyncLoadScene = new List<AsyncOperation>();
-	static private ESceneLoadState _eSceneLoadState = ESceneLoadState.None;
+	//static private ESceneLoadState _eSceneLoadState = ESceneLoadState.None;
 
-	static private bool _bManualCall_EventOnFinishLoadScene;
-	static private int _iMaxLoadScene;
-	static private float _fStackProgress = 0f;
+	// static private bool _bManualCall_EventOnFinishLoadScene;
+	// static private int _iMaxLoadScene;
+	// static private float _fStackProgress = 0f;
 
 	static private int _iLocalDataLoadingCount_Request;
 	static private int _iLocalDataLoadingCount_Finish;
@@ -158,6 +177,11 @@ public class CManagerFrameWorkBase<CLASS_Framework, ENUM_Scene_Name, ENUM_Sound_
 	// public - [Do] Function                //
 	// 외부 객체가 요청                      //
 	// ===================================== //
+
+	static public void DoSetDBEventNull()
+	{
+		p_pNetworkDB.DoSetEventNull();
+	}
 
 	static public float GetFloat_InGameData( ENUM_DataField eDataField)
 	{
@@ -174,21 +198,21 @@ public class CManagerFrameWorkBase<CLASS_Framework, ENUM_Scene_Name, ENUM_Sound_
 		return SGameData.GetString( eDataField );
 	}
 
-	static public void DoNetworkDB_CheckCount_IsEqualOrGreater<StructDB>( string strFieldName, object iCheckFieldCount, System.Action<bool> OnResult )
+	static public void DoNetworkDB_CheckCount_IsEqualOrGreater<StructDB>( string strFieldName, object iCheckFieldCount, delDBRequest OnResult = null )
 	{
 		CheckIsContainField<StructDB>( strFieldName );
 
 		instance.StartCoroutine( p_pNetworkDB.CoExcutePHP( instance._strID, EPHPName.Check_Count, typeof( StructDB ).ToString(), OnResult, new StringPair( strFieldName, iCheckFieldCount.ToString() ) ) );
 	}
 
-	static public void DoNetworkDB_UpdateAdd_If_CheckCount_IsEqualOrGreater<StructDB>( string strFieldName, object iCheckFieldCount, int iAddFieldCount, System.Action<bool, string> OnResult )
+	static public void DoNetworkDB_UpdateAdd_If_CheckCount_IsEqualOrGreater<StructDB>( string strFieldName, object iCheckFieldCount, int iAddFieldCount, delDBRequest_WithText OnResult = null )
 	{
 		CheckIsContainField<StructDB>( strFieldName );
 
 		instance.StartCoroutine( p_pNetworkDB.CoExcuteAndGetValue( instance._strID, EPHPName.CheckCount_AndUpdateAdd, typeof( StructDB ).ToString(), OnResult, new StringPair( strFieldName, iCheckFieldCount.ToString() ), new StringPair( strFieldName, iAddFieldCount.ToString() ) ) );
 	}
 
-	static public void DoNetworkDB_UpdateAdd<StructDB>( string strFieldName, object iFieldCount, System.Action<bool, string> OnResult, params StringPair[] arrParams )
+	static public void DoNetworkDB_UpdateAdd<StructDB>( string strFieldName, object iFieldCount, delDBRequest_WithText OnResult = null, params StringPair[] arrParams )
 	{
 		CheckIsContainField<StructDB>( strFieldName );
 
@@ -207,29 +231,29 @@ public class CManagerFrameWorkBase<CLASS_Framework, ENUM_Scene_Name, ENUM_Sound_
 	}
 
 
-	static public void DoNetworkDB_GetRange_Orderby_HighToLow<StructDB>( string strFieldName, int iGetDataCount, System.Action<bool, StructDB[]> OnFinishLoad )
+	static public void DoNetworkDB_GetRange_Orderby_HighToLow<StructDB>( string strFieldName, int iGetDataCount, delDBRequest_GenericArray<StructDB> OnFinishLoad = null )
 	{
 		CheckIsContainField<StructDB>( strFieldName );
 
 		instance.StartCoroutine( p_pNetworkDB.CoLoadDataFromServer_Json_Array( instance._strID, EPHPName.Get_Range, OnFinishLoad, new StringPair( strFieldName, iGetDataCount ) ) );
 	}
 
-	static public void DoNetworkDB_Get_Single<StructDB>( System.Action<bool, StructDB> OnFinishLoad, params StringPair[] arrParams )
+	static public void DoNetworkDB_Get_Single<StructDB>( delDBRequest_Generic<StructDB> OnFinishLoad = null, params StringPair[] arrParams )
 	{
 		instance.StartCoroutine( p_pNetworkDB.CoLoadDataFromServer_Json( instance._strID, EPHPName.Get, OnFinishLoad, arrParams ) );
 	}
 
-	static public void DoNetworkDB_GetOrInsert_Single<StructDB>( System.Action<bool, StructDB> OnFinishLoad, params StringPair[] arrParams )
+	static public void DoNetworkDB_GetOrInsert_Single<StructDB>( delDBRequest_Generic<StructDB> OnFinishLoad = null, params StringPair[] arrParams )
 	{
 		instance.StartCoroutine( p_pNetworkDB.CoLoadDataFromServer_Json( instance._strID, EPHPName.Get_OrInsert, OnFinishLoad, arrParams ) );
 	}
 
-	static public void DoNetworkDB_GetRandomKey( string strCheckOverlapTableName, System.Action<bool, string> OnFinishLoad, params StringPair[] arrParams )
+	static public void DoNetworkDB_GetRandomKey( string strCheckOverlapTableName, delDBRequest_WithText OnFinishLoad = null, params StringPair[] arrParams )
 	{
 		instance.StartCoroutine( p_pNetworkDB.CoExcuteAndGetValue( null, EPHPName.Get_RandomKey, strCheckOverlapTableName, OnFinishLoad, arrParams ) );
 	}
 
-	static public void DoNetworkDB_Get_Array<StructDB>( System.Action<bool, StructDB[]> OnFinishLoad, params StringPair[] arrParams )
+	static public void DoNetworkDB_Get_Array<StructDB>( delDBRequest_GenericArray<StructDB> OnFinishLoad = null, params StringPair[] arrParams )
 	{
 		instance.StartCoroutine( p_pNetworkDB.CoLoadDataFromServer_Json_Array( instance._strID, EPHPName.Get, OnFinishLoad, arrParams ) );
 	}
@@ -241,14 +265,14 @@ public class CManagerFrameWorkBase<CLASS_Framework, ENUM_Scene_Name, ENUM_Sound_
 	/// <param name="strFieldName">Generic에 있는 필드 명</param>
 	/// <param name="strSetFieldValue">Generic에 있는 필드에 덮어씌울 값</param>
 	/// <param name="OnResult">결과 함수</param>
-	static public void DoNetworkDB_Update_Set<StructDB>( string strFieldName, object strSetFieldValue, System.Action<bool, StructDB> OnResult )
+	static public void DoNetworkDB_Update_Set<StructDB>( string strFieldName, object strSetFieldValue, delDBRequest_Generic<StructDB> OnResult = null )
 	{
 		CheckIsContainField<StructDB>( strFieldName );
 
 		instance.StartCoroutine( p_pNetworkDB.CoLoadDataFromServer_Json( instance._strID, EPHPName.Update_Set_ID, OnResult, new StringPair( strFieldName, strSetFieldValue ) ) );
 	}
 
-	static public void DoNetworkDB_Update_Set_DoubleKey<StructDB>( string strFieldName, object strSetFieldValue, System.Action<bool> OnResult, StringPair pDoubleKey )
+	static public void DoNetworkDB_Update_Set_DoubleKey<StructDB>( string strFieldName, object strSetFieldValue, delDBRequest OnResult, StringPair pDoubleKey )
 	{
 		CheckIsContainField<StructDB>( strFieldName );
 
@@ -256,7 +280,7 @@ public class CManagerFrameWorkBase<CLASS_Framework, ENUM_Scene_Name, ENUM_Sound_
 			new StringPair[2] { pDoubleKey, new StringPair( strFieldName, strSetFieldValue ) } ) );
 	}
 
-	static public void DoNetworkDB_Update_Set_Custom<StructDB>( string strFieldName, object strSetFieldValue, System.Action<bool> OnResult, params StringPair[] arrField )
+	static public void DoNetworkDB_Update_Set_Custom<StructDB>( string strFieldName, object strSetFieldValue, delDBRequest OnResult, params StringPair[] arrField )
 	{
 		CheckIsContainField<StructDB>( strFieldName );
 
@@ -269,29 +293,29 @@ public class CManagerFrameWorkBase<CLASS_Framework, ENUM_Scene_Name, ENUM_Sound_
 		instance.StartCoroutine( p_pNetworkDB.CoExcutePHP( null, EPHPName.Update_Set_Custom, typeof( StructDB ).ToString(), OnResult, arrPair ) );
 	}
 
-	static public void DoNetworkDB_Update_Set_Multi<StructDB>( System.Action<bool> OnResult, params StringPair[] arrParam )
+	static public void DoNetworkDB_Update_Set_Multi<StructDB>( delDBRequest OnResult, params StringPair[] arrParam )
 	{
 		instance.StartCoroutine( p_pNetworkDB.CoExcutePHP( instance._strID, EPHPName.Update_Set_ID, typeof( StructDB ).ToString(), OnResult, arrParam ) );
 	}
 
-	static public void DoNetworkDB_Update_Set_ServerTime<StructDB>( string strFieldName, System.Action<bool> OnResult )
+	static public void DoNetworkDB_Update_Set_ServerTime<StructDB>( string strFieldName, delDBRequest OnResult )
 	{
 		instance.StartCoroutine( p_pNetworkDB.CoExcutePHP( instance._strID, EPHPName.Update_Set_ServerTime, typeof( StructDB ).ToString(), OnResult, new StringPair( strFieldName, "" ) ) );
 	}
 
-	static public void DoNetworkDB_Insert<StructDB>( System.Action<bool> OnResult, StructDB pStructDB )
+	static public void DoNetworkDB_Insert<StructDB>( delDBRequest OnResult, StructDB pStructDB )
 		where StructDB : IDB_Insert
 	{
 		instance.StartCoroutine( p_pNetworkDB.CoExcutePHP( instance._strID, EPHPName.Insert, typeof( StructDB ).ToString(), OnResult, pStructDB.IDB_Insert_GetField() ) );
 	}
 
-	static public void DoNetworkDB_Insert_Get_InsertData<StructDB>( System.Action<bool, StructDB> OnResult, StructDB pStructDB )
+	static public void DoNetworkDB_Insert_Get_InsertData<StructDB>( delDBRequest_Generic<StructDB> OnResult, StructDB pStructDB )
 		where StructDB : IDB_Insert
 	{
 		instance.StartCoroutine( p_pNetworkDB.CoLoadDataFromServer_Json( instance._strID, EPHPName.Insert, OnResult, pStructDB.IDB_Insert_GetField() ) );
 	}
 
-	static public void DoNetworkDB_Delete<StructDB>( System.Action<bool> OnResult, params StringPair[] arrParam )
+	static public void DoNetworkDB_Delete<StructDB>( delDBRequest OnResult, params StringPair[] arrParam )
 	{
 		if (instance._strID != null)
 			instance.StartCoroutine( p_pNetworkDB.CoExcutePHP( instance._strID, EPHPName.DeleteInfo, typeof( StructDB ).ToString(), OnResult, arrParam ) );
@@ -299,20 +323,20 @@ public class CManagerFrameWorkBase<CLASS_Framework, ENUM_Scene_Name, ENUM_Sound_
 			Debug.Log( "Delete는 strID에 null이오면 안됩니다." );
 	}
 
-	static public void DoNetworkDB_Insert<StructDB>( System.Action<bool> OnResult, params StringPair[] arrParam )
+	static public void DoNetworkDB_Insert<StructDB>( delDBRequest OnResult, params StringPair[] arrParam )
 	{
 		instance.StartCoroutine( p_pNetworkDB.CoExcutePHP( instance._strID, EPHPName.Insert, typeof( StructDB ).ToString(), OnResult, arrParam ) );
 	}
 
-#if UNITY_ANDROID
 	public void DoShakeMobile()
 	{
+#if UNITY_ANDROID
 		if (Application.isPlaying && _pSetting_User.bVibration)
 			Handheld.Vibrate();
-	}
 #endif
+    }
 
-	public void DoSetTestMode()
+    public void DoSetTestMode()
 	{
 		_strID = "Test";
 	}
@@ -325,21 +349,21 @@ public class CManagerFrameWorkBase<CLASS_Framework, ENUM_Scene_Name, ENUM_Sound_
 	static public void DoSetTimeScale(float fTimeScale)
 	{
 		// ITween에서 흔들리는 모션을 TimeScale에 조종하기 위해..
-		if (Time.timeScale != 0f && fTimeScale == 0f) // 플레이 중에 멈출때
-		{
-			iTween[] arrTween = FindObjectsOfType<iTween>();
-			_listTween.Clear();
-			for (int i = 0; i < arrTween.Length; i++)
-			{
-				_listTween.Add(arrTween[i]);
-				arrTween[i].isRunning = false;
-			}
-		}
-		else if (Time.timeScale != 0f) // 중지상태에서 플레이 할 때
-		{
-			for (int i = 0; i < _listTween.Count; i++)
-				_listTween[i].isRunning = true;
-		}
+		//if (Time.timeScale != 0f && fTimeScale == 0f) // 플레이 중에 멈출때
+		//{
+		//	iTween[] arrTween = FindObjectsOfType<iTween>();
+		//	_listTween.Clear();
+		//	for (int i = 0; i < arrTween.Length; i++)
+		//	{
+		//		_listTween.Add(arrTween[i]);
+		//		arrTween[i].isRunning = false;
+		//	}
+		//}
+		//else if (Time.timeScale != 0f) // 중지상태에서 플레이 할 때
+		//{
+		//	for (int i = 0; i < _listTween.Count; i++)
+		//		_listTween[i].isRunning = true;
+		//}
 
 		Time.timeScale = fTimeScale;
 	}
@@ -395,10 +419,10 @@ public class CManagerFrameWorkBase<CLASS_Framework, ENUM_Scene_Name, ENUM_Sound_
 				if (p_EVENT_OnLoadSceneProgress != null)
 					p_EVENT_OnLoadSceneProgress(fTotalProgress / iMaxLoadScene);
 
-				SceneManager.SetActiveScene(pCurrentLoadScene);
-
 				yield return null;
 			}
+
+			SceneManager.SetActiveScene(pCurrentLoadScene);
 
 			GameObject[] arrGameObject = pScene_Empty.GetRootGameObjects();
 			int iLen = arrGameObject.Length;
@@ -407,7 +431,7 @@ public class CManagerFrameWorkBase<CLASS_Framework, ENUM_Scene_Name, ENUM_Sound_
 			{
 				GameObject pGameObject = arrGameObject[j];
 				if (pGameObject.name.Equals("Main Camera")) continue;
-				print(pGameObject.name);
+
 				SceneManager.MoveGameObjectToScene(pGameObject, pCurrentLoadScene);
 			}
 		}

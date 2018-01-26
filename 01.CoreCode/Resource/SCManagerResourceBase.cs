@@ -56,12 +56,6 @@ public class SCManagerResourceBase<CLASS, ENUM_RESOURCE_NAME, RESOURCE>
 
 	static public CLASS DoMakeInstance(MonoBehaviour pBaseClass, string strFolderPath, EResourcePath eResourcePath = EResourcePath.Resources)
     {
-		if(pBaseClass == null)
-		{
-			Debug.LogWarning("Base Class가 없습니다. " + typeof(CLASS).ToString());
-			return null;
-		}
-
 		CLASS pInstance = new CLASS();
 		pInstance._pBase = pBaseClass;
         pInstance._eResourcePath = eResourcePath;
@@ -103,7 +97,7 @@ public class SCManagerResourceBase<CLASS, ENUM_RESOURCE_NAME, RESOURCE>
 
         return pFindResource;
     }
-	
+
 	// ========================================================================== //
 
 	// ===================================== //
@@ -138,7 +132,14 @@ public class SCManagerResourceBase<CLASS, ENUM_RESOURCE_NAME, RESOURCE>
 			{
 				ENUM_RESOURCE_NAME eResourceName = default( ENUM_RESOURCE_NAME );
 				if (arrResources[i].name.ConvertEnum( out eResourceName ))
+				{
+					if(_mapResourceOrigin.ContainsKey( eResourceName ))
+					{
+						Debug.LogWarning( "Error - Already Contas Key : " + eResourceName );
+						continue;
+					}
 					_mapResourceOrigin.Add( eResourceName, arrResources[i] );
+				}
 			}
 		}
 		else

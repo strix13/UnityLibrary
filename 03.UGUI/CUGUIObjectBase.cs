@@ -30,8 +30,14 @@ public class CUGUIObjectBase : CObjectBase
 	protected Dictionary<string, Text> _mapText = null;
 	protected Dictionary<string, Image> _mapImage = null;
 	protected Dictionary<string, Slider> _mapSlider = null;
+	protected Dictionary<string, Button> _mapButton = null;
+	protected Dictionary<string, Toggle> _mapToggle = null;
 	protected Dictionary<string, Dropdown> _mapDropdown = null;
 	protected Dictionary<string, CUGUIDropDown> _mapDropdownExtension = null;
+
+#if TMPro
+	protected Dictionary<string, TMPro.TMP_Text> _mapTextMesh = null;
+#endif
 
 	/* private - Field declaration           */
 
@@ -40,17 +46,34 @@ public class CUGUIObjectBase : CObjectBase
 	/* public - [Do] Function
      * 외부 객체가 호출(For External class call)*/
 
-	public void DoEditText<T_TextName>( T_TextName tTextName, object strText )
+#if TMPro
+	public void DoEditTextMesh<T_TextMeshName>( T_TextMeshName tTextMeshProName, object strText )
 	{
 		if (strText == null)
-			FindUIElement( _mapText, tTextName.ToString() ).text = "";
+			FindUIElement( _mapTextMesh, tTextMeshProName.ToString() ).text = "";
 		else
-			FindUIElement( _mapText, tTextName.ToString() ).text = strText.ToString();
+			FindUIElement( _mapTextMesh, tTextMeshProName.ToString() ).text = strText.ToString();
+	}
+#endif
+
+	public void DoEditText<T_TextName>( T_TextName tTextName, object strText, bool bShow = true )
+	{
+		Text pText = FindUIElement(_mapText, tTextName.ToString());
+
+		if (strText == null)
+			pText.text = "";
+		else
+			pText.text = strText.ToString();
+
+		pText.gameObject.SetActive(bShow);
 	}
 
-	public void DoEditImage<T_ImageName>( T_ImageName tImageName, Sprite pSprite )
+	public void DoEditImage<T_ImageName>( T_ImageName tImageName, Sprite pSprite, bool bNativeSize = false )
 	{
-		FindUIElement( _mapImage, tImageName.ToString() ).sprite = pSprite;
+		Image pImage = FindUIElement(_mapImage, tImageName.ToString());
+		pImage.sprite = pSprite;
+		if (bNativeSize)
+			pImage.SetNativeSize();
 	}
 
 	public Text GetText<T_TextName>( T_TextName tTextName, bool bIgnoreError = false )
@@ -66,6 +89,11 @@ public class CUGUIObjectBase : CObjectBase
 	public Slider GetSlider<T_Slider>( T_Slider tSlider, bool bIgnoreError = false )
 	{
 		return FindUIElement( _mapSlider, tSlider.ToString(), bIgnoreError );
+	}
+
+	public Button GetButton<T_Button>(T_Button tButton, bool bIgnoreError = false)
+	{
+		return FindUIElement(_mapButton, tButton.ToString(), bIgnoreError);
 	}
 
 	public Dropdown GetDropdown<T_Dropdown>( T_Dropdown tDropdownName, bool bIgnoreError = false )

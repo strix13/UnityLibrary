@@ -96,9 +96,19 @@ public static class SCEnumeratorHelper
 		}
 	}
 
+	static public void Add<TKey, TSource>( this Dictionary<TKey, List<TSource>> mapDataTable, TSource pAddSource )
+		where TSource : IDictionaryItem<TKey>
+	{
+		TKey hDataID = pAddSource.IDictionaryItem_GetKey();
+		if(mapDataTable.ContainsKey( hDataID ) == false)
+			mapDataTable.Add(hDataID, new List<TSource>());
 
-	static public void DoAddItem<Struct, TKey>( this Dictionary<TKey, Struct> mapDataTable, Struct[] arrDataTable, UnityEngine.Object pObjectForDebug = null )
-	where Struct : IDictionaryItem<TKey>
+		mapDataTable[hDataID].Add( pAddSource );
+	}
+	
+
+	static public void DoAddItem<TSource, TKey>( this Dictionary<TKey, TSource> mapDataTable, TSource[] arrDataTable, UnityEngine.Object pObjectForDebug = null )
+		where TSource : IDictionaryItem<TKey>
 	{
 		mapDataTable.Clear();
 		if (arrDataTable == null) return;
@@ -107,14 +117,32 @@ public static class SCEnumeratorHelper
 		{
 			TKey hDataID = arrDataTable[i].IDictionaryItem_GetKey();
 			if (mapDataTable.ContainsKey( hDataID ))
-				Debug.LogWarning( "에러, 데이터 테이블에 공통된 키값을 가진 데이터가 존재!!" + typeof( Struct ) + " : " + hDataID, pObjectForDebug );
+				Debug.LogWarning( "에러, 데이터 테이블에 공통된 키값을 가진 데이터가 존재!!" + typeof( TSource ) + " : " + hDataID, pObjectForDebug );
 			else
 				mapDataTable.Add( hDataID, arrDataTable[i] );
 		}
 	}
 
-	static public void DoAddItem<Struct, TKey>( this Dictionary<TKey, List<Struct>> mapDataTable, Struct[] arrDataTable )
-	where Struct : IDictionaryItem<TKey>
+	static public void DoAddItem<TSource, TKey>( this Dictionary<TKey, List<TSource>> mapDataTable, IEnumerable<TSource> source, bool bIsClear = true )
+		where TSource : IDictionaryItem<TKey>
+	{
+		if (bIsClear)
+			mapDataTable.Clear();
+
+		IEnumerator<TSource> pIter = source.GetEnumerator();
+		while (pIter.MoveNext())
+		{
+			TSource pCurrent = pIter.Current;
+			TKey hDataID = pCurrent.IDictionaryItem_GetKey();
+			if (mapDataTable.ContainsKey( hDataID ) == false)
+				mapDataTable.Add( hDataID, new List<TSource>() );
+			
+			mapDataTable[hDataID].Add( pCurrent );
+		}
+	}
+	
+	static public void DoAddItem<TSource, TKey>( this Dictionary<TKey, List<TSource>> mapDataTable, TSource[] arrDataTable )
+		where TSource : IDictionaryItem<TKey>
 	{
 		mapDataTable.Clear();
 		if (arrDataTable == null) return;
@@ -124,11 +152,12 @@ public static class SCEnumeratorHelper
 			TKey hDataID = arrDataTable[i].IDictionaryItem_GetKey();
 
 			if (mapDataTable.ContainsKey( hDataID ) == false)
-				mapDataTable.Add( hDataID, new List<Struct>() );
+				mapDataTable.Add( hDataID, new List<TSource>() );
 
 			mapDataTable[hDataID].Add( arrDataTable[i] );
 		}
 	}
+
 	static public void DoLinkOwnerToData<TOwner, TKeyData, TData>( this Dictionary<TKeyData, TData> mapData, List<TOwner> listDataOwner )
 		where TOwner : class, IDictionaryItem_ContainData<TKeyData, TData>
 		where TData : IDictionaryItem<TKeyData>
@@ -176,7 +205,7 @@ public static class SCEnumeratorHelper
 		if (bIsContain == false)
 		{
 			outData = new T();
-			Debug.Log( "List.TryGetValue 에 실패했습니다 - Index :  " + iIndex, null );
+			Debug.LogWarning( "List.TryGetValue 에 실패했습니다 - Index :  " + iIndex, null );
 		}
 		else
 			outData = list[iIndex];
@@ -191,7 +220,7 @@ public static class SCEnumeratorHelper
 		{
 			string strKeyName = typeof( TKey ).Name;
 			string strValueName = typeof( TValue ).Name;
-			Debug.Log( string.Format( "Dictionary<{0}, {1}>.ContainsKey 에 실패했습니다 - {2}", strKeyName, strValueName, CheckKey ), pObjectForDebug );
+			Debug.LogWarning( string.Format( "Dictionary<{0}, {1}>.ContainsKey 에 실패했습니다 - {2}", strKeyName, strValueName, CheckKey ), pObjectForDebug );
 		}
 
 		return bIsContain;

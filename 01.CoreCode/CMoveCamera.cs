@@ -37,7 +37,7 @@ public class CMoveCamera : CObjectBase
 	/* public - Field declaration            */
 
 	[Header("카메라 이동좌표")]
-	[SerializeField] private ECameraAxis p_eCameraAxis;
+	[SerializeField] private ECameraAxis p_eCameraAxis = ECameraAxis.XY_2D;
 
 	[Header("카메라 이동제한 (수평)")]
 	[SerializeField] private int p_iLimitMoveHorizontal = 720;
@@ -83,7 +83,7 @@ public class CMoveCamera : CObjectBase
 
 	private float _fLastDragStoppedTime;
 
-	private float _fStartPinchDistance;
+	//private float _fStartPinchDistance;
 	private float _fStartPinchZoomSize;
 	private float _fLerpPinchDistance;
 
@@ -154,7 +154,7 @@ public class CMoveCamera : CObjectBase
 	private void OnStartPinch(float fDistance)
 	{
 		_fLerpPinchDistance = fDistance;
-		_fStartPinchDistance = fDistance;
+		//_fStartPinchDistance = fDistance;
 
 		if (_bIsCameraOrtho)
 			_fStartPinchZoomSize = _pCamera.orthographicSize;

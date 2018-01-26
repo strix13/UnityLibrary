@@ -16,62 +16,38 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using System.Collections;
 using System.Collections.Generic;
+using System;
 
-//public class CInventoryData_Test
-//{
-//	private IInventoryListener _pInventoryOwner; public IInventoryListener p_pInventoryOwner { get { return _pInventoryOwner; } }
-
-//	private Sprite _pSprite; public Sprite p_pSprite { get { return _pSprite; } }
-
-//	private int _iSlotID; public int p_iSlotID { get { return _iSlotID; } }
-//	private int _iRealID; public int p_iRealID { get { return _iRealID; } }
-
-//	public void DoInit(Sprite pSprite, IInventoryListener pInventoryListener)
-//	{
-//		DoInitSprite(pSprite);
-//		DoInitOwnerListener(pInventoryListener);
-//	}
-
-//	public void DoInitSprite(Sprite pSprite) { this._pSprite = pSprite; }
-
-//	public void DoSetSlotID(int iSlotID) { this._iSlotID = iSlotID; }
-
-//	public void DoSetRealID(int iRealID) { this._iRealID = iRealID; }
-
-//	public void DoInitOwnerListener(IInventoryListener pInventoryOwner) { _pInventoryOwner = pInventoryOwner; }
-//}
-
-//public interface IInventoryListener
-//{
-//	void OnRegisterSlot(CUGUIInventorySlot pSlot);
-
-//	void OnPickItem(Vector3 v3CursorPos, int iPickSlotID);
-//	void OnDragItem(Vector3 v3CursorPos, int iPickSlotID);
-//	void OnDropItem(GameObject pGameObject, int iPickSlotID, int iHashCode);
-//	void OnSelectSlot(CUGUIInventorySlot pSlot);
-
-//	void OnReceiveData(int iReceiveSlotID, CInventoryData_Test IReceiveData);
-//}
-
-public interface IInventory
+public interface IInventory<Class_Data, Class_Slot>
+	where Class_Data : IInventoryData<Class_Data>
+	where Class_Slot : IInventorySlot<Class_Slot, Class_Data>
 {
-	void OnClickSlot(IInventorySlot IInventorySlot);
+	void IInventory_OnClickSlot( Class_Slot IInventorySlot );
+	void IInventory_RefreshData( );
 }
 
-public interface IInventorySlot
+public interface IInventorySlot<Class_Slot, Class_Data>
+	where Class_Slot : IInventorySlot<Class_Slot, Class_Data>
+	where Class_Data : IInventoryData<Class_Data>
 {
-	void DoInit(IInventory IInventory);
+	Class_Data p_pInventoryData { get; }
 
-	void OnSetSprite(string strSpriteName);
+	void IInventorySlot_DoInit( IInventory<Class_Data, Class_Slot> pInventoryOwner );
 
-	void OnEnableSlot(bool bEnable);
+	void IInventorySlot_OnSetData( Class_Data pData, string strImageName );
+	void IInventorySlot_OnEnableSlot( bool bEnable );
+	void IInventorySlot_OnClickSlot( bool bIsCurrentSelectedSlot );
 }
 
-public interface IInventoryInfoData { }
+public interface IInventoryData<Class_Data>
+	where Class_Data : IInventoryData<Class_Data>
+{
+	string IInventoryData_GetImageName( );
+}
 
-public abstract class CInventoryBase<CLASS_DATA, CLASS_SLOT> : CObjectBase, IInventory
-	where CLASS_DATA : IInventoryInfoData
-	where CLASS_SLOT : IInventorySlot
+public abstract class CInventoryBase<CLASS_Data, CLASS_Slot> : CSingletonBase<CInventoryBase<CLASS_Data, CLASS_Slot>>, IInventory<CLASS_Data, CLASS_Slot>
+	where CLASS_Data : class, IInventoryData<CLASS_Data>
+	where CLASS_Slot : CObjectBase, IInventorySlot<CLASS_Slot, CLASS_Data>
 {
 	/* const & readonly declaration             */
 
@@ -79,6 +55,7 @@ public abstract class CInventoryBase<CLASS_DATA, CLASS_SLOT> : CObjectBase, IInv
 
 	public enum EInventoryType
 	{
+		None,
 		Scroll,
 		Page,
 		Page_Auto
@@ -90,13 +67,13 @@ public abstract class CInventoryBase<CLASS_DATA, CLASS_SLOT> : CObjectBase, IInv
 
 	/* protected - Field declaration         */
 
+	protected Dictionary<int, CLASS_Slot> _mapInventorySlot = new Dictionary<int, CLASS_Slot>();
+	protected List<CLASS_Slot> _listInventorySlot = new List<CLASS_Slot>();
+
 	/* private - Field declaration           */
 
-	private Dictionary<int, CLASS_DATA> _mapInventoryData = new Dictionary<int, CLASS_DATA>();
-	private Dictionary<int, IInventorySlot> _mapInventorySlot = new Dictionary<int, IInventorySlot>();
-
-	private int _iMaxPage;
-	private int _iCurPage;
+	private int _iMaxPage;	public int p_iMaxPage {  get { return _iMaxPage; } }
+	private int _iCurPage;  public int p_iCurPage { get { return _iCurPage; } }
 
 	private int _iMaxSlotCount;
 	private int _iTotalDataCount;
@@ -110,178 +87,48 @@ public abstract class CInventoryBase<CLASS_DATA, CLASS_SLOT> : CObjectBase, IInv
 	/* public - [Do] Function
      * 외부 객체가 호출(For External class call)*/
 
-	public void DoInit_InventoryData()
-	{
-		EventInit_InventoryType();
-	}
-
-	public void DoPrevPage()
-	{
-		EventPrevPage();
-	}
-
-	public void DoNextPage()
-	{
-		EventNextPage();
-	}
-
-	public void DoAddMaxPage(int iAddMaxPage)
-	{
-		EventAddMaxPage(iAddMaxPage);
-	}
-
-	public void DoSetPage(int iPage)
-	{
-		EventSetPage(iPage);
-	}
-
-	//public CLASS_DATA GetInventoryData(int iRealID)
-	//{
-	//	return _mapInventoryData[iRealID];
-	//}
-
-	//public CUGUIInventorySlot GetInventorySlot(int iSlotID)
-	//{
-	//	return _mapInventorySlot[iSlotID];
-	//}
+	public void DoRefresh_InventoryData() { IInventory_RefreshData(); }
+	public void DoPrevPage()	{ EventPrevPage(); }
+	public void DoNextPage() { EventNextPage(); }
+	public void DoSetMaxPage(int iMaxPage) { EventSetMaxPage(iMaxPage); }
+	public void DoAddMaxPage( int iAddMaxPage ) { EventAddMaxPage( iAddMaxPage ); }
+	public void DoSetPage( int iPage ) { EventSetPage( iPage ); }
 
 	/* public - [Event] Function             
        프랜드 객체가 호출(For Friend class call)*/
 
-	//public void OnRegisterSlot(CUGUIInventorySlot pSlot)
-	//{
-	//	int iSlotID = pSlot.p_iSlotID;
-	//	if (_mapInventorySlot.ContainsKey(iSlotID))
-	//	{
-	//		Debug.Log( "이미 슬롯 키 값이 들어가있습니다." );
-	//		return;
-	//	}
-
-	//	_mapInventorySlot.Add(iSlotID, pSlot);
-	//}
-
-	//public void OnPickItem(Vector3 v3CursorPos, int iPickSlotID)
-	//{
-	//	if (_bEnableDragItem == false) return;
-
-	//	_bIsSlotContainItem = _mapInventoryData.ContainsKey(iPickSlotID);
-	//}
-
-	//public void OnDragItem(Vector3 v3CursorPos, int iPickSlotID)
-	//{
-	//	if (_bEnableDragItem == false) return;
-
-	//	if (_bIsSlotContainItem == false) return;
-
-	//	CUGUIInventorySlot pSlot = _mapInventorySlot[iPickSlotID];
-
-	//	_pInventoryCursor.DoSetImage(pSlot.p_pImage.sprite);
-	//	_pInventoryCursor.DoUpdatePosition(v3CursorPos);
-	//}
-
-	//public void OnDropItem(GameObject pGameObject, int iOwnerSlotID, int iOwnerSlotHashCode)
-	//{
-	//	if (_bEnableDragItem == false) return;
-
-	//	if (_bIsSlotContainItem == false) return;
-
-	//	_pInventoryCursor.SetActive(false);
-
-	//	if (pGameObject == null) return;
-
-	//	// 일단 슬롯이 있는지 체크
-	//	CUGUIInventorySlot pTargetSlot = pGameObject.GetComponent<CUGUIInventorySlot>();
-	//	if (pTargetSlot == null) return;
-
-	//	CLASS_DATA pOwnerData_Backup = _mapInventoryData[iOwnerSlotID];
-
-	//	IInventoryEquipSlot<CLASS_DATA> ITargetEquipSlot = pTargetSlot.GetComponent<IInventoryEquipSlot<CLASS_DATA>>();
-	//	if (ITargetEquipSlot != null)
-	//	{
-	//		CUGUIInventorySlot pOwnerSlot = GetInventorySlot(iOwnerSlotID);
-	//		if (ITargetEquipSlot.CheckSlotType(pOwnerData_Backup) == false) return;
-	//	}
-
-	//	if (iOwnerSlotHashCode == pTargetSlot.p_iInvenHashCode)
-	//	{
-	//		// 같은 슬롯일 경우 데이터만 스왑해준다.
-	//		if (_bEnableSwapItemInSameInventory)
-	//			EventSwapData(iOwnerSlotID, pTargetSlot.p_iSlotID);
-	//	}
-	//	else
-	//	{
-	//		// 다른 슬롯일 경우 데이터 발신
-	//		if (_bRemoveItem)
-	//			EventRemoveData(iOwnerSlotID);
-
-	//		pTargetSlot.OnReceiveData(pOwnerData_Backup);
-	//	}
-	//}
-
-	//public void OnSelectSlot(CUGUIInventorySlot pSlot)
-	//{
-	//	if (_bEnableSelectSlot == false) return;
-
-	//	EventSelectSlot(pSlot);
-	//}
-
-	//protected void EventSelectSlot(CUGUIInventorySlot pSlot)
-	//{
-	//	int iSlotID = pSlot.p_iSlotID;
-	//	if (_mapInventoryData.ContainsKey(iSlotID) == false) return;
-
-	//	if (_pSelectedSlot != null)
-	//	{
-	//		_pSelectedSlot.DoEnableImageSelected(false);
-
-	//		if (_pSelectedSlot.p_iSlotID == pSlot.p_iSlotID)
-	//		{
-	//			EventUnSelectSlot();
-	//			OnUnSelectedSlot();
-	//			return;
-	//		}
-	//	}
-
-	//	pSlot.DoEnableImageSelected(true);
-	//	OnSelectedSlot(pSlot, _mapInventoryData[pSlot.p_iSlotID]);
-
-	//	_pSelectedSlot = pSlot;
-	//}
-
-	//protected void EventUnSelectSlot()
-	//{
-	//	if (_pSelectedSlot != null)
-	//	{
-	//		_pSelectedSlot.DoEnableImageSelected(false);
-	//		_pSelectedSlot = null;
-	//	}
-	//}
-
-	//public void OnReceiveData(int iReceiveSlotID, CInventoryData_Test IReceiveData)
-	//{
-	//	CLASS_DATA pData = (CLASS_DATA)IReceiveData;
-
-	//	if (_mapInventoryData.ContainsKey(iReceiveSlotID))
-	//	{
-	//		// 일단 옮기기 전에 들어있던 데이터 백업
-	//		CLASS_DATA pDataDroppedPos_Backup = _mapInventoryData[iReceiveSlotID];
-	//		IInventoryListener pInventoryListner_Backup = pData.p_pInventoryOwner;
-
-	//		int iSlot_Backup = pData.p_iSlotID;
-
-	//		// 현재 드래그된 아이템을 현재 인벤토리에 일단 옮긴다..
-	//		EventSetSlotData(iReceiveSlotID, pData);
-	//		pInventoryListner_Backup.OnReceiveData(iSlot_Backup, pDataDroppedPos_Backup);
-	//	}
-	//	else
-	//	{
-	//		EventSetSlotData(iReceiveSlotID, pData);
-	//	}
-	//}
-
-	public void OnClickSlot(IInventorySlot IInventorySlot)
+	public void IInventory_OnClickSlot( CLASS_Slot pInventorySlot )
 	{
+		if(pInventorySlot != null)
+		{
+			CLASS_Data pData = pInventorySlot.p_pInventoryData;
+			OnInventory_ClickSlot( pInventorySlot, pData );
+		}
 
+		_mapInventorySlot.Values.ToList( _listInventorySlot );
+		for (int i = 0; i < _listInventorySlot.Count; i++)
+			_listInventorySlot[i].IInventorySlot_OnClickSlot( _listInventorySlot[i] == pInventorySlot );
+	}
+	
+	public void IInventory_RefreshData()
+	{
+		_iTotalDataCount = GetInventoryData().Count;
+
+		EInventoryType eInventoryType = GetInventoryType();
+		switch (eInventoryType)
+		{
+			case EInventoryType.Scroll:
+				ProcInit_InventoryData( GetInventoryData() );
+				break;
+
+			case EInventoryType.Page:
+			case EInventoryType.Page_Auto:
+				ProcInit_InventoryData_Page( 1, eInventoryType == EInventoryType.Page_Auto );
+				break;
+		}
+
+		IInventory_OnClickSlot( null );
+		OnInventory_RefreshInventoryData( GetInventoryData() );
 	}
 
 	#endregion Public
@@ -292,93 +139,20 @@ public abstract class CInventoryBase<CLASS_DATA, CLASS_SLOT> : CObjectBase, IInv
 
 	/* protected - [abstract & virtual]         */
 
-	protected virtual void OnSetInventoryData(CLASS_DATA sInfoData, CLASS_SLOT pSlot) { }
+	abstract protected List<CLASS_Data> GetInventoryData();
+	abstract protected EInventoryType GetInventoryType();
 
-	protected virtual void OnSetPage(int iCurPage, int iMaxPage) { }
-
-	protected abstract List<CLASS_DATA> GetInventoryData();
-
-	protected abstract EInventoryType GetInventoryType();
-
-	protected abstract string GetSpriteName(CLASS_DATA sInfoData);
-
-	//protected virtual void OnSelectedSlot(CUGUIInventorySlot pSlot, CLASS_DATA pData) { }
-
-	//protected virtual void OnUnSelectedSlot() { }
-
-	//protected virtual void OnSetItem(CUGUIInventorySlot pSlot, CLASS_DATA pData) { }
-
-	//protected virtual void OnRemoveItem(int iRealID) { }
-
-	/* protected - [Event] Function           
-       자식 객체가 호출(For Child class call)		*/
-
-	//private void EventSwapData(int iOwnerSlotID, int iTargetSlotID)
-	//{
-	//	if (iOwnerSlotID == iTargetSlotID) return;
-
-	//	CLASS_DATA pOwnerDataTemp = _mapInventoryData[iOwnerSlotID];
-
-	//	if (_mapInventoryData.ContainsKey(iTargetSlotID))
-	//	{
-	//		EventSetSlotData(iOwnerSlotID, _mapInventoryData[iTargetSlotID]);
-	//		EventSetSlotData(iTargetSlotID, pOwnerDataTemp);
-	//	}
-	//	else
-	//	{
-	//		EventRemoveData(iOwnerSlotID);
-	//		EventSetSlotData(iTargetSlotID, pOwnerDataTemp);
-	//	}
-	//}
-
-	//private void EventSetSlotData(int iSlotID, CLASS_DATA pData)
-	//{
-	//	pData.DoInitOwnerListener(this);
-
-	//	CUGUIInventorySlot pSlot = _mapInventorySlot[iSlotID];
-	//	pSlot.EventSetData(pData);
-
-	//	_mapInventoryData[iSlotID] = pData;
-
-	//	OnSetItem(pSlot, pData);
-	//}
-
-	//private void EventRemoveData(int iSlotID)
-	//{
-	//	if (_mapInventoryData.ContainsKey(iSlotID) == false) return;
-
-	//	int iRealID_Backup = _mapInventoryData[iSlotID].p_iRealID;
-
-	//	_mapInventorySlot[iSlotID].DoEnableImage(false);
-	//	_mapInventoryData.Remove(iSlotID);
-
-	//	OnRemoveItem(iRealID_Backup);
-	//}
-
-	protected void EventInit_InventoryType()
-	{
-		_iTotalDataCount = GetInventoryData().Count;
-
-		EInventoryType eInventoryType = GetInventoryType();
-		switch (eInventoryType)
-		{
-			case EInventoryType.Scroll:
-				ProcInit_InventoryData(GetInventoryData());
-				break;
-
-			case EInventoryType.Page:
-			case EInventoryType.Page_Auto:
-					ProcInit_InventoryData_Page(1, eInventoryType == EInventoryType.Page_Auto);
-				break;
-		}
-	}
-
-	protected void EventSetMaxPage(int iMaxPage)
+	virtual protected void OnInventory_ClickSlot( CLASS_Slot pInventorySlot, CLASS_Data pData ) { }
+	virtual protected void OnInventory_SetData( CLASS_Data sInfoData, CLASS_Slot pSlot ) { }
+	virtual protected void OnInventory_SetPage( int iCurPage, int iMaxPage ) { }
+	virtual protected void OnInventory_RefreshInventoryData( List<CLASS_Data> listData ) { }
+	
+	protected void EventSetMaxPage( int iMaxPage )
 	{
 		_iMaxPage = iMaxPage;
 	}
 
-	protected void EventAddMaxPage(int iAddMaxPage)
+	protected void EventAddMaxPage( int iAddMaxPage )
 	{
 		_iMaxPage += iAddMaxPage;
 	}
@@ -387,19 +161,19 @@ public abstract class CInventoryBase<CLASS_DATA, CLASS_SLOT> : CObjectBase, IInv
 	{
 		_iCurPage--;
 
-		EventSetPage(GetPageClamped(_iCurPage));
+		EventSetPage( GetPageClamped( _iCurPage ) );
 	}
 
 	protected void EventNextPage()
 	{
 		_iCurPage++;
 
-		EventSetPage(GetPageClamped(_iCurPage));
+		EventSetPage( GetPageClamped( _iCurPage ) );
 	}
 
-	protected void EventSetPage(int iPage)
+	protected void EventSetPage( int iPage )
 	{
-		ProcInit_InventoryData_Page(iPage);
+		ProcInit_InventoryData_Page( iPage );
 	}
 
 	/* protected - Override & Unity API         */
@@ -409,25 +183,6 @@ public abstract class CInventoryBase<CLASS_DATA, CLASS_SLOT> : CObjectBase, IInv
 		base.OnAwake();
 
 		ProcInit_InventorySlot();
-
-		//if (_bEnableDragItem && _pInventoryCursor == null)
-		//{
-		//	Debug.Log("InventoryCursor를 인스펙터에 등록해주세요.");
-		//	return;
-		//}
-
-		//List<CUGUIInventorySlot> listInventorySlot = new List<CUGUIInventorySlot>();
-		//GetComponentsInChildren(listInventorySlot);
-
-		//int iCount = listInventorySlot.Count;
-		//for (int i = 0; i < iCount; i++)
-		//{
-		//	CUGUIInventorySlot pSlot = listInventorySlot[i];
-		//	pSlot.EventOnAwake();
-		//	pSlot.DoSetInventoryListener(this);
-		//}
-
-		//_iMaxSlot = iCount;
 	}
 
 	#endregion Protected
@@ -441,7 +196,13 @@ public abstract class CInventoryBase<CLASS_DATA, CLASS_SLOT> : CObjectBase, IInv
 
 	private void ProcInit_Page_Auto()
 	{
-		EventSetMaxPage(1);
+		EventSetMaxPage( 1 );
+
+		if(_iMaxSlotCount == 0)
+		{
+			Debug.LogWarning( name + "Error InventoryBase _iMaxSlotCount == 0", this );
+			return;
+		}
 
 		int i = 1;
 		while ((_iTotalDataCount - 1) >= i)
@@ -449,7 +210,7 @@ public abstract class CInventoryBase<CLASS_DATA, CLASS_SLOT> : CObjectBase, IInv
 			int iPercent = i % _iMaxSlotCount;
 			if (iPercent == 0)
 			{
-				EventAddMaxPage(1);
+				EventAddMaxPage( 1 );
 			}
 
 			i++;
@@ -458,79 +219,75 @@ public abstract class CInventoryBase<CLASS_DATA, CLASS_SLOT> : CObjectBase, IInv
 
 	private void ProcInit_InventorySlot()
 	{
-		IInventorySlot[] arrInventoryslot = GetComponentsInChildren<IInventorySlot>(true);
-
+		IInventory<CLASS_Data, CLASS_Slot> pInventory = this;
+		CLASS_Slot[] arrInventoryslot = GetComponentsInChildren<CLASS_Slot>( true );
 		int iLen = arrInventoryslot.Length;
 		for (int i = 0; i < iLen; i++)
 		{
-			IInventorySlot pSlot = arrInventoryslot[i];
-
-			if (_mapInventorySlot.ContainsKey(i))
+			CLASS_Slot pSlot = arrInventoryslot[i];
+			if (_mapInventorySlot.ContainsKey( i ))
 			{
-				Debug.LogWarning("이미 _mapInventorySlot 에 " + pSlot + " 가 있습니다...");
+				Debug.LogWarning( "이미 _mapInventorySlot 에 " + pSlot + " 가 있습니다..." );
 			}
 			else
 			{
-				_mapInventorySlot.Add(i, pSlot);
+				_mapInventorySlot.Add( i, pSlot );
 
-				pSlot.DoInit(this);
-				pSlot.OnEnableSlot(false);
+				pSlot.EventOnAwake();
+				pSlot.IInventorySlot_DoInit( pInventory );
+				pSlot.IInventorySlot_OnEnableSlot( false );
 			}
 		}
 
 		_iMaxSlotCount = iLen;
 	}
 
-	private void ProcInit_InventoryData(List<CLASS_DATA> listInventoryData)
+	private void ProcInit_InventoryData( List<CLASS_Data> listInventoryData )
 	{
-		_mapInventoryData.Clear();
-
 		int iCount_InventoryData = listInventoryData.Count;
-		int iCount = _mapInventorySlot.Count;
-		for (int i = 0; i < iCount; i++)
+		for (int i = 0; i < _mapInventorySlot.Count; i++)
 		{
-			IInventorySlot pSlot = _mapInventorySlot[i];
-
+			CLASS_Data sInfoData = null;
+			CLASS_Slot pSlot = _mapInventorySlot[i];
 			bool bContains_InventoryData = i < iCount_InventoryData;
+			pSlot.IInventorySlot_OnEnableSlot( bContains_InventoryData );
 			if (bContains_InventoryData)
 			{
-				CLASS_DATA sInfoData = listInventoryData[i];
-				string strSpriteName = GetSpriteName(sInfoData);
-
-				pSlot.OnSetSprite(strSpriteName);
-				OnSetInventoryData(sInfoData, (CLASS_SLOT)pSlot);
-
-				_mapInventoryData.Add(i, sInfoData);
+				sInfoData = listInventoryData[i];
+				pSlot.IInventorySlot_OnSetData(sInfoData, sInfoData.IInventoryData_GetImageName());
+				OnInventory_SetData(sInfoData, pSlot);
 			}
-
-			pSlot.OnEnableSlot(bContains_InventoryData);
+			else
+			{
+				pSlot.IInventorySlot_OnSetData(null, null);
+			}
 		}
 	}
 
-	private void ProcInit_InventoryData_Page(int iPage, bool bPageAuto = false)
+	private void ProcInit_InventoryData_Page( int iPage, bool bPageAuto = false )
 	{
 		if (bPageAuto)
 			ProcInit_Page_Auto();
 
-		int iPrev_PageSlotCount = Mathf.Max(0, iPage - 1) * _iMaxSlotCount;
+		int iPrev_PageSlotCount = Mathf.Max( 0, iPage - 1 ) * _iMaxSlotCount;
 		int iNext_PageSlotCount = iPage * _iMaxSlotCount;
 
-		List<CLASS_DATA> listInventoryData = GetInventoryData();
-		List<CLASS_DATA> listInventoryData_Page = new List<CLASS_DATA>();
+		List<CLASS_Data> listInventoryData = GetInventoryData();
+		List<CLASS_Data> listInventoryData_Page = new List<CLASS_Data>();
 
 		for (int i = iPrev_PageSlotCount; i <= iNext_PageSlotCount; i++)
 		{
 			if (i < _iTotalDataCount)
 			{
-				CLASS_DATA sInfoData = listInventoryData[i];
-				listInventoryData_Page.Add(sInfoData);
+				CLASS_Data sInfoData = listInventoryData[i];
+				listInventoryData_Page.Add( sInfoData );
 			}
 			else
 				break;
 		}
 
-		ProcInit_InventoryData(listInventoryData_Page);
-		OnSetPage(iPage, _iMaxPage);
+		ProcInit_InventoryData( listInventoryData_Page );
+		OnInventory_SetPage( iPage, _iMaxPage );
 
 		_iCurPage = iPage;
 	}
@@ -538,9 +295,9 @@ public abstract class CInventoryBase<CLASS_DATA, CLASS_SLOT> : CObjectBase, IInv
 	/* private - Other[Find, Calculate] Func 
        찾기, 계산등 단순 로직(Simpe logic)         */
 
-	private int GetPageClamped(int iPage)
+	private int GetPageClamped( int iPage )
 	{
-		return Mathf.Clamp(iPage, 1, _iMaxPage);
+		return Mathf.Clamp( iPage, 1, _iMaxPage );
 	}
 
 	#endregion Private

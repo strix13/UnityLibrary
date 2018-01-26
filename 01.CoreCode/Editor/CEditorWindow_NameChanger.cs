@@ -263,6 +263,7 @@ public class CEditorWindow_NameChanger : EditorWindow
 			string strFilePath = Path.Combine( Directory.GetCurrentDirectory(), strAssetPath );
 			DirectoryInfo pDirectoryInfo = new DirectoryInfo( strFilePath );
 
+			if (pDirectoryInfo.Name.Contains( _strReplaceTarget ) == false) continue;
 			string strName = pDirectoryInfo.Name.Replace( _strReplaceTarget, _strReplaceDest );
 			string strExtension = pDirectoryInfo.Extension;
 
@@ -272,7 +273,11 @@ public class CEditorWindow_NameChanger : EditorWindow
 			AssetDatabase.RenameAsset( strFilePath, strName );
 			AssetDatabase.Refresh( ImportAssetOptions.ForceUpdate );
 			File.Move( strFilePath, strFilePathNew );
+
+			EditorUtility.DisplayProgressBar( "Name Changing.. ", "Working..", (float)i / _listObject.Count );
 		}
+
+		EditorUtility.ClearProgressBar();
 	}
 
 	private void ProcNameChange_Append()
@@ -297,7 +302,11 @@ public class CEditorWindow_NameChanger : EditorWindow
 			AssetDatabase.RenameAsset( strFilePath, strName );
 			AssetDatabase.Refresh( ImportAssetOptions.ForceUpdate );
 			File.Move( strFilePath, strFilePathNew );
+
+			EditorUtility.DisplayProgressBar( "Name Changing.. ", "Working..", (float)i / _listObject.Count );
 		}
+
+		EditorUtility.ClearProgressBar();
 	}
 
 	private void ProcNameChange_Insert()

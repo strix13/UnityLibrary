@@ -10,7 +10,7 @@ using System.Collections.Generic;
    ============================================ */
    
 [RequireComponent(typeof(CCompoEventSystemChecker))]
-public class CManagerUIShared_UGUI : CManagerUGUIBase<CManagerUIShared_UGUI, CManagerUIShared_UGUI.EFrame, CManagerUIShared_UGUI.EFrame>
+public class CManagerUIShared_UGUI : CManagerUGUIBase<CManagerUIShared_UGUI, CManagerUIShared_UGUI.EFrame>
 {
 	/* const & readonly declaration             */
 

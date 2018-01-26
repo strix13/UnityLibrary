@@ -41,8 +41,6 @@ abstract public class CUGUIPanelHasInputBase<Enum_InputName> : CUGUIPanelBase, I
 
 	private List<CUGUIScrollItem> _listScrollView = new List<CUGUIScrollItem>();
 
-	private Dictionary<string, Button> _mapButton = new Dictionary<string, Button>();
-
 	#endregion Field
 
 	#region Public
@@ -57,6 +55,10 @@ abstract public class CUGUIPanelHasInputBase<Enum_InputName> : CUGUIPanelBase, I
 		 return FindUIElement(_mapButton, tButton.ToString());
 	}
 
+	public Toggle GetToggle<T_TOGGLE>(T_TOGGLE tToggle)
+	{
+		return FindUIElement(_mapToggle, tToggle.ToString());
+	}
 
 	/* public - [Event] Function             
        프랜드 객체가 호출(For Friend class call)*/
@@ -98,6 +100,7 @@ abstract public class CUGUIPanelHasInputBase<Enum_InputName> : CUGUIPanelBase, I
 
 	abstract public void OnClick_Buttons( Enum_InputName eButtonName );
 	protected virtual void OnClick_Buttons(Enum_InputName eButtonName, Button pButton) { OnClick_Buttons(eButtonName); }
+	protected virtual void OnClick_Toggles(Enum_InputName eToggle, bool bIsOn) { }
 
 	virtual public void OnPress_And_Hold_Buttons( Enum_InputName eButtonName, bool bPress ) { }
 	virtual public void OnScrollView_ClickItem( CUGUIScrollItem pScrollItem, IUGUIScrollItemData pScrollData, Enum_InputName eButtonName ) { }
@@ -123,6 +126,9 @@ abstract public class CUGUIPanelHasInputBase<Enum_InputName> : CUGUIPanelBase, I
 			if (strButtonName.ConvertEnum( out eButtonName ))
 			{
 				pButton.onClick.AddListener(() => { OnClick_Buttons(eButtonName, pButton); });
+				if (_mapButton == null)
+					_mapButton = new Dictionary<string, Button>();
+
 				_mapButton.Add(strButtonName, pButton);
 
 				CUGUIButton_Press pButtonPress = pButton.GetComponent<CUGUIButton_Press>();
@@ -131,6 +137,26 @@ abstract public class CUGUIPanelHasInputBase<Enum_InputName> : CUGUIPanelBase, I
 					pButtonPress.p_Event_OnPress_Down.AddListener( delegate { OnPress_And_Hold_Buttons( eButtonName, true ); } );
 					pButtonPress.p_Event_OnPress_Up.AddListener( delegate { OnPress_And_Hold_Buttons( eButtonName, false ); } );
 				}
+			}
+		}
+
+		Toggle[] arrToggle = GetComponentsInChildren<Toggle>(true);
+		int iLen = arrToggle.Length;
+		for (int i = 0; i < iLen; i++)
+		{
+			Toggle pToggle = arrToggle[i];
+			Enum_InputName eToggleName;
+			string strToggleName = pToggle.name;
+
+			if (strToggleName.ConvertEnum(out eToggleName))
+			{
+				pToggle.onValueChanged.AddListener((bool bIsOn) => { OnClick_Toggles(eToggleName, bIsOn); });
+
+				if (_mapToggle == null)
+					_mapToggle = new Dictionary<string, Toggle>();
+
+				if (_mapToggle.ContainsKey(strToggleName) == false)
+					_mapToggle.Add(strToggleName, pToggle);
 			}
 		}
 

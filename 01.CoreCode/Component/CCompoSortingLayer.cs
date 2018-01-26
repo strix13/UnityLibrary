@@ -15,7 +15,17 @@
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+#if UNITY_EDITOR
+using UnityEditor;
+using UnityEditorInternal;
+using System.Reflection;
 
+[ExecuteInEditMode]
+[System.Serializable]
+#endif
+
+// 참고 링크
+// https://answers.unity.com/questions/682285/editor-script-for-setting-the-sorting-layer-of-an.html
 public class CCompoSortingLayer : CObjectBase
 {
 	/* const & readonly declaration             */
@@ -55,8 +65,11 @@ public class CCompoSortingLayer : CObjectBase
 		base.OnAwake();
 
 		Renderer pRenderer = GetComponent<Renderer>();
-		pRenderer.sortingLayerName = strSortingLayer;
-		pRenderer.sortingOrder = iSortOrder;
+		if (pRenderer != null)
+		{
+			pRenderer.sortingLayerName = strSortingLayer;
+			pRenderer.sortingOrder = iSortOrder;
+		}
 
 		enabled = false;
 	}
@@ -69,6 +82,18 @@ public class CCompoSortingLayer : CObjectBase
 
 	/* private - [Proc] Function             
        로직을 처리(Process Local logic)           */
+
+#if UNITY_EDITOR
+	protected override void OnUpdate()
+	{
+		base.OnUpdate();
+		
+		Renderer pRenderer = GetComponent<Renderer>();
+		if (pRenderer != null)
+			pRenderer.sortingLayerName = this.strSortingLayer;
+	}
+
+#endif
 
 	/* private - Other[Find, Calculate] Func 
        찾기, 계산등 단순 로직(Simpe logic)         */

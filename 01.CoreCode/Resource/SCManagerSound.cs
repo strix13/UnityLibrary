@@ -225,6 +225,16 @@ public class SCManagerSound<ENUM_SOUND_NAME> : SCManagerResourceBase<SCManagerSo
 		_pSlotBGM.p_pAudioSource.volume = fVolume;
 	}
 
+	public void DoEnableSoundBGM(bool bEnable)
+	{
+		DoSetVolumeBGM(bEnable ? 0.5f : 0);
+	}
+
+	public void DoEnableSoundEffect(bool bEnable)
+	{
+		DoSetVolumeEffect(bEnable ? 0.5f : 0);
+	}
+
 	public void DoStopAllSound(bool bIsBGMSoundOff = true)
     {
 		if(bIsBGMSoundOff)

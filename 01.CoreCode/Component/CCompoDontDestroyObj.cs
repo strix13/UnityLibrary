@@ -9,65 +9,47 @@ using System.Collections.Generic;
 // Edit Log    : 
 // ============================================ 
 
+// Singleton의 경우 미리 찾아서 SetActive를 False시켜야 같은 게임오브젝트의 다른 컴포넌트의 Awake의 실행을 방지한다.
+[DefaultExecutionOrder(-1000)]
 public class CCompoDontDestroyObj : CObjectBase
 {
-    // ===================================== //
-    // public - Variable declaration         //
-    // ===================================== //
+	static private Dictionary<string, CCompoDontDestroyObj> g_mapSingleton = new Dictionary<string, CCompoDontDestroyObj>();
 
-    // ===================================== //
-    // protected - Variable declaration      //
-    // ===================================== //
+	[Rename_Inpector( "중복있으면삭제?" )]
+	public bool _bIsSingleton = false;
 
-    // ===================================== //
-    // private - Variable declaration        //
-    // ===================================== //
-    
-    // ========================================================================== //
-
-    // ===================================== //
-    // public - [Do] Function                //
-    // 외부 객체가 요청                      //
-    // ===================================== //
-
-    // ===================================== //
-    // public - [Getter And Setter] Function //
-    // ===================================== //
-
-    // ========================================================================== //
-
-    // ===================================== //
-    // protected - [Event] Function          //
-    // 프랜드 객체가 요청                    //
-    // ===================================== //
-
-    // ===================================== //
-    // protected - Unity API                 //
-    // ===================================== //
-
-    protected override void OnAwake()
+	protected override void OnAwake()
     {
-        base.OnAwake();
+		base.OnAwake();
 
-        Transform pTransformRoot = transform;
-        while (pTransformRoot.parent != null)
-        {
-            pTransformRoot = transform.parent;
-        }
+		if (_bIsSingleton)
+		{
+			if (g_mapSingleton.ContainsKey( name ))
+			{
+				if (g_mapSingleton[name] == this)
+					return;
 
-        DontDestroyOnLoad(pTransformRoot.gameObject);
-    }
+				Debug.LogWarning( "[CCompoDontDestroyObj] Destroy!! " + gameObject.name );
+				gameObject.SetActive( false );
+				Destroy( gameObject );
+				return;
+			}
+			else
+				g_mapSingleton.Add( name, this );
+		}
 
-    // ========================================================================== //
+		ProcSetDonDestoryOnLoad();
+	}
 
-    // ===================================== //
-    // private - [Proc] Function             //
-    // 중요 로직을 처리                      //
-    // ===================================== //
+	private void ProcSetDonDestoryOnLoad()
+	{
+		Transform pTransformRoot = transform;
+		while (pTransformRoot.parent != null)
+		{
+			pTransformRoot = transform.parent;
+		}
 
-    // ===================================== //
-    // private - [Other] Function            //
-    // 찾기, 계산 등의 비교적 단순 로직      //
-    // ===================================== //
+		DontDestroyOnLoad( pTransformRoot.gameObject );
+	}
 
 }

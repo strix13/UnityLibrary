@@ -34,16 +34,6 @@ public class CShakeObject : CObjectBase
 		_bMachineShaking = bEnable;
 	}
 
-	public void DoShakeObject(float fShakePow, float fTime)
-	{
-		_vecOriginPos = _pTransformCached.localPosition;
-		Vector3 vecShakePos = PrimitiveHelper.RandomRange( _vecOriginPos.AddFloat( -fShakePow ), _vecOriginPos.AddFloat( fShakePow ) );
-
-		iTween.ShakePosition( _pGameObjectCached, vecShakePos, fTime );
-		//if(_bMachineShaking)
-		//	PCManagerFramework.instance.DoShakeMobile();
-	}
-
 	public void DoShakeObject(bool bBackToOriginPos)
     {
         if (_bBackToOriginPos)
@@ -53,6 +43,9 @@ public class CShakeObject : CObjectBase
         _fRemainShakePow = _fDefaultShakePow;
         StopAllCoroutines();
         StartCoroutine(CoStartShake());
+
+		//if (_bMachineShaking)
+		//	.instance.DoShakeMobile();
 	}
 
 	public void DoShakeObject(float fShakePow, bool bReverseOrigin)
