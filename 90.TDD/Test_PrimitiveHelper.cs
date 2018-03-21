@@ -1,7 +1,8 @@
-﻿using NUnit.Framework;
-using System;
+﻿using System;
 using System.Collections.Generic;
 
+#if UNITY_EDITOR
+using NUnit.Framework;
 public class Test_PrimitiveHelper
 {
 	[Test]
@@ -73,3 +74,4 @@ public class Test_PrimitiveHelper
 		}
 	}
 }
+#endif

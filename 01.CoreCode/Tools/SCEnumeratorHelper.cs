@@ -36,7 +36,7 @@ public static class SCEnumeratorHelper
 
 		TSource[] arrReturn = new TSource[iCapacity];
 		int iIndex = 0;
-		pIter.Reset();
+		pIter = source.GetEnumerator();
 		while (pIter.MoveNext())
 		{
 			arrReturn[iIndex++] = pIter.Current;
@@ -48,24 +48,12 @@ public static class SCEnumeratorHelper
 
 	public static List<TSource> ToList<TSource>( this IEnumerable<TSource> source )
 	{
-		List<TSource> listOut = new List<TSource>();
-		IEnumerator<TSource> pIter = source.GetEnumerator();
-		while (pIter.MoveNext())
-		{
-			listOut.Add( pIter.Current );
-		}
-
-		return listOut;
+		return new List<TSource>(source);
 	}
 
 	public static void ToList<TSource>( this IEnumerable<TSource> source, List<TSource> listOut )
 	{
-		listOut.Clear();
-		IEnumerator<TSource> pIter = source.GetEnumerator();
-		while (pIter.MoveNext())
-		{
-			listOut.Add( pIter.Current );
-		}
+		listOut.AddRange(source);
 	}
 
 	public static Dictionary<TKey, TSource> ToDictionary<TKey, TSource>( this IEnumerable<TSource> source )
@@ -215,18 +203,28 @@ public static class SCEnumeratorHelper
 
 	static public bool ContainsKey_PrintOnError<TKey, TValue>( this Dictionary<TKey, TValue> map, TKey CheckKey, Object pObjectForDebug = null )
 	{
-		bool bIsContain = map.ContainsKey( CheckKey );
+		bool bIsContain = CheckKey != null;
+		if (bIsContain)
+			bIsContain = map.ContainsKey( CheckKey );
+
 		if (bIsContain == false)
 		{
 			string strKeyName = typeof( TKey ).Name;
 			string strValueName = typeof( TValue ).Name;
-			Debug.LogWarning( string.Format( "Dictionary<{0}, {1}>.ContainsKey 에 실패했습니다 - {2}", strKeyName, strValueName, CheckKey ), pObjectForDebug );
+			Debug.LogWarning( string.Format( "Dictionary<{0}, {1}>.ContainsKey 에 실패했습니다 - ({2})", strKeyName, strValueName, CheckKey ), pObjectForDebug );
 		}
 
 		return bIsContain;
 	}
 
 	static System.Text.StringBuilder pStringBuilder = new System.Text.StringBuilder();
+	
+	/// <summary>
+	/// 디버그용 출력
+	/// </summary>
+	/// <typeparam name="T"></typeparam>
+	/// <param name="list"></param>
+	/// <returns></returns>
 	static public string ToString_DataList<T>( this List<T> list )
 		where T : MonoBehaviour
 	{

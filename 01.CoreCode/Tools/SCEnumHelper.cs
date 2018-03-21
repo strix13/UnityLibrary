@@ -62,24 +62,7 @@ public static class SCEnumHelper
 
 		return bSuccess;
 	}
-
-	static public bool ConvertEnum_IgnoreError<TENUM>( this string strText, out TENUM eEnum)
-	{
-		bool bSuccess = true;
-		eEnum = default( TENUM );
-		try
-		{
-			eEnum = (TENUM)System.Enum.Parse( typeof( TENUM ), strText );
-		}
-		catch
-		{
-			bSuccess = false;
-		}
-
-		return bSuccess;
-	}
-
-
+	
 	static public ENUM[] DoGetEnumArray<ENUM>(string strEnumName, int iIndexStart = 0, int iIndexEnd = 0)
 	{
 		int iLoopIndex = iIndexEnd - iIndexStart;

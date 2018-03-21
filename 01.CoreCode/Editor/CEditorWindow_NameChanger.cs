@@ -56,13 +56,13 @@ public class CEditorWindow_NameChanger : EditorWindow
 
 	private ENameChangeType _eNameChangeType;
 	private EChangeType _eFillFormat;
+	private EAlphabetGrade _eAlphabetGrade = EAlphabetGrade.F;
 
 	private string _strNameFormat;
 	private string _strReplaceTarget;
 	private string _strReplaceDest;
 	private int _iStartNum;
-
-	private EAlphabetGrade _eAlphabetGrade = EAlphabetGrade.F;
+	private bool _bIsChangeChildren;
 
 	// ========================================================================== //
 
@@ -72,7 +72,7 @@ public class CEditorWindow_NameChanger : EditorWindow
 	[MenuItem("Strix_Tools/NameChanger")]
 	public static void ShowWindow()
 	{
-		EditorWindow.GetWindow(typeof(CEditorWindow_NameChanger));
+		GetWindow(typeof(CEditorWindow_NameChanger), true, "NameChanger");
 	}
 
 	/* public - [Event] Function             
@@ -110,12 +110,43 @@ public class CEditorWindow_NameChanger : EditorWindow
 				break;
 		}
 
+		GUILayout.BeginHorizontal();
+		_bIsChangeChildren = EditorGUILayout.Toggle( "IsChangeChildren ? ", _bIsChangeChildren );
+		GUILayout.EndHorizontal();
+
 		GUILayout.Space(20f);
         if(GUILayout.Button("Change Name!"))
         {
 			GameObject[] arrObject = Selection.gameObjects;
 			_listGameObject.Clear();
 			_listGameObject.AddRange( arrObject );
+
+			if(_bIsChangeChildren)
+			{
+				HashSet<GameObject> setObjectChecked = new HashSet<GameObject>();
+				LinkedList<GameObject> listObject = new LinkedList<GameObject>( _listGameObject );
+				LinkedListNode<GameObject> pNode = listObject.First;
+				while(pNode != null)
+				{
+					GameObject pObjectCurrent = pNode.Value;
+
+					if (setObjectChecked.Contains( pObjectCurrent ))
+					{
+						pNode = pNode.Next;
+						continue;
+					}
+					setObjectChecked.Add( pObjectCurrent );
+
+					Transform pTransCurrent = pObjectCurrent.transform;
+					for(int i = 0; i < pTransCurrent.childCount; i++)
+						listObject.AddLast( pTransCurrent.GetChild(i).gameObject);
+
+					pNode = pNode.Next;
+				}
+
+				_listGameObject.Clear();
+				_listGameObject.AddRange( listObject );
+			}
 			_listGameObject.Sort( Comparer_GameObject );
 
 			Object[] arrFile = Selection.objects;

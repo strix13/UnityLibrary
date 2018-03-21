@@ -188,9 +188,9 @@ public class CMoveCamera : CObjectBase
 			_fLerpPinchDistance = fDistance;
 	}
 
-	/* protected - Override & Unity API         */
+    /* protected - Override & Unity API         */
 
-	protected override void OnUpdate()
+    public override void OnUpdate()
 	{
 		base.OnUpdate();
 
@@ -215,8 +215,8 @@ public class CMoveCamera : CObjectBase
 	{
 		base.OnAwake();
 
-		GetComponent(out _pEventTouch);
-		GetComponent(out _pCamera);
+        this.GetComponent(out _pEventTouch);
+        this.GetComponent(out _pCamera);
 
 		_pTransCamera = _pCamera.transform;
 

@@ -56,21 +56,29 @@ public class CUGUIObjectBase : CObjectBase
 	}
 #endif
 
-	public void DoEditText<T_TextName>( T_TextName tTextName, object strText, bool bShow = true )
+	public void DoEditText<T_TextName>( T_TextName tTextName, object strText, bool bIsPrintError = true )
 	{
-		Text pText = FindUIElement(_mapText, tTextName.ToString());
+		if(strText == null)
+		{
+			Debug.LogWarning( "Warnning " + name + " DoEditText - strText = null", this);
+			return;
+		}
 
-		if (strText == null)
-			pText.text = "";
-		else
-			pText.text = strText.ToString();
+		Text pText = this.GetComponentInChildren_Cashed(_mapText, tTextName.ToString(), bIsPrintError );
+		if(pText != null)
+		{
+			if (strText == null)
+				pText.text = "";
+			else
+				pText.text = strText.ToString();
 
-		pText.gameObject.SetActive(bShow);
+			pText.gameObject.SetActive( true );
+		}
 	}
 
 	public void DoEditImage<T_ImageName>( T_ImageName tImageName, Sprite pSprite, bool bNativeSize = false )
 	{
-		Image pImage = FindUIElement(_mapImage, tImageName.ToString());
+		Image pImage = this.GetComponentInChildren_Cashed(_mapImage, tImageName.ToString());
 		pImage.sprite = pSprite;
 		if (bNativeSize)
 			pImage.SetNativeSize();
@@ -78,32 +86,32 @@ public class CUGUIObjectBase : CObjectBase
 
 	public Text GetText<T_TextName>( T_TextName tTextName, bool bIgnoreError = false )
 	{
-		return FindUIElement( _mapText, tTextName.ToString(), bIgnoreError );
+		return this.GetComponentInChildren_Cashed( _mapText, tTextName.ToString(), bIgnoreError );
 	}
 
 	public Image GetImage<T_ImageName>( T_ImageName tImageName, bool bIgnoreError = false )
 	{
-		return FindUIElement( _mapImage, tImageName.ToString(), bIgnoreError );
+		return this.GetComponentInChildren_Cashed( _mapImage, tImageName.ToString(), bIgnoreError );
 	}
 
 	public Slider GetSlider<T_Slider>( T_Slider tSlider, bool bIgnoreError = false )
 	{
-		return FindUIElement( _mapSlider, tSlider.ToString(), bIgnoreError );
+		return this.GetComponentInChildren_Cashed( _mapSlider, tSlider.ToString(), bIgnoreError );
 	}
 
 	public Button GetButton<T_Button>(T_Button tButton, bool bIgnoreError = false)
 	{
-		return FindUIElement(_mapButton, tButton.ToString(), bIgnoreError);
+		return this.GetComponentInChildren_Cashed(_mapButton, tButton.ToString(), bIgnoreError);
 	}
 
 	public Dropdown GetDropdown<T_Dropdown>( T_Dropdown tDropdownName, bool bIgnoreError = false )
 	{
-		return FindUIElement( _mapDropdown, tDropdownName.ToString(), bIgnoreError );
+		return this.GetComponentInChildren_Cashed( _mapDropdown, tDropdownName.ToString(), bIgnoreError );
 	}
 
 	public CUGUIDropDown GetDropdown_Extension<T_Dropdown>( T_Dropdown tDropdownName, bool bIgnoreError = false )
 	{
-		return FindUIElement( _mapDropdownExtension, tDropdownName.ToString(), bIgnoreError );
+		return this.GetComponentInChildren_Cashed( _mapDropdownExtension, tDropdownName.ToString(), bIgnoreError );
 	}
 
 	/* public - [Event] Function             

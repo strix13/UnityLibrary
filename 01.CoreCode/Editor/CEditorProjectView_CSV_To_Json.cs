@@ -219,38 +219,4 @@ public class CEditorProjectView_CSV_To_Json : Editor
 		if (bom[0] == 0 && bom[1] == 0 && bom[2] == 0xfe && bom[3] == 0xff) return Encoding.UTF32;
 		return Encoding.ASCII;
 	}
-
-	private static System.Data.Odbc.OdbcConnection dbConnection;
-	private static void openSqlConnection()
-	{
-		string connectionString = "Server=xxx.xxx.xxx.xxx;" +
-			"Port=xxxx" +
-			"Database=xxx;" +
-			"User ID=xxx;" +
-			"Password=xxx;";
-
-		dbConnection = new System.Data.Odbc.OdbcConnection( connectionString );
-		dbConnection.Open();
-		Debug.Log( "Connected to database." );
-	}
-
-	// Disconnect from database
-	private static void closeSqlConnection()
-	{
-		dbConnection.Close();
-		dbConnection = null;
-		Debug.Log( "Disconnected from database." );
-	}
-
-	// MySQL Query
-	public static void doQuery( string sqlQuery )
-	{
-		System.Data.Odbc.OdbcCommand dbCommand = dbConnection.CreateCommand();
-		dbCommand.CommandText = sqlQuery;
-		System.Data.Odbc.OdbcDataReader reader = dbCommand.ExecuteReader();
-		reader.Close();
-		reader = null;
-		dbCommand.Dispose();
-		dbCommand = null;
-	}
 }

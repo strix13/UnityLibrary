@@ -9,16 +9,16 @@ using System.Text;
    Description : 
    Edit Log    : 
    ============================================ */
-   
+
 public static class PrimitiveHelper
 {
-	static public bool IsSimilar(this float fValueTarget, float fValue, float fProximityDelta_0_1 = 0.1f)
+	static public bool IsSimilar( this float fValueTarget, float fValue, float fProximityDelta_0_1 = 0.1f )
 	{
 		float fProximityValue = fValueTarget * fProximityDelta_0_1;
 		return System.Math.Abs( fValueTarget - fValue ) < fProximityValue;
 	}
 
-	static public Vector3 Inverse(this Vector3 vecTarget)
+	static public Vector3 Inverse( this Vector3 vecTarget )
 	{
 		return vecTarget * -1;
 	}
@@ -29,24 +29,24 @@ public static class PrimitiveHelper
 	/// <param name="strText"></param>
 	/// <param name="vecOut"></param>
 	/// <returns></returns>
-	static public bool TryParse_Vector3(this string strText, out Vector3 vecOut)
+	static public bool TryParse_Vector3( this string strText, out Vector3 vecOut )
 	{
 		vecOut = Vector3.zero;
 		strText = strText.Trim();
 
 		// Parsing X
 		int iIndex = strText.IndexOf( "," );
-		string strFloat = strText.Substring( 1, iIndex - 1); // (를 뺀다.
+		string strFloat = strText.Substring( 1, iIndex - 1 ); // (를 뺀다.
 
 		if (float.TryParse( strFloat, out vecOut.x ) == false) return false;
-		strText = strText.Substring( iIndex + 1);
+		strText = strText.Substring( iIndex + 1 );
 
 		// Parsing Y
 		iIndex = strText.IndexOf( "," );
 		strFloat = strText.Substring( 0, iIndex );
 
 		if (float.TryParse( strFloat, out vecOut.y ) == false) return false;
-		strText = strText.Substring( iIndex + 1);
+		strText = strText.Substring( iIndex + 1 );
 		strText = strText.Substring( 0, strText.Length - 1 );
 
 		// Parsing Z
@@ -57,7 +57,7 @@ public static class PrimitiveHelper
 
 	static public Vector3 ConvertToVector3( this Color pColor )
 	{
-		return new Vector3( pColor .r, pColor .g, pColor .b);
+		return new Vector3( pColor.r, pColor.g, pColor.b );
 	}
 
 	static public Color ConvertToColor( this Vector3 sVector )
@@ -65,24 +65,24 @@ public static class PrimitiveHelper
 		return new Color( sVector.x, sVector.y, sVector.z );
 	}
 
-	static public Vector3 RandomRange(Vector3 vecMinRange, Vector3 vecMaxRange)
+	static public Vector3 RandomRange( Vector3 vecMinRange, Vector3 vecMaxRange )
 	{
-		float fRandX = Random.Range(vecMinRange.x, vecMaxRange.x);
-		float fRandY = Random.Range(vecMinRange.y, vecMaxRange.y);
-		float fRandZ = Random.Range(vecMinRange.z, vecMaxRange.z);
+		float fRandX = Random.Range( vecMinRange.x, vecMaxRange.x );
+		float fRandY = Random.Range( vecMinRange.y, vecMaxRange.y );
+		float fRandZ = Random.Range( vecMinRange.z, vecMaxRange.z );
 
-		return new Vector3(fRandX, fRandY, fRandZ);
+		return new Vector3( fRandX, fRandY, fRandZ );
 	}
 
-	static public Vector2 RandomRange(Vector2 vecMinRange, Vector2 vecMaxRange)
+	static public Vector2 RandomRange( Vector2 vecMinRange, Vector2 vecMaxRange )
 	{
-		float fRandX = Random.Range(vecMinRange.x, vecMaxRange.x);
-		float fRandY = Random.Range(vecMinRange.y, vecMaxRange.y);
+		float fRandX = Random.Range( vecMinRange.x, vecMaxRange.x );
+		float fRandY = Random.Range( vecMinRange.y, vecMaxRange.y );
 
-		return new Vector2(fRandX, fRandY);
+		return new Vector2( fRandX, fRandY );
 	}
 
-	static public Vector3 AddFloat(this Vector3 vecOrigin, float fAddValue)
+	static public Vector3 AddFloat( this Vector3 vecOrigin, float fAddValue )
 	{
 		vecOrigin.x += fAddValue;
 		vecOrigin.y += fAddValue;
@@ -91,36 +91,36 @@ public static class PrimitiveHelper
 		return vecOrigin;
 	}
 
-	public static Vector3 GetPositionByResolution(Vector3 v3Pos)
+	public static Vector3 GetPositionByResolution( Vector3 v3Pos )
 	{
-		return new Vector3(v3Pos.x / Screen.width, v3Pos.y / Screen.height, v3Pos.z);
+		return new Vector3( v3Pos.x / Screen.width, v3Pos.y / Screen.height, v3Pos.z );
 	}
 
-	public static float GetDistanceByResolution(Vector3 v3PosOne, Vector3 v3PosTwo)
+	public static float GetDistanceByResolution( Vector3 v3PosOne, Vector3 v3PosTwo )
 	{
 		Vector2 v2Offset = (v3PosOne - v3PosTwo);
-		Vector2 v2CalcResolution = new Vector2(v2Offset.x / Screen.width, v2Offset.y / Screen.height);
+		Vector2 v2CalcResolution = new Vector2( v2Offset.x / Screen.width, v2Offset.y / Screen.height );
 
 		return v2CalcResolution.magnitude;
 	}
 
-	public static float GetDistanceByResolutionSqrt(Vector3 v3PosOne, Vector3 v3PosTwo)
+	public static float GetDistanceByResolutionSqrt( Vector3 v3PosOne, Vector3 v3PosTwo )
 	{
-		float fOffsetOne = Mathf.Abs(v3PosOne.x - v3PosTwo.x) / Screen.width;
-		float fOffsetTwo = Mathf.Abs(v3PosOne.y - v3PosTwo.y) / Screen.height;
+		float fOffsetOne = Mathf.Abs( v3PosOne.x - v3PosTwo.x ) / Screen.width;
+		float fOffsetTwo = Mathf.Abs( v3PosOne.y - v3PosTwo.y ) / Screen.height;
 
-		float fCalcSqrtDistance = Mathf.Sqrt((fOffsetOne * fOffsetOne) + (fOffsetTwo * fOffsetTwo));
+		float fCalcSqrtDistance = Mathf.Sqrt( (fOffsetOne * fOffsetOne) + (fOffsetTwo * fOffsetTwo) );
 
 		return fCalcSqrtDistance;
 	}
 
-	public static Vector3 GetPlaneRaycastPos(Plane sPlane, Ray sRay)
+	public static Vector3 GetPlaneRaycastPos( Plane sPlane, Ray sRay )
 	{
 		float fDistance = 0f;
-		bool bSuccess = sPlane.Raycast(sRay, out fDistance);
+		bool bSuccess = sPlane.Raycast( sRay, out fDistance );
 		if (bSuccess == false)
 		{
-			Debug.Log( "Plane 과 Ray 교차에 실패했습니다. Plane 의 높이를 확인해주세요.");
+			Debug.Log( "Plane 과 Ray 교차에 실패했습니다. Plane 의 높이를 확인해주세요." );
 			return Vector3.zero;
 		}
 
@@ -131,7 +131,7 @@ public static class PrimitiveHelper
 
 	public static Vector2 GetCenterByResolution()
 	{
-		return new Vector2(Screen.width * 0.5f, Screen.height * 0.5f);
+		return new Vector2( Screen.width * 0.5f, Screen.height * 0.5f );
 	}
 
 	public static float GetScreenRatio()
@@ -139,21 +139,21 @@ public static class PrimitiveHelper
 		return Screen.width / (float)Screen.height;
 	}
 
-	public static Vector3 GetCenterPos(Vector3 v3PosOne, Vector3 v3PosTwo)
+	public static Vector3 GetCenterPos( Vector3 v3PosOne, Vector3 v3PosTwo )
 	{
 		return (v3PosOne - v3PosTwo) * 0.5f;
 	}
 
-	static public string CutString(this string strText, char chCut, out string strCut)
+	static public string CutString( this string strText, char chCut, out string strCut )
 	{
 		strCut = null;
 		int iLength = strText.Length;
 		for (int i = 0; i < iLength; i++)
 		{
-			if (strText[i].Equals(chCut))
+			if (strText[i].Equals( chCut ))
 			{
-				strCut = strText.Substring(0, i);
-				strText = strText.Substring(i + 1);
+				strCut = strText.Substring( 0, i );
+				strText = strText.Substring( i + 1 );
 				break;
 			}
 		}
@@ -161,59 +161,35 @@ public static class PrimitiveHelper
 		return strText;
 	}
 
-	static public string CutString(this string strText, char chCut, out int iValue)
+	static public string CutString( this string strText, char chCut, out int iValue )
 	{
 		iValue = -1;
 
 		string strTemp;
-		strText = strText.CutString(chCut, out strTemp);
+		strText = strText.CutString( chCut, out strTemp );
 
 		if (strTemp != null)
-			int.TryParse(strTemp, out iValue);
+			int.TryParse( strTemp, out iValue );
 
 		return strText;
 	}
 
-	public static string CommaString(this int iValue)
+	public static string CommaString( this int iValue )
 	{
-		if (iValue.Equals(0)) return "0";
+		if (iValue.Equals( 0 )) return "0";
 
 		if (iValue < 1000)
 			return iValue.ToString();
 		else
-			return string.Format("{0:#,###}", iValue );
+			return string.Format( "{0:#,###}", iValue );
 	}
 
-	public static string CommaString(this float fValue)
+	public static string CommaString( this float fValue )
 	{
 		if (fValue.Equals( 0f )) return "0";
 		return string.Format( "{0:#,###.#}", fValue );
 	}
-
-	public static string CommaString(this object pObject)
-	{
-		return string.Format("{0:#,##0}", pObject);
-	}
-
-	private static readonly string[] const_arrPrefix_Ordinal = {
-		"th", "st", "nd", "rd", "th", "th", "th", "th", "th", "th"
-	};
-
-	private static string ProcGetOrdinalPrefix(int iValue)
-	{
-		int iNum = Mathf.Abs(iValue);
-		int iLastTwoDigits = iNum % 100;
-		int iLastDigit = iNum % 10;
-		int idx = (iLastTwoDigits >= 11 && iLastTwoDigits <= 13) ? 0 : iLastDigit;
-
-		return const_arrPrefix_Ordinal[idx];
-	}
-
-	public static string ToOrdinal(this int iNum)
-	{
-		return new StringBuilder().Append(iNum).Append(ProcGetOrdinalPrefix(iNum)).ToString();
-	}
-
+    
 	static public ENUM[] DoGetEnumArray<ENUM>( int iIndexStart, int iIndexEnd )
 	{
 		int iLoopIndex = iIndexEnd - iIndexStart;
@@ -226,7 +202,7 @@ public static class PrimitiveHelper
 		{
 			try
 			{
-				arrEnumArray[i] = (ENUM)System.Enum.Parse( typeof( ENUM ), string.Format( "{0}{1}", typeof( ENUM).Name, i ) );
+				arrEnumArray[i] = (ENUM)System.Enum.Parse( typeof( ENUM ), string.Format( "{0}{1}", typeof( ENUM ).Name, i ) );
 			}
 			catch
 			{
@@ -247,7 +223,7 @@ public static class PrimitiveHelper
 		return (T[])System.Enum.GetValues( typeof( T ) );
 	}
 
-	static public void DoShuffleList<Compo>( this List<Compo> list, int iShuffleStartIndex = 0)
+	static public void DoShuffleList<Compo>( this List<Compo> list, int iShuffleStartIndex = 0 )
 	{
 		if (list == null)
 		{
@@ -262,6 +238,30 @@ public static class PrimitiveHelper
 			list[RandomIndex] = list[i];
 			list[i] = temp;
 		}
+	}
+
+	static public void DoShuffleList<Compo>( this List<Compo> list, int iShuffleStartIndex, int iShuffleFinishIndex )
+	{
+		if (list == null)
+		{
+			Debug.LogWarning( "Shuffle List에서 Shuffle할게 없다.." + typeof( Compo ).Name );
+			return;
+		}
+
+		for (int i = iShuffleStartIndex; i < iShuffleFinishIndex; i++)
+		{
+			int RandomIndex = Random.Range( i, iShuffleFinishIndex );
+			Compo temp = list[RandomIndex];
+			list[RandomIndex] = list[i];
+			list[i] = temp;
+		}
+	}
+
+	static public void DoSwapList<Compo>( this List<Compo> list, int iIndexA, int iIndexB)
+	{
+		Compo pCompoTemp = list[iIndexA];
+		list[iIndexA] = list[iIndexB];
+		list[iIndexB] = pCompoTemp;
 	}
 
 	static public void DoResetTransform( this Transform pTrans )
@@ -284,47 +284,15 @@ public static class PrimitiveHelper
 		return strTarget != null && strTarget.Length != 0;
 	}
 
-	public static void SetActive(this CObjectBase pObj, bool bEnable)
-	{
-		if (pObj == null) return;
-
-		if (pObj.p_pGameObjectCached == null)
-			pObj.EventOnAwake();
-
-		pObj.p_pGameObjectCached.SetActive(bEnable);
-	}
-
-	public static void SetEnableCachedIndex(this CObjectBase[] arrObj, int iCachedLen, int iMaxLen, bool bEnable)
-	{
-		for (int i = 0; i < iCachedLen; i++)
-			arrObj[i].SetActive(i < iMaxLen);
-	}
-
-	public static void SetEnableIndex(this CObjectBase[] arrObj, int iMaxLen, bool bEnable)
-	{
-		int iLen = arrObj.Length;
-		for (int i = 0; i < iLen; i++)
-		{
-			arrObj[i].SetActive(i < iMaxLen);
-		}
-	}
-
-	public static void SetActiveAll(this CObjectBase[] arrObj, bool bEnable)
-	{
-		int iLen = arrObj.Length;
-		for (int i = 0; i < iLen; i++)
-			arrObj[i].SetActive(bEnable);
-	}
-
 	public static void PrintArray<ARRAY>(this ARRAY[] arrData)
 	{
 		StringBuilder pStringBuider = new StringBuilder();
 
 		int iLen = arrData.Length;
 		for (int i = 0; i < iLen; i++)
-			pStringBuider.Append(i).Append(" : ").Append(arrData[i]).Append("\n");
+			pStringBuider.Append(i).Append(" : ").Append(arrData[i]).Append(System.Environment.NewLine);
 
-		Debug.Log( pStringBuider.ToString());
+		Strix.Debug.Log( pStringBuider.ToString());
 	}
 
 	static Dictionary<System.Type, CDictionary_ForEnumKey<System.Enum, string>> g_mapEnumToString = new Dictionary<System.Type, CDictionary_ForEnumKey<System.Enum, string>>();
@@ -340,23 +308,7 @@ public static class PrimitiveHelper
 
 		return mapEnumToString[eEnum];
 	}
-
-	static public void Sort_ObjectSibilingIndex( this List<GameObject> listpObject )
-	{
-		listpObject.Sort( Comparer_Object );
-	}
-
-	/// <summary>
-	/// 이거쓰면 유니티 에디터가 뻗는다.. 왜뻗는지 의문
-	/// </summary>
-	/// <typeparam name="TComponent"></typeparam>
-	/// <param name="listpObject"></param>
-	static public void Sort_ObjectSibilingIndex<TComponent>( this List<TComponent> listpObject )
-		where TComponent : UnityEngine.Component
-	{
-		listpObject.Sort( Comparer_Component );
-	}
-
+    
 	static public int Comparer_Object( GameObject pObjectX, GameObject pObjectY )
 	{
 		int iSiblingIndexX = pObjectX.transform.GetSiblingIndex();
@@ -424,51 +376,6 @@ public static class PrimitiveHelper
 		return fCalcReverse;
 	}
 
-	private static System.Diagnostics.Stopwatch _pStopwatch = new System.Diagnostics.Stopwatch();
-	public static void PerformanceTest(System.Action RunAction, int iStep = 10000, string strTestName = "Test")
-	{
-		_pStopwatch.Reset();
-		_pStopwatch.Start();
-		for (int i = 0; i < iStep; i++)
-		{
-			RunAction();
-		}
-		_pStopwatch.Stop();
-
-		string strFormat = string.Format("[{0}] 성능 테스트 결과 : {1}", strTestName, _pStopwatch.ElapsedTicks);
-		Debug.Log(strFormat);
-	}
-
-	static public COMPONENT GetComponentInChildrenOnly<COMPONENT>( this Component pTarget )
-	where COMPONENT : UnityEngine.Component
-	{
-		COMPONENT pFindCompo = null;
-		COMPONENT[] arrChildrenCompo = pTarget.GetComponentsInChildren<COMPONENT>();
-		for (int i = 0; i < arrChildrenCompo.Length; i++)
-		{
-			if (arrChildrenCompo[i].transform != pTarget.transform)
-			{
-				pFindCompo = arrChildrenCompo[i];
-				break;
-			}
-		}
-
-		return pFindCompo;
-	}
-
-	static public COMPONENT[] GetComponentsInChildrenOnly<COMPONENT>( this Component pTarget )
-		where COMPONENT : UnityEngine.Component
-	{
-		List<COMPONENT> listComponentChildrenOnly = new List<COMPONENT>();
-		COMPONENT[] arrChildrenCompo = pTarget.GetComponentsInChildren<COMPONENT>();
-		for (int i = 0; i < arrChildrenCompo.Length; i++)
-		{
-			if (arrChildrenCompo[i].transform != pTarget.transform)
-				listComponentChildrenOnly.Add( arrChildrenCompo[i] );
-		}
-
-		return listComponentChildrenOnly.ToArray();
-	}
 
 	public enum ETransformSibling
 	{

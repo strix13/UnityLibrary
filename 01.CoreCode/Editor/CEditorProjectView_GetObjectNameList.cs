@@ -14,7 +14,6 @@ public class CEditorProjectView_GetObjectNameList : Editor
 			return;
 		else
 		{
-			StringBuilder pStrBuilder = new StringBuilder();
 			List<UnityEngine.Object> listObject = new List<UnityEngine.Object>();
 			listObject.AddRange(Selection.objects);
 			ProcPrintListObject( listObject );

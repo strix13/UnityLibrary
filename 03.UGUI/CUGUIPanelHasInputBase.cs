@@ -23,8 +23,7 @@ public interface IDropDownInitializer
 	void IDropDownInitializer_Regist_DropDownItem( CUGUIDropdownItem pItem );
 }
 
-//[RequireComponent( typeof( GraphicRaycaster ) )]
-//[RequireComponent( typeof( CanvasScaler ) )]
+[RequireComponent( typeof( GraphicRaycaster ) )]
 abstract public class CUGUIPanelHasInputBase<Enum_InputName> : CUGUIPanelBase, IDropDownInitializer
 {
 	/* const & readonly declaration             */
@@ -50,14 +49,21 @@ abstract public class CUGUIPanelHasInputBase<Enum_InputName> : CUGUIPanelBase, I
 	/* public - [Do] Function
      * 외부 객체가 호출(For External class call)*/
 
+	public void DoEnableButtons( bool bEnable )
+	{
+		List<Button> listButton = _mapButton.Values.ToList();
+		for (int i = 0; i < listButton.Count; i++)
+			listButton[i].enabled = bEnable;
+	}
+
 	public Button GetButton<T_BUTTON>(T_BUTTON tButton)
 	{
-		 return FindUIElement(_mapButton, tButton.ToString());
+		 return this.GetComponentInChildren_Cashed(_mapButton, tButton.ToString());
 	}
 
 	public Toggle GetToggle<T_TOGGLE>(T_TOGGLE tToggle)
 	{
-		return FindUIElement(_mapToggle, tToggle.ToString());
+		return this.GetComponentInChildren_Cashed(_mapToggle, tToggle.ToString());
 	}
 
 	/* public - [Event] Function             
@@ -99,8 +105,9 @@ abstract public class CUGUIPanelHasInputBase<Enum_InputName> : CUGUIPanelBase, I
 	/* protected - [abstract & virtual]         */
 
 	abstract public void OnClick_Buttons( Enum_InputName eButtonName );
-	protected virtual void OnClick_Buttons(Enum_InputName eButtonName, Button pButton) { OnClick_Buttons(eButtonName); }
 	protected virtual void OnClick_Toggles(Enum_InputName eToggle, bool bIsOn) { }
+	protected virtual void OnValueChanged_InputFields( Enum_InputName eToggle, string strInput ) { }
+	protected virtual void OnSubmit_InputFields( Enum_InputName eToggle, string strInput ) { }
 
 	virtual public void OnPress_And_Hold_Buttons( Enum_InputName eButtonName, bool bPress ) { }
 	virtual public void OnScrollView_ClickItem( CUGUIScrollItem pScrollItem, IUGUIScrollItemData pScrollData, Enum_InputName eButtonName ) { }
@@ -109,6 +116,8 @@ abstract public class CUGUIPanelHasInputBase<Enum_InputName> : CUGUIPanelBase, I
 
 	/* protected - [Event] Function           
        자식 객체가 호출(For Child class call)		*/
+
+	protected void OnClick_Buttons_Wrapper( Enum_InputName eButtonName, Button pButton ) { OnClick_Buttons( eButtonName ); }
 
 	/* protected - Override & Unity API         */
 
@@ -125,9 +134,16 @@ abstract public class CUGUIPanelHasInputBase<Enum_InputName> : CUGUIPanelBase, I
 			Enum_InputName eButtonName;
 			if (strButtonName.ConvertEnum( out eButtonName ))
 			{
-				pButton.onClick.AddListener(() => { OnClick_Buttons(eButtonName, pButton); });
+				pButton.onClick.AddListener(() => { OnClick_Buttons_Wrapper(eButtonName, pButton); });
 				if (_mapButton == null)
 					_mapButton = new Dictionary<string, Button>();
+
+				if(_mapButton.ContainsKey( strButtonName ))
+				{
+					Debug.LogWarning( name + "Already Button Exist A - " + strButtonName, _mapButton[strButtonName] );
+					Debug.LogWarning( name + "Already Button Exist B - " + strButtonName, pButton );
+					continue;
+				}
 
 				_mapButton.Add(strButtonName, pButton);
 
@@ -172,6 +188,20 @@ abstract public class CUGUIPanelHasInputBase<Enum_InputName> : CUGUIPanelBase, I
 		GetComponentsInChildren( true, _listScrollView );
 		for (int i = 0; i < _listScrollView.Count; i++)
 			_listScrollView[i].EventInitScrollItem<Enum_InputName>( OnScrollView_ClickItem );
+
+		InputField[] arrInputField = GetComponentsInChildren<InputField>();
+		for (int i = 0; i < arrInputField.Length; i++)
+		{
+			InputField pInputField = arrInputField[i];
+
+			Enum_InputName eInputField_Name;
+			if (pInputField.name.ConvertEnum( out eInputField_Name ))
+			{
+				pInputField.onValueChanged.AddListener( ( string strInput ) => { OnValueChanged_InputFields( eInputField_Name, strInput ); } );
+				pInputField.onEndEdit.AddListener( ( string strInput ) => { OnSubmit_InputFields( eInputField_Name, strInput ); } );
+			}
+
+		}
 	}
 
 	#endregion Protected
@@ -182,7 +212,7 @@ abstract public class CUGUIPanelHasInputBase<Enum_InputName> : CUGUIPanelBase, I
 
 	/* private - [Proc] Function             
        로직을 처리(Process Local logic)           */
-	   
+
 
 	/* private - Other[Find, Calculate] Func 
        찾기, 계산등 단순 로직(Simpe logic)         */

@@ -82,7 +82,7 @@ public class CIndicator : CObjectBase
 
 	public void DoSetPos(Vector3 vecPos)
 	{
-		_pTransformCached.position = vecPos;
+        transform.position = vecPos;
 	}
 
 	public void DoSetColor(Color pColor)
@@ -123,7 +123,7 @@ public class CIndicator : CObjectBase
 	{
 		base.OnAwake();
 
-		if(GetComponentInChildren(out _pUIText ))
+		if(this.GetComponentInChildren(out _pUIText ))
 		{
 			_eIndicatorType = EIndicatorType.UGUI;
 			//_pRectTrans = _pUIText.GetComponent<RectTransform>();
@@ -152,8 +152,8 @@ public class CIndicator : CObjectBase
 	{
 		base.OnEnableObject();
 
-		if (_pTransformCached.localScale != Vector3.one)
-			_pTransformCached.localScale = Vector3.one;
+		if (transform.localScale != Vector3.one)
+            transform.localScale = Vector3.one;
 	}
 
 	protected override void OnDisableObject()

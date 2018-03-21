@@ -16,7 +16,7 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 
-public class SCManagerRandomEnum<Enum_Group, Enum_Item> : CSingletonBase_Not_UnityComponent<SCManagerRandomEnum<Enum_Group, Enum_Item>>
+public class SCManagerRandomEnum<Enum_Group, Enum_Item> : CSingletonNotMonoBase<SCManagerRandomEnum<Enum_Group, Enum_Item>>
 	where Enum_Group : System.IComparable, System.IConvertible
 	where Enum_Item : System.IComparable, System.IConvertible
 {

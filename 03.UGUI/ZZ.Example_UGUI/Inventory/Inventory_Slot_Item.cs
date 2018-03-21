@@ -66,10 +66,10 @@ public class Inventory_Slot_Item : CUGUIInventorySlot<Inventory_Slot_Item, Inven
 	{
 		base.OnAwake();
 
-		_pGoImage_Icon = GetGameObject( EImage.Image_Icon );
-		_pGoImage_Selected = GetGameObject( EImage.Image_Selected );
-		_pGoImage_Equip = GetGameObject( EImage.Image_Equip );
-		_pGoImage_New = GetGameObject( EImage.Image_New );
+		_pGoImage_Icon = this.GetGameObject( EImage.Image_Icon );
+		_pGoImage_Selected = this.GetGameObject( EImage.Image_Selected );
+		_pGoImage_Equip = this.GetGameObject( EImage.Image_Equip );
+		_pGoImage_New = this.GetGameObject( EImage.Image_New );
 
 		_pPopupOwner = GetComponentInParent<Popup_Inventory>();
 	}
@@ -83,8 +83,8 @@ public class Inventory_Slot_Item : CUGUIInventorySlot<Inventory_Slot_Item, Inven
 		_pGoImage_Equip.SetActive( _pPopupOwner.p_list_Equip.Contains( p_pInventoryData ) );
 		_pGoImage_New.SetActive( false );
 
-		if(GetSiblingIndex() == 1)
-			Debug.Log( name + "IInventorySlot_OnEnableSlot" + bEnable );
+		//if(GetSiblingIndex() == 1)
+		//	Debug.Log( name + "IInventorySlot_OnEnableSlot" + bEnable );
 	}
 
 	protected override bool OnSetDataOrNull_And_CheckHasData( Inventory_Item.SDataInventory pData )
@@ -94,8 +94,8 @@ public class Inventory_Slot_Item : CUGUIInventorySlot<Inventory_Slot_Item, Inven
 		if (pData == null) return false;
 
 		DoEditImage( "Image_Icon", pData.pSprite );
-		if (GetSiblingIndex() == 1)
-			Debug.Log( name + "OnSetData" + pData.ToString() );
+		//if (GetSiblingIndex() == 1)
+		//	Debug.Log( name + "OnSetData" + pData.ToString() );
 
 		return true;
 	}

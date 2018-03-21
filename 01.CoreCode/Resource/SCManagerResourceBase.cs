@@ -69,8 +69,7 @@ public class SCManagerResourceBase<CLASS, ENUM_RESOURCE_NAME, RESOURCE>
             pInstance.OnMakeClass_AfterInitResource(pBaseClass);
         }
 
-		if (_pInstance == null)
-			_pInstance = pInstance;
+		_pInstance = pInstance;
 
 		return pInstance;
     }

@@ -75,7 +75,7 @@ public class CPathFinder_RayCast : CObjectBase
 
     private void OnDrawGizmosSelected()
     {
-        Vector3 vecPos = _pTransformCached.position;
+        Vector3 vecPos = transform.position;
         vecPos.y = _fRayHeight;
         for (int i = 0; i < _listRayDirection.Count; i++)
         {
@@ -84,7 +84,7 @@ public class CPathFinder_RayCast : CObjectBase
             else
                 Gizmos.color = Color.blue;
 
-            Gizmos.DrawRay(vecPos, _pTransformCached.TransformDirection(_listRayDirection[i]));
+            Gizmos.DrawRay(vecPos, transform.TransformDirection(_listRayDirection[i]));
         }
     }
 
@@ -97,13 +97,13 @@ public class CPathFinder_RayCast : CObjectBase
     {
         while(true)
         {
-            Vector3 vecPos = _pTransformCached.position;
+            Vector3 vecPos = transform.position;
             vecPos.y = _fRayHeight;
 
             bool bHitRaySomthing = false;
             for (int i = 0; i < _listRayDirection.Count; i++)
             {
-                Vector3 vecDirection = _pTransformCached.TransformDirection(_listRayDirection[i]);
+                Vector3 vecDirection = transform.TransformDirection(_listRayDirection[i]);
                 _arrRayHit[i] = Physics.Raycast(vecPos, vecDirection, _fRayDistance);
 
                 if (_arrRayHit[i] && bHitRaySomthing == false)
@@ -121,7 +121,7 @@ public class CPathFinder_RayCast : CObjectBase
                         vecDestDirection = _listRayDirection[i];
 
                         if (i == 0)
-                            _pTransformCached.Translate(Vector3.forward * fSpeed, Space.Self);
+                            transform.Translate(Vector3.forward * fSpeed, Space.Self);
 
                         break;
                     }
@@ -129,12 +129,12 @@ public class CPathFinder_RayCast : CObjectBase
             }
             else
             {
-                vecDestDirection = pTransTarget.position - _pTransformCached.position;
-                _pTransformCached.Translate(Vector3.forward * fSpeed, Space.Self);
+                vecDestDirection = pTransTarget.position - transform.position;
+                transform.Translate(Vector3.forward * fSpeed, Space.Self);
             }
 
             Quaternion quatTarget = Quaternion.LookRotation(vecDestDirection);
-            _pTransformCached.rotation = Quaternion.RotateTowards(_pTransformCached.rotation, quatTarget, fSpeedRotate);
+            transform.rotation = Quaternion.RotateTowards(transform.rotation, quatTarget, fSpeedRotate);
 
             yield return SCManagerYield.GetWaitForSecond(_fUpdateTime);
         }

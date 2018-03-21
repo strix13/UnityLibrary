@@ -18,7 +18,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.Events;
 
-public class SCManagerIndicator : CSingletonBase_Not_UnityComponent<SCManagerIndicator>
+public class SCManagerIndicator : CSingletonNotMonoBase<SCManagerIndicator>
 {
 	/* const & readonly declaration             */
 

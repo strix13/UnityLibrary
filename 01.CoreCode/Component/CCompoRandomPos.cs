@@ -6,7 +6,7 @@
  *	관련 링크 :
  *	
  *	설계자 : 
- *	작성자 : KJH
+ *	작성자 : Strix
  *	
  *	기능 : 
    ============================================ */
@@ -61,7 +61,7 @@ public class CCompoRandomPos : CCompoEventTrigger
 		base.OnPlayEventMain();
 
 		_vecPos = PrimitiveHelper.RandomRange(_vecRandom_Min, _vecRandom_Max);
-		_pTransformCached.localPosition = _vecPos;
+        transform.localPosition = _vecPos;
 	}
 
 	#endregion Protected

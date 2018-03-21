@@ -80,9 +80,9 @@ public class CManagerObjectScroll : CObjectBase
 		_pScrollObject_Old = null;
 		_pScrollObject_Last = null;
 
-		Vector3 vecCurrentPos = _pTransformCached.position;
+		Vector3 vecCurrentPos = transform.position;
 		vecCurrentPos.x = _fOriginPosX;
-		_pTransformCached.position = vecCurrentPos;
+        transform.position = vecCurrentPos;
 		
 		ProcGenerate_ScrollObject();
 	}
@@ -149,7 +149,7 @@ public class CManagerObjectScroll : CObjectBase
 		CManagerRandomTable<CScrollObject>.instance[iInstanceID].DoClearRandomItemTable();
 		CManagerRandomTable<CScrollObject>.instance[iInstanceID].DoAddRandomItem_Range( _listScrollObject_Origin );
 		CManagerPooling<string, CScrollObject>.DoInitPoolingObject( listObject );
-		CManagerPooling<string, CScrollObject>.instance.DoStartPooling( p_iPoolingCount, _pTransformCached );
+		CManagerPooling<string, CScrollObject>.instance.DoStartPooling( p_iPoolingCount, transform );
 
 		for (int i = 0; i < _listScrollObject_Origin.Count; i++)
 			_listScrollObject_Origin[i].SetActive( false );
@@ -157,7 +157,7 @@ public class CManagerObjectScroll : CObjectBase
 		if (p_pTransTarget != null)
 			_fTargetPos_Origin = p_pTransTarget.position.x;
 
-		_fOriginPosX = _pTransformCached.position.x;
+		_fOriginPosX = transform.position.x;
 	}
 
 	protected override void OnEnableObject()
@@ -167,7 +167,7 @@ public class CManagerObjectScroll : CObjectBase
 		DoResetScroll();
 	}
 
-	protected override void OnUpdate()
+    public override void OnUpdate()
 	{
 		base.OnUpdate();
 
@@ -181,9 +181,9 @@ public class CManagerObjectScroll : CObjectBase
 		float fMoveTargetGap = _fTargetPos_Origin - fTargetPos;
 		float fMoveAmount = _fOriginPosX + fMoveTargetGap * p_fScrollingSpeed;
 
-		Vector3 vecPos = _pTransformCached.position;
+		Vector3 vecPos = transform.position;
 		vecPos.x = fMoveAmount;
-		_pTransformCached.position = vecPos;
+        transform.position = vecPos;
 
 		// 타겟의 위치 + 카메라 넓이가
 		// 가장 우측의 스크롤 오브젝트의 위치 - 가장 우측의 오브젝트의 넓이보다 크다면

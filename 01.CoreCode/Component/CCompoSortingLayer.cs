@@ -74,17 +74,17 @@ public class CCompoSortingLayer : CObjectBase
 		enabled = false;
 	}
 
-	#endregion Protected
+    #endregion Protected
 
-	// ========================================================================== //
+    // ========================================================================== //
 
-	#region Private
+    #region Private
 
-	/* private - [Proc] Function             
+    /* private - [Proc] Function             
        로직을 처리(Process Local logic)           */
 
 #if UNITY_EDITOR
-	protected override void OnUpdate()
+    public override void OnUpdate()
 	{
 		base.OnUpdate();
 		

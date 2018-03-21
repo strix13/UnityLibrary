@@ -16,7 +16,7 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 
-public class SCManagerYield : CSingletonBase_Not_UnityComponent<SCManagerYield>
+public class SCManagerYield : CSingletonNotMonoBase<SCManagerYield>
 {
 	/* const & readonly declaration             */
 

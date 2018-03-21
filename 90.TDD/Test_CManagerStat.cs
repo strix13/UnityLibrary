@@ -1,7 +1,8 @@
 ﻿using UnityEngine;
-using NUnit.Framework;
 using System.Collections;
 
+#if UNITY_EDITOR
+using NUnit.Framework;
 public class Test_CManagerStat
 {
 	public enum ECodeDefinition
@@ -145,3 +146,4 @@ public class Test_CManagerStat
 		}
 	}
 }
+#endif

@@ -16,7 +16,7 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 
-public class CManagerStat : CSingletonBase<CManagerStat>
+public class CManagerStat : CSingletonMonoBase<CManagerStat>
 {
 	/* const & readonly declaration             */
 

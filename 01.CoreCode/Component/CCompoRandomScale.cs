@@ -44,7 +44,7 @@ public class CCompoRandomScale : CCompoEventTrigger
 	{
 		base.OnPlayEventMain();
 
-		_pTransformCached.localScale = PrimitiveHelper.RandomRange( _vecRandomScale_Min, _vecRandomScale_Max );
+        transform.localScale = PrimitiveHelper.RandomRange( _vecRandomScale_Min, _vecRandomScale_Max );
 	}
 
 	// ========================================================================== //

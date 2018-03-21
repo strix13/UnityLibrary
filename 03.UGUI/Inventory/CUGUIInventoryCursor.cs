@@ -53,8 +53,8 @@ public class CUGUIInventoryCursor : CObjectBase
 		Vector2 v2ConvertPos = Vector3.zero;
 		RectTransformUtility.ScreenPointToLocalPointInRectangle(_pRecTransRootCanvas, v3CursorPos, _pCamera, out v2ConvertPos);
 
-		_pTransformCached.position = _pRecTransRootCanvas.TransformPoint(v2ConvertPos);
-		_pGameObjectCached.SetActive(true);
+        transform.position = _pRecTransRootCanvas.TransformPoint(v2ConvertPos);
+		gameObject.SetActive(true);
 	}
 
 	public void DoSetImage(Sprite pSprite)
@@ -88,14 +88,14 @@ public class CUGUIInventoryCursor : CObjectBase
 	{
 		base.OnAwake();
 
-		GetComponentInChildren(out _pImage);
+        this.GetComponentInChildren(out _pImage);
 		_pImage.raycastTarget = false;
 
 		_pRootCanvas = GetComponentInParent<Canvas>();
 		_pRecTransRootCanvas = (RectTransform)_pRootCanvas.transform;
 		_pCamera = _pRootCanvas.worldCamera;
 
-		_pGameObjectCached.SetActive(false);
+		gameObject.SetActive(false);
 	}
 
 	#endregion Protected

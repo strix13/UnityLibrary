@@ -18,7 +18,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System;
 
-//[RequireComponent( typeof( Canvas ))]
+[RequireComponent( typeof( Canvas ))]
 public class CUGUIPanelBase : CUGUIObjectBase, IUIPanel
 {
 	/* const & readonly declaration             */
@@ -50,9 +50,28 @@ public class CUGUIPanelBase : CUGUIObjectBase, IUIPanel
 		}
 	}
 
+	public int p_iHashCode
+	{
+		get
+		{
+			return _iHashCode;
+		}
+	}
+
+	public IManagerUI p_pManagerUI
+	{
+		get
+		{
+			return _pManagerUI;
+		}
+	}
+
 	/* protected - Field declaration         */
 
 	/* private - Field declaration           */
+
+	private IManagerUI _pManagerUI;
+	private int _iHashCode;
 
 	#endregion Field
 
@@ -62,6 +81,32 @@ public class CUGUIPanelBase : CUGUIObjectBase, IUIPanel
 
 	/* public - [Do] Function
      * 외부 객체가 호출(For External class call)*/
+
+	public void DoShow_UGUIPanel()
+	{
+		_pManagerUI.IManagerUI_ShowHide_Panel( _iHashCode, true );
+	}
+
+	public void DoShow_UGUIPanel(System.Action OnFinishAnimation)
+	{
+		_pManagerUI.IManagerUI_ShowHide_Panel( _iHashCode, true, OnFinishAnimation );
+	}
+
+	public void DoHide_UGUIPanel()
+	{
+		_pManagerUI.IManagerUI_ShowHide_Panel( _iHashCode, false );
+	}
+
+	public void DoHide_UGUIPanel( System.Action OnFinishAnimation )
+	{
+		_pManagerUI.IManagerUI_ShowHide_Panel( _iHashCode, false, OnFinishAnimation );
+	}
+
+	public void IUIPanel_Init( IManagerUI pManagerUI, int iHashCode )
+	{
+		_pManagerUI = pManagerUI;
+		_iHashCode = iHashCode;
+	}
 
 	public void IUIPanel_SetOrder( int iSortOrder )
 	{

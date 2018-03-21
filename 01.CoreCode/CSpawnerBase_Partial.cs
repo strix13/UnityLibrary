@@ -71,8 +71,8 @@ public partial class CSpawnerBase<Enum_Key, Class_Resource> : CObjectBase
 				float fStartAngle = _fAngleMuzzle * -iStartGap;
 				for (int i = 0; i < _iMuzzleCount; i++)
 				{
-					Vector3 vecPosGap = _pTransformCached.position + vecStartPos;
-					Vector3 vecAngleGap = _pTransformCached.rotation.eulerAngles + new Vector3( 0f, 0f, fStartAngle );
+					Vector3 vecPosGap = transform.position + vecStartPos;
+					Vector3 vecAngleGap = transform.rotation.eulerAngles + new Vector3( 0f, 0f, fStartAngle );
 
 					ProcShotGenerate( vecPosGap, Quaternion.Euler( vecAngleGap ) );
 					fStartAngle += _fAngleMuzzle;

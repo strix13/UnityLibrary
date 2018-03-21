@@ -10,13 +10,6 @@ public class Popup_Inventory : CUGUIPanelHasInputBase<Popup_Inventory.EInput>
 		주무기, 보조무기
 	}
 
-	[Rename_Inpector( "테스트2" )]
-	public string strTest2;
-
-	[EnumToString]
-	public string strTest;
-	
-
 	[Header( "여기에 아무 이미지를 넣어주시기 바랍니다." )]
 	public List<Sprite> p_listSprite = new List<Sprite>();
 

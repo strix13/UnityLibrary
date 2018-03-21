@@ -33,9 +33,9 @@ public partial class CSpawnerBase<Enum_Key, Class_Resource> : CObjectBase
 	[Header( "패턴 옵션" )]
 	[SerializeField]
 	public float _fDelaySec_Pattern = 0f;
-	[Rename_Inpector("최소 랜덤 딜레이")]
+	[Rename_InspectorAttribute("최소 랜덤 딜레이")]
 	public float _fDelaySec_GenerateMin = 0.2f;
-	[Rename_Inpector( "최대 랜덤 딜레이" )]
+	[Rename_InspectorAttribute( "최대 랜덤 딜레이" )]
 	public float _fDelaySec_Generate_Max = 0.2f;
 	[SerializeField]
 	private EMissionPatternName _ePattern = EMissionPatternName.Line;
@@ -70,7 +70,7 @@ public partial class CSpawnerBase<Enum_Key, Class_Resource> : CObjectBase
 	private System.Func<IEnumerator> _pPattern;
 	private System.Action _OnFinishPattern;
 
-	private float _fAdjust_GenerateDelay = 1f;
+	// private float _fAdjust_GenerateDelay = 1f;
 	private Vector2 _vecAdjust_GenerateScale = Vector2.one;
 
 	// ========================================================================== //
@@ -85,7 +85,7 @@ public partial class CSpawnerBase<Enum_Key, Class_Resource> : CObjectBase
 
 	public void DoSetAdjust_GenerateDelay(float fGenerateDelayAdjust )
 	{
-		_fAdjust_GenerateDelay = fGenerateDelayAdjust;
+		// _fAdjust_GenerateDelay = fGenerateDelayAdjust;
 	}
 
 	public void DoSetGenrating( bool bGenerating )
@@ -230,7 +230,7 @@ public partial class CSpawnerBase<Enum_Key, Class_Resource> : CObjectBase
 			if (_bIsGenerating)
 			{
 				_iGenerateRemainCount--;
-				ProcShotGenerate(_pTransformCached.position, _pTransformCached.rotation);
+				ProcShotGenerate(transform.position, transform.rotation);
 			}
 
 			float fDelaySecRandom = Random.Range( _fDelaySec_GenerateMin, _fDelaySec_Generate_Max );
@@ -245,7 +245,7 @@ public partial class CSpawnerBase<Enum_Key, Class_Resource> : CObjectBase
 			if (_bIsGenerating)
 			{
 				_iGenerateRemainCount--;
-				ProcShotGenerate(_pTransformCached.position + vecPosGap, Quaternion.Euler(_pTransformCached.rotation.eulerAngles + vecAngleGap));
+				ProcShotGenerate(transform.position + vecPosGap, Quaternion.Euler(transform.rotation.eulerAngles + vecAngleGap));
 			}
 
 			float fDelaySecRandom = Random.Range( _fDelaySec_GenerateMin, _fDelaySec_Generate_Max );

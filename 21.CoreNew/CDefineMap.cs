@@ -47,6 +47,12 @@ public class SGameData
 
 	static public void SetData( SGameData[] arrData )
 	{
+		if (arrData == null)
+		{
+			Debug.LogWarning( "SGameData - arrData == null" );
+			return;
+		}
+
 		for (int i = 0; i < arrData.Length; i++)
 			_mapDataConfig_String.Add( arrData[i].strKey, arrData[i].strValue );
 	}

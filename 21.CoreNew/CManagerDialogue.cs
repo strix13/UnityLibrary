@@ -63,7 +63,7 @@ public interface IDialogueListner
     void IDialogueListner_OnFinishDialogue();
 }
 
-public class CManagerDialogue : CSingletonBase_Not_UnityComponent<CManagerDialogue>
+public class CManagerDialogue : CSingletonNotMonoBase<CManagerDialogue>
 {
 	/* const & readonly declaration             */
 

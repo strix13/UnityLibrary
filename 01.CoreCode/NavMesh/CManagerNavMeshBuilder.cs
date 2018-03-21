@@ -6,7 +6,7 @@ using NavMeshBuilder = UnityEngine.AI.NavMeshBuilder;
 
 // Build and update a localized navmesh from the sources marked by NavMeshSourceTag
 [DefaultExecutionOrder(-102)]
-public class CManagerNavMeshBuilder : CSingletonBase<CManagerNavMeshBuilder>
+public class CManagerNavMeshBuilder : CSingletonMonoBase<CManagerNavMeshBuilder>
 {
     // The center of the build
     public Transform p_pTrasnformFollow;

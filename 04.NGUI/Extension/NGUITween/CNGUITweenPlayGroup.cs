@@ -105,7 +105,6 @@ public class CNGUITweenPlayGroup : CCompoEventTrigger
 			if (fDelay > 0f)
 				pUITween.delay = fDelay;
 
-			pUITween.ResetToFactor();
 			pUITween.Play(eTweenPlay == ETweenPlay.Forward);
 			pUITween.ResetToBeginning();
 		}
@@ -119,7 +118,6 @@ public class CNGUITweenPlayGroup : CCompoEventTrigger
 			if (pUITween.tweenGroup != iGroupID) continue;
 
 			pUITween.enabled = false;
-			pUITween.ResetToFactor();
 			pUITween.ResetToBeginning();
 		}
 	}
@@ -131,7 +129,6 @@ public class CNGUITweenPlayGroup : CCompoEventTrigger
 			UITweener pUITween = _listTween[i];
 
 			pUITween.enabled = false;
-			pUITween.ResetToFactor();
 			pUITween.ResetToBeginning();
 		}
 	}

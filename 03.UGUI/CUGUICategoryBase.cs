@@ -12,6 +12,8 @@ using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
 
+#pragma warning disable 0414
+
 [System.Serializable]
 public class CInfoTabData
 {

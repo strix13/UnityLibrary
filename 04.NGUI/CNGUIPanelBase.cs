@@ -2,7 +2,6 @@
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
-using System;
 
 [RequireComponent(typeof(UIPanel))]
 abstract public class CNGUIPanelBase : CNGUIObjectBase, IUIPanel
@@ -32,8 +31,33 @@ abstract public class CNGUIPanelBase : CNGUIObjectBase, IUIPanel
 			return _bIsFixedSortOrder;
 		}
 	}
-	
+
+	public int p_iHashCode
+	{
+		get
+		{
+			return _iHashCode;
+		}
+	}
+
+	public IManagerUI p_pManagerUI
+	{
+		get
+		{
+			return _pManagerUI;
+		}
+	}
+
+	private IManagerUI _pManagerUI;
+	private int _iHashCode;
+
 	// ========================== [ Division ] ========================== //
+
+	public void IUIPanel_Init( IManagerUI pManagerUI, int iHashCode )
+	{
+		_pManagerUI = pManagerUI;
+		_iHashCode = iHashCode;
+	}
 
 	public void IUIPanel_SetOrder( int iSortOrder )
 	{

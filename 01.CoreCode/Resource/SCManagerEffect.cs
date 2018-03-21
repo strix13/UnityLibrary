@@ -60,7 +60,7 @@ public class SCManagerEffect<ENUM_EFFECT_NAME, CLASS_EFFECT> : CManagerPooling<E
         CLASS_EFFECT pEffect = instance.DoPop( eEffect);
 		pEffect.p_eEffectName = eEffect;
 		pEffect.DoPlayEffect(vecPos);
-        pEffect.p_pTransCached.rotation = quatRot;
+        pEffect.transform.rotation = quatRot;
 
         return pEffect;
     }
@@ -71,7 +71,7 @@ public class SCManagerEffect<ENUM_EFFECT_NAME, CLASS_EFFECT> : CManagerPooling<E
         CLASS_EFFECT pEffect = instance.DoPop( eEffect);
 		pEffect.p_eEffectName = eEffect;
 		pEffect.DoPlayEffect(vecPos);
-        pEffect.p_pTransCached.rotation = Quaternion.LookRotation(vecRot);
+        pEffect.transform.rotation = Quaternion.LookRotation(vecRot);
 
         return pEffect;
     }

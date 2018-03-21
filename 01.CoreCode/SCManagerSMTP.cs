@@ -15,7 +15,7 @@ using System.Security.Cryptography.X509Certificates;
 
 #pragma warning disable 0618
 
-public class SCManagerSMTP : CSingletonBase_Not_UnityComponent<SCManagerSMTP>
+public class SCManagerSMTP : CSingletonNotMonoBase<SCManagerSMTP>
 {
     /* const & readonly declaration             */
 

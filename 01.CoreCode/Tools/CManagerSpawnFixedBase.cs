@@ -14,7 +14,7 @@ public interface ISpawner
 	void ILevelSpawner_PlaySpawn();
 }
 
-public class CManagerSpawnFixedBase<Class_Manager, Enum_SpawnName, Class_Spawner, Data_Spawn> : CSingletonBase<Class_Manager>
+public class CManagerSpawnFixedBase<Class_Manager, Enum_SpawnName, Class_Spawner, Data_Spawn> : CSingletonMonoBase<Class_Manager>
 	where Class_Manager : CManagerSpawnFixedBase<Class_Manager, Enum_SpawnName, Class_Spawner, Data_Spawn>
 	where Enum_SpawnName : System.IConvertible, System.IComparable
 	where Class_Spawner : MonoBehaviour, IDictionaryItem<Enum_SpawnName>, ISpawner

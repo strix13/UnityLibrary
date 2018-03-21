@@ -1,9 +1,15 @@
-﻿using NUnit.Framework;
-using System;
+﻿using System;
 using System.Collections.Generic;
 
+#if UNITY_EDITOR
+using NUnit.Framework;
 public class Test_ByteHandler
 {
+	public enum ETest
+	{
+		ETest1
+	}
+
 	[Test]
 	[Repeat( 10 )]
 	static public void Test_Byte_To_BitArray()
@@ -14,3 +20,4 @@ public class Test_ByteHandler
 		Assert.IsTrue( SCByteHandler.ConvertByte_To_Int( 127, 8, 2 ) == (127 - 3));
 	}
 }
+#endif

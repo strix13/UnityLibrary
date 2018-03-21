@@ -52,12 +52,12 @@ abstract public class CEffectBase<CLASS_EFFECT, ENUM_EFFECT_NAME> : CObjectBase
 
 	public void DoPlayEffect( Transform pTransParents )
 	{
-		_pTransformCached.SetParent( pTransParents );
+        transform.SetParent( pTransParents );
 		Vector3 vecLocalPos = Vector3.zero;
 		OnPlayEffectBefore( _eEffectName, ref vecLocalPos );
 
-		_pTransformCached.localPosition = vecLocalPos;
-		_pTransformCached.localRotation = Quaternion.identity;
+        transform.localPosition = vecLocalPos;
+        transform.localRotation = Quaternion.identity;
 
 		ProcPlayEffect();
 
@@ -69,7 +69,7 @@ abstract public class CEffectBase<CLASS_EFFECT, ENUM_EFFECT_NAME> : CObjectBase
 		OnPlayEffectBefore( _eEffectName, ref V3Targetpos );
 
 		_OnFinishEffect = OnFinishEffect;
-		_pTransformCached.position = V3Targetpos;
+        transform.position = V3Targetpos;
 		ProcPlayEffect();
 
 		OnPlayEffectAfter( _eEffectName );
@@ -77,9 +77,9 @@ abstract public class CEffectBase<CLASS_EFFECT, ENUM_EFFECT_NAME> : CObjectBase
 	
 	public void DoPlayEffect( Transform pTransParents, Vector3 vecWorldPos )
 	{
-		_pTransformCached.SetParent( pTransParents );
+        transform.SetParent( pTransParents );
 		OnPlayEffectBefore( _eEffectName, ref vecWorldPos );
-		_pTransformCached.position = vecWorldPos;
+        transform.position = vecWorldPos;
 		ProcPlayEffect();
 
 		OnPlayEffectAfter( _eEffectName );
@@ -202,7 +202,7 @@ abstract public class CEffectBase<CLASS_EFFECT, ENUM_EFFECT_NAME> : CObjectBase
 		if (p_Event_Effect_OnPlayStop != null)
 			p_Event_Effect_OnPlayStop( _eEffectName, _pInstance, false );
 
-		_pGameObjectCached.SetActive( false );
+		gameObject.SetActive( false );
 	}
 
 	/* private - Other[Find, Calculate] Func 

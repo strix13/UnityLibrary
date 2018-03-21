@@ -20,7 +20,7 @@ using TimeSpan = System.TimeSpan;
 
    ============================================ */
 
-public class CManagerProfiler : CSingletonBase_Not_UnityComponent<CManagerProfiler>
+public class CManagerProfiler : CSingletonNotMonoBase<CManagerProfiler>
 {
     /* const & readonly declaration             */
 

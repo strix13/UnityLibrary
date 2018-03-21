@@ -15,7 +15,7 @@ public class CCompoDontDestroyObj : CObjectBase
 {
 	static private Dictionary<string, CCompoDontDestroyObj> g_mapSingleton = new Dictionary<string, CCompoDontDestroyObj>();
 
-	[Rename_Inpector( "중복있으면삭제?" )]
+	[Rename_InspectorAttribute( "중복있으면삭제?" )]
 	public bool _bIsSingleton = false;
 
 	protected override void OnAwake()

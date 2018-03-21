@@ -24,7 +24,7 @@ public interface IUGUIScrollItemData
 	int IScrollData_GetSortOrder();
 }
 
-public class CUGUIScrollItem : CUGUIPanelBase
+public class CUGUIScrollItem : CUGUIObjectBase
 {
 	/* const & readonly declaration             */
 

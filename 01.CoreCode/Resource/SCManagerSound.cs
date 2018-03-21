@@ -35,6 +35,8 @@ public struct SINI_Sound : IDictionaryItem<string>
 public class SCManagerSound<ENUM_SOUND_NAME> : SCManagerResourceBase<SCManagerSound<ENUM_SOUND_NAME>, ENUM_SOUND_NAME, AudioClip>
     where ENUM_SOUND_NAME : System.IFormattable, System.IConvertible, System.IComparable
 {
+    private const int const_iDefault_SoundSlot_PoolingCount = 10;
+
     // ===================================== //
     // public - Variable declaration         //
     // ===================================== //
@@ -48,25 +50,26 @@ public class SCManagerSound<ENUM_SOUND_NAME> : SCManagerResourceBase<SCManagerSo
     // ===================================== //
 
     private List<CSoundSlot> _listSoundSlotAll = new List<CSoundSlot>();
-    private HashSet<CSoundSlot> _queueNotUseSlot = new HashSet< CSoundSlot >();
-	private Dictionary<string, CSoundSlot> _mapCurrentPlayingSound = new Dictionary<string, CSoundSlot>();
+    private HashSet<CSoundSlot> _queueNotUseSlot = new HashSet<CSoundSlot>();
+    private Dictionary<string, CSoundSlot> _mapCurrentPlayingSound = new Dictionary<string, CSoundSlot>();
 
     private Dictionary<ENUM_SOUND_NAME, float> _mapSoundVolume = new Dictionary<ENUM_SOUND_NAME, float>();
     private Dictionary<int, List<ENUM_SOUND_NAME>> _mapGroupSound = new Dictionary<int, List<ENUM_SOUND_NAME>>();
 
     private EVolumeOff _eVolumeOff;
 
-	private bool _bIsMute = false;
-    private int _iSlotPoolingCount = 50;
-    private float _fVolumeEffect = 1f;	public float p_fVolumeEffect {  get { return _fVolumeEffect; } }
-	private float _fVolumeBGM;			public float p_fVolumeBGM {  get { return _fVolumeBGM; } }
+    private bool _bIsMute = false;
+    private bool _bPause = false;
 
-	private float _fVolumeBackup_Effect;
-	private float _fVolumeBackup_BGM;
+    private float _fVolumeEffect = 1f; public float p_fVolumeEffect { get { return _fVolumeEffect; } }
+    private float _fVolumeBGM; public float p_fVolumeBGM { get { return _fVolumeBGM; } }
 
-	private float _fVolumeBackUp_CurrentBGM;
+    private float _fVolumeBackup_Effect;
+    private float _fVolumeBackup_BGM;
 
-	private CSoundSlot _pSlotBGM;
+    private float _fVolumeBackUp_CurrentBGM;
+
+    private CSoundSlot _pSlotBGM;
     static private System.Action _CallBackOnFinishBGM;
 
     // ========================================================================== //
@@ -76,16 +79,16 @@ public class SCManagerSound<ENUM_SOUND_NAME> : SCManagerResourceBase<SCManagerSo
     // 외부 객체가 요청                      //
     // ===================================== //
 
-	public bool DoCheckIsPlayingBGM( ENUM_SOUND_NAME eSound )
-	{
-		bool bIsPlaying = false;
-		if (_pSlotBGM.CheckIsPlaying())
-			bIsPlaying = _pSlotBGM.p_pAudioSource.clip.name == DoGetResource_Origin( eSound ).name;
+    public bool DoCheckIsPlayingBGM(ENUM_SOUND_NAME eSound)
+    {
+        bool bIsPlaying = false;
+        if (_pSlotBGM.CheckIsPlaying())
+            bIsPlaying = _pSlotBGM.p_pAudioSource.clip.name == DoGetResource_Origin(eSound).name;
 
-		return bIsPlaying;
-	}
+        return bIsPlaying;
+    }
 
-	public void DoPlayBGM(ENUM_SOUND_NAME eSound, System.Action CallBackOnFinishBGM = null )
+    public void DoPlayBGM(ENUM_SOUND_NAME eSound, System.Action CallBackOnFinishBGM = null)
     {
         float fVolume = 0f;
         if (_mapSoundVolume.ContainsKey(eSound))
@@ -93,18 +96,54 @@ public class SCManagerSound<ENUM_SOUND_NAME> : SCManagerResourceBase<SCManagerSo
         else
             fVolume = _fVolumeBGM;
 
-		//Debug.Log( eSound + "Volume : " + fVolume );
+        //Debug.Log( eSound + "Volume : " + fVolume );
 
         if (_pSlotBGM.CheckIsPlaying())
-            _pSlotBGM.DoSetFadeOut(DoGetResource_Origin(eSound), fVolume );
+            _pSlotBGM.DoSetFadeOut(DoGetResource_Origin(eSound), fVolume);
         else
             _pSlotBGM.DoPlaySound(DoGetResource_Origin(eSound), fVolume);
 
         _CallBackOnFinishBGM = CallBackOnFinishBGM;
     }
 
-    public CSoundSlot DoPlaySoundEffect(ENUM_SOUND_NAME eSound, float fVolume = 1f)
+    public CSoundSlot DoPlaySoundEffect_OrNull(AudioClip pClip, float fVolume = 1f)
     {
+        if (_bIsMute) return null;
+
+        //Debug.Log("Play Sound : " + eSound);
+        CSoundSlot pSoundSlot = FindDisableSlot_OrMakeSlot();
+        if (pSoundSlot == null) return null;
+
+        if (pSoundSlot != null)
+            pSoundSlot.DoPlaySound(pClip, fVolume * _fVolumeEffect);
+
+        return pSoundSlot;
+    }
+    
+    public CSoundSlot DoPlaySoundEffect_OrNull(ENUM_SOUND_NAME eSound, float fVolume = 1f)
+    {
+		if (_bIsMute) return null;
+
+		string strSoundName = eSound.ToString();
+        //Debug.Log("Play Sound : " + eSound);
+        CSoundSlot pSoundSlot = FindDisableSlot_OrMakeSlot();
+		if (pSoundSlot == null) return null;
+
+        if (pSoundSlot != null)
+        {
+            if (_mapSoundVolume.ContainsKey(eSound))
+                pSoundSlot.DoPlaySound(DoGetResource_Origin(eSound), _mapSoundVolume[eSound] * fVolume * _fVolumeEffect );
+            else
+                pSoundSlot.DoPlaySound(DoGetResource_Origin(eSound), fVolume * _fVolumeEffect);
+		}
+
+        return pSoundSlot;
+    }
+
+	public CSoundSlot DoPlaySoundEffect_OnlySinglePlay_OrNull( ENUM_SOUND_NAME eSound, float fVolume = 1f )
+	{
+		if (_bIsMute) return null;
+
 		string strSoundName = eSound.ToString();
 		if (_mapCurrentPlayingSound.ContainsKey( strSoundName ))
 		{
@@ -115,31 +154,32 @@ public class SCManagerSound<ENUM_SOUND_NAME> : SCManagerResourceBase<SCManagerSo
 			return pSlotCurrentPlaying;
 		}
 
-        //Debug.Log("Play Sound : " + eSound);
-        CSoundSlot pSoundSlot = FindDisableSlot_OrNull();
+		//Debug.Log("Play Sound : " + eSound);
+		CSoundSlot pSoundSlot = FindDisableSlot_OrMakeSlot();
 		if (pSoundSlot == null) return null;
-        //{
-        //    MakeSoundSlot();
-        //    pSoundSlot = FindDisableSlot();
-        //}
+		//{
+		//    MakeSoundSlot();
+		//    pSoundSlot = FindDisableSlot();
+		//}
 
-        if (pSoundSlot != null)
-        {
-            if (_mapSoundVolume.ContainsKey(eSound))
-                pSoundSlot.DoPlaySound(DoGetResource_Origin(eSound), _mapSoundVolume[eSound] * fVolume * _fVolumeEffect );
-            else
-                pSoundSlot.DoPlaySound(DoGetResource_Origin(eSound), fVolume * _fVolumeEffect);
+		if (pSoundSlot != null)
+		{
+			if (_mapSoundVolume.ContainsKey( eSound ))
+				pSoundSlot.DoPlaySound( DoGetResource_Origin( eSound ), _mapSoundVolume[eSound] * fVolume * _fVolumeEffect );
+			else
+				pSoundSlot.DoPlaySound( DoGetResource_Origin( eSound ), fVolume * _fVolumeEffect );
 
 			_mapCurrentPlayingSound.Add( strSoundName, pSoundSlot );
 		}
 
-        return pSoundSlot;
-    }
+		return pSoundSlot;
+	}
 
-	public CSoundSlot DoPlaySoundEffect_Loop(ENUM_SOUND_NAME eSound)
+	public CSoundSlot DoPlaySoundEffect_Loop(ENUM_SOUND_NAME eSound, float fVolume)
     {
-        CSoundSlot pSoundSlot = DoPlaySoundEffect(eSound);
-        pSoundSlot.DoPlaySoundLoop();
+        CSoundSlot pSoundSlot = DoPlaySoundEffect_OrNull(eSound, fVolume );
+		if(pSoundSlot != null)
+	        pSoundSlot.DoPlaySoundLoop();
 
         return pSoundSlot;
     }
@@ -157,7 +197,7 @@ public class SCManagerSound<ENUM_SOUND_NAME> : SCManagerResourceBase<SCManagerSo
             int iRandomCount = _mapGroupSound[iHashCode].Count;
             int iRandomIndex = Random.Range(0, iRandomCount);
 
-            return DoPlaySoundEffect(_mapGroupSound[iHashCode][iRandomIndex]);
+            return DoPlaySoundEffect_OrNull(_mapGroupSound[iHashCode][iRandomIndex]);
         }
     }
 
@@ -181,12 +221,19 @@ public class SCManagerSound<ENUM_SOUND_NAME> : SCManagerResourceBase<SCManagerSo
         return DoGetResource_Origin(eSound);
     }
 
-	public void DoSetMute(bool bMute)
+    public void DoSetMute(bool bMute, bool bAudioSourceControl = false)
 	{
 		if (_bIsMute == bMute) return;
 		_bIsMute = bMute;
 
-		if (bMute)
+        if (bAudioSourceControl)
+        {
+            AudioSource[] arrAudioSource = GameObject.FindObjectsOfType<AudioSource>();
+            for (int i = 0; i < arrAudioSource.Length; i++)
+                arrAudioSource[i].mute = bMute;
+        }
+
+        if (bMute)
 		{
 			_fVolumeBackup_BGM = _fVolumeBGM;
 			_fVolumeBackup_Effect = _fVolumeEffect;
@@ -203,9 +250,26 @@ public class SCManagerSound<ENUM_SOUND_NAME> : SCManagerResourceBase<SCManagerSo
 
 			_pSlotBGM.DoSetVolume( _fVolumeBackUp_CurrentBGM );
 		}
-	}
+    }
 
-	public void DoSetVolumeEffect(float fVolumeEffect)
+    public void DoSetPause(bool bPause)
+    {
+        _bPause = bPause;
+
+        AudioSource[] arrAudioSource = GameObject.FindObjectsOfType<AudioSource>();
+        if(_bPause)
+        {
+            for (int i = 0; i < arrAudioSource.Length; i++)
+                arrAudioSource[i].Pause();
+        }
+        else
+        {
+            for (int i = 0; i < arrAudioSource.Length; i++)
+                arrAudioSource[i].Play();
+        }
+    }
+
+    public void DoSetVolumeEffect(float fVolumeEffect)
     {
         _fVolumeEffect = fVolumeEffect;
 	}
@@ -235,9 +299,16 @@ public class SCManagerSound<ENUM_SOUND_NAME> : SCManagerResourceBase<SCManagerSo
 		DoSetVolumeEffect(bEnable ? 0.5f : 0);
 	}
 
-	public void DoStopAllSound(bool bIsBGMSoundOff = true)
+	public void DoStopAllSound(bool bIsBGMSoundOff = true, bool bAudioSourceControl = false)
     {
-		if(bIsBGMSoundOff)
+        if (bAudioSourceControl)
+        {
+            AudioSource[] arrAudioSource = GameObject.FindObjectsOfType<AudioSource>();
+            for (int i = 0; i < arrAudioSource.Length; i++)
+                arrAudioSource[i].Stop();
+        }
+
+        if (bIsBGMSoundOff)
 	        _pSlotBGM.DoStopSound();
 
         for (int i = 0; i < _listSoundSlotAll.Count; i++)
@@ -320,10 +391,10 @@ public class SCManagerSound<ENUM_SOUND_NAME> : SCManagerResourceBase<SCManagerSo
     {
         base.OnMakeClass(pBaseClass, ref bIsMultipleResource);
         
-        for (int i = 0; i < _iSlotPoolingCount; i++)
+        for (int i = 0; i < const_iDefault_SoundSlot_PoolingCount; i++)
             MakeSoundSlot();
 
-        _pSlotBGM = FindDisableSlot_OrNull();
+        _pSlotBGM = FindDisableSlot_OrMakeSlot();
         EventOnSlotPlayClip(_pSlotBGM);
     }
 
@@ -334,9 +405,11 @@ public class SCManagerSound<ENUM_SOUND_NAME> : SCManagerResourceBase<SCManagerSo
     // 중요 로직을 처리                      //
     // ===================================== //
 
-    private void MakeSoundSlot()
+    private CSoundSlot MakeSoundSlot()
     {
-        GameObject pObject = new GameObject(string.Format("SoundSlot_{0}", _listSoundSlotAll.Count));
+		if (_pBase == null) return null;
+
+		GameObject pObject = new GameObject(string.Format("SoundSlot_{0}", _listSoundSlotAll.Count));
         Transform pTrans = pObject.transform;
 
         pTrans.SetParent(_pBase.transform);
@@ -347,14 +420,16 @@ public class SCManagerSound<ENUM_SOUND_NAME> : SCManagerResourceBase<SCManagerSo
         pSlot.EventInitSoundSlot(_pBase, EventOnSlotPlayClip, EventOnSlotFinishClip);
         _listSoundSlotAll.Add(pSlot);
         _queueNotUseSlot.Add(pSlot);
-    }
+
+		return pSlot;
+	}
 
     // ===================================== //
     // private - [Other] Function            //
     // 찾기, 계산 등의 비교적 단순 로직      //
     // ===================================== //
 
-    private CSoundSlot FindDisableSlot_OrNull()
+    private CSoundSlot FindDisableSlot_OrMakeSlot()
     {
         CSoundSlot pFindSlot = null;
 		IEnumerator<CSoundSlot> pEnum = _queueNotUseSlot.GetEnumerator();
@@ -363,6 +438,9 @@ public class SCManagerSound<ENUM_SOUND_NAME> : SCManagerResourceBase<SCManagerSo
 			pFindSlot = pEnum.Current;
 			_queueNotUseSlot.Remove( pFindSlot );
 		}
+
+		if (pFindSlot == null)
+			pFindSlot = MakeSoundSlot();
 
 		return pFindSlot;
     }

@@ -52,7 +52,7 @@ public class CCompoRandomRotate : CCompoEventTrigger
 		base.OnPlayEventMain();
 
 		_vecRotate = PrimitiveHelper.RandomRange( _vecRandomRotateSpeed_Min, _vecRandomRotateSpeed_Max );
-		_pTransformCached.Rotate(_vecRotate);
+        transform.Rotate(_vecRotate);
 
 		if (_bExcuteUpdate)
 			StartCoroutine("CoUpdateRotate");
@@ -67,7 +67,7 @@ public class CCompoRandomRotate : CCompoEventTrigger
 	{
 		while(true)
 		{
-			_pTransformCached.Rotate(_vecRotate * Time.deltaTime);
+            transform.Rotate(_vecRotate * Time.deltaTime);
 
 			yield return null;
 		}

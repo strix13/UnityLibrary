@@ -104,7 +104,7 @@ public class CCompoMagnetic : CObjectBase
 		Gizmos.DrawWireSphere(transform.position, p_fMagnetReactRadius);
 
 		if (_pSphereCollider == null)
-			GetComponent(out _pSphereCollider);
+            this.GetComponent(out _pSphereCollider);
 
 		_pSphereCollider.radius = p_fFindRadius;
 	}
@@ -114,7 +114,7 @@ public class CCompoMagnetic : CObjectBase
 		Transform pTrans = pCollider.transform;
 
 		int iHashCode = pCollider.GetHashCode();
-		float fDistance = (pTrans.position - _pTransformCached.position).sqrMagnitude;
+		float fDistance = (pTrans.position - transform.position).sqrMagnitude;
 		if (_mapMagneticPool.ContainsKey(iHashCode) == false)
 		{
 			IMagneticListener IMagneticListener = pTrans.GetComponent<IMagneticListener>();
@@ -143,7 +143,7 @@ public class CCompoMagnetic : CObjectBase
 
 		Transform pTrans = sInfoMagnetic.pTransCached;
 
-		float fDistanceSqrt = (pTrans.position - _pTransformCached.position).sqrMagnitude;
+		float fDistanceSqrt = (pTrans.position - transform.position).sqrMagnitude;
 		float fDistAtrractSqrt = (p_fMagnetReactRadius * p_fMagnetReactRadius);
 
 		if (sInfoMagnetic.eStateMagnetic == EStateMagnetic.Reaction || fDistanceSqrt < fDistAtrractSqrt)
@@ -151,7 +151,7 @@ public class CCompoMagnetic : CObjectBase
 			if (sInfoMagnetic.eStateMagnetic == EStateMagnetic.None)
 				sInfoMagnetic.eStateMagnetic = EStateMagnetic.Reaction;
 
-			Vector3 v3Direction = (pTrans.position - _pTransformCached.position);
+			Vector3 v3Direction = (pTrans.position - transform.position);
 			//float fLastDistance = sInfoMagnetic.fLastDistance;
 			float fRealDistance = v3Direction.sqrMagnitude;
 			float fCurrentDistance = PrimitiveHelper.GetCalcReverseFloat(sInfoMagnetic.fLastDistance, fRealDistance) * p_fMagnetReactMultiplier;
@@ -178,7 +178,7 @@ public class CCompoMagnetic : CObjectBase
 	{
 		base.OnAwake();
 
-		GetComponent(out _pSphereCollider);
+        this.GetComponent(out _pSphereCollider);
 
 		_iMagneticTypeDir = (int)p_eMagnetReactType;
 

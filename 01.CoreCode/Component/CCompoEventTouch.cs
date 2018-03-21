@@ -62,32 +62,32 @@ public class CCompoEventTouch : CObjectBase//CFSMBase<EStateTouch>
 	private float _fLerpPinchDistance;
 #endif
 
-	#endregion Field
+    #endregion Field
 
-	#region Public
+    #region Public
 
-	// ========================================================================== //
+    // ========================================================================== //
 
-	/* public - [Do] Function
+    /* public - [Do] Function
      * 외부 객체가 호출(For External class call)*/
 
-	/* public - [Event] Function             
+    /* public - [Event] Function             
        프랜드 객체가 호출(For Friend class call)*/
 
-	#endregion Public
+    #endregion Public
 
-	// ========================================================================== //
+    // ========================================================================== //
 
-	#region Protected
+    #region Protected
 
-	/* protected - [abstract & virtual]         */
+    /* protected - [abstract & virtual]         */
 
-	/* protected - [Event] Function           
+    /* protected - [Event] Function           
        자식 객체가 호출(For Child class call)		*/
 
-	/* protected - Override & Unity API         */
+    /* protected - Override & Unity API         */
 
-	protected override void OnUpdate()
+    public override void OnUpdate()
 	{
 		base.OnUpdate();
 

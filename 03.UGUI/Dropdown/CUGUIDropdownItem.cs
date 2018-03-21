@@ -99,8 +99,8 @@ public class CUGUIDropdownItem : CObjectBase, IPointerEnterHandler
 	{
 		base.OnAwake();
 
-		GetComponentInChildren( out _pText );
-		GetComponentInChildren( out _pToggle );
+        this.GetComponentInChildren( out _pText );
+        this.GetComponentInChildren( out _pToggle );
 		_pImage = _pToggle.targetGraphic.GetComponent<Image>();
 	}
 
@@ -112,7 +112,6 @@ public class CUGUIDropdownItem : CObjectBase, IPointerEnterHandler
 		if (pDropDownInitializer == null)
 		{
 			Debug.LogWarning( "Error" );
-			Debug.Break();
 			return;
 		}
 

@@ -97,7 +97,18 @@ public class CDictionary_ForEnumKey<TKey, TValue> : Dictionary<int, TValue>
         base.Add(iHashCode, value);
     }
 
-    public bool TryGetValue(TKey key, out TValue value)
+	public TKey ConvertHashCodeToEnum(int iHashCode)
+	{
+		if(ContainsKey( iHashCode ) == false)
+		{
+			Debug.LogWarning( "Error" );
+			return default( TKey );
+		}
+
+		return (TKey)(object)iHashCode;
+	}
+
+	public bool TryGetValue(TKey key, out TValue value)
     {
         return TryGetValue(key.GetHashCode(), out value);
     }

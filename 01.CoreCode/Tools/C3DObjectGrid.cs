@@ -68,12 +68,12 @@ public class C3DObjectGrid : CObjectBase
 
 				if (_eCircleOption == ECircleOption.Rotate_Circle_Inverse_Y)
 				{
-					Vector3 vecDirection = _pTransformCached.position - pTransformChild.position;
+					Vector3 vecDirection = transform.position - pTransformChild.position;
 					pTransformChild.up = vecDirection.normalized;
 				}
 				else if (_eCircleOption == ECircleOption.Rotate_Circle_Inverse_Z)
 				{
-					Vector3 vecDirection = _pTransformCached.position - pTransformChild.position;
+					Vector3 vecDirection = transform.position - pTransformChild.position;
 					pTransformChild.forward = vecDirection.normalized;
 				}
 			}
@@ -122,7 +122,7 @@ public class C3DObjectGrid : CObjectBase
 		}
 	}
 
-	protected override void OnUpdate()
+    public override void OnUpdate()
 	{
 		base.OnUpdate();
 

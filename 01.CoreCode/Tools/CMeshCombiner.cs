@@ -96,7 +96,7 @@ public class CMeshCombiner : CObjectBase
         _pObjectMakeInstance.AddComponent<MeshFilter>();
         MeshRenderer pRenderer = _pObjectMakeInstance.AddComponent<MeshRenderer>();
 
-        _pObjectMakeInstance.transform.SetParent(_pTransformCached);
+        _pObjectMakeInstance.transform.SetParent(transform);
         _pObjectMakeInstance.transform.localPosition = vecOffsetCombineModel;
 
         EventStartMerge();

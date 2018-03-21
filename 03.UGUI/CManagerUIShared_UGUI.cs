@@ -62,11 +62,17 @@ public class CManagerUIShared_UGUI : CManagerUGUIBase<CManagerUIShared_UGUI, CMa
 	{
 		base.OnAwake();
 
+#if CUSTOMLOG
+		Strix.Debug.SetFileNameType(Strix.Debug.EFileNameType.OnMinute);
+		Strix.Debug.SetFileExportType(Strix.Debug.EFlagFileExportType.CSV, Strix.Debug.EFlagFileExportType.TXT);
+		Application.logMessageReceived += Strix.Debug.OnUnityDebugLogCallBack;
+#endif
+
 		_pUIPopup_DebugConsole = GetUIPanel<CUIPopupShared_DebugConsole_UGUI>();
 		Input.gyro.enabled = true;
 	}
 
-	protected override void OnUpdate()
+    public override void OnUpdate()
 	{
 		base.OnUpdate();
 

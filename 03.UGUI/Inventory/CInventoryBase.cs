@@ -6,7 +6,7 @@
  *	관련 링크 :
  *	
  *	설계자 : 
- *	작성자 : KJH
+ *	작성자 : Strix
  *	
  *	기능 : 
    ============================================ */
@@ -45,7 +45,7 @@ public interface IInventoryData<Class_Data>
 	string IInventoryData_GetImageName( );
 }
 
-public abstract class CInventoryBase<CLASS_Data, CLASS_Slot> : CSingletonBase<CInventoryBase<CLASS_Data, CLASS_Slot>>, IInventory<CLASS_Data, CLASS_Slot>
+public abstract class CInventoryBase<CLASS_Data, CLASS_Slot> : CSingletonMonoBase<CInventoryBase<CLASS_Data, CLASS_Slot>>, IInventory<CLASS_Data, CLASS_Slot>
 	where CLASS_Data : class, IInventoryData<CLASS_Data>
 	where CLASS_Slot : CObjectBase, IInventorySlot<CLASS_Slot, CLASS_Data>
 {

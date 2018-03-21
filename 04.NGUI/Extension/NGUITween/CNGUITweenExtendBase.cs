@@ -6,7 +6,7 @@
 //				      - 기존의 Tween과 다르게 Play만 해도 자동으로 Factor가 리셋 됩니다.
 //					  -
 //                    -
- #if NGUI
+#if NGUI
 
 using UnityEngine;
 using System.Collections.Generic;
@@ -46,8 +46,6 @@ abstract public class CNGUITweenExtendBase<TEMPLATE> : UITweener
     public List<TEMPLATE> listTweenInfo = new List<TEMPLATE>(2);
     protected TEMPLATE m_pCurrentTweenInfo;
 	
-	private event System.Action _EVENT_OnFinish = null;
-
 	[HideInInspector]
 	public float p_fTweenSpeed
 	{
@@ -81,27 +79,18 @@ abstract public class CNGUITweenExtendBase<TEMPLATE> : UITweener
 
 	//=============================== [1. Start Public] ===============================//
 	#region Public
-		
-	protected override void Start()
-	{
-		ResetToBeginning();
-		_iLastPlayIndex = _iDefaultPlayIndex;
-	}
 
-	private void OnEnable()
+	protected override void Start()
 	{
 		if(_bPlayOnEnable)
 		{
-			ResetToBeginning();
-			ResetToFactor();
-			DoPlayTween_Forward( _iLastPlayIndex );
+			CCompoEventTrigger pEventTrigger = gameObject.AddComponent<CCompoEventTrigger>();
+			pEventTrigger.DoAddEvent_Main( DoPlayTween_Forward_0 );
+			pEventTrigger.p_eInputType_Main = CCompoEventTrigger.EInputType.OnEnable;
 		}
-	}
 
-	private void OnDisable()
-	{
-		if (_EVENT_OnFinish != null)
-			_EVENT_OnFinish();
+		ResetToBeginning();
+		_iLastPlayIndex = _iDefaultPlayIndex;
 	}
 
 	private void EventOnEnable()
@@ -118,6 +107,7 @@ abstract public class CNGUITweenExtendBase<TEMPLATE> : UITweener
     public void DoObjectActiveTrue() { gameObject.SetActive(true); }
     public void DoObjectActiveFalse() { gameObject.SetActive(false); }
 
+	public void DoPlayTween_CurrentGroup() { DoPlayTween_Forward( _iLastPlayIndex ); }
     public void DoPlayTween_Forward_0() { DoPlayTween_Forward(0); }
     public void DoPlayTween_Forward_1() { DoPlayTween_Forward(1); }
     public void DoPlayTween_Forward_2() { DoPlayTween_Forward(2); }
@@ -136,7 +126,6 @@ abstract public class CNGUITweenExtendBase<TEMPLATE> : UITweener
 
 	public void DoPlayTween_Reverse(int iGroupNumber)
 	{
-		ResetToFactor( 1f );
 		ProcSettingBeforePlay(iGroupNumber);
 		Play(false);
 	}

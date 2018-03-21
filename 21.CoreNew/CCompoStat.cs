@@ -61,7 +61,7 @@ public class CCompoStat : CObjectBase
 			switch (sBuffType.eBufftype)
 			{
 				case EBuffType.Plus: iValue += sBuffType.iValue; break;
-				case EBuffType.Multipleication: iValue *= sBuffType.iValue; break;
+				case EBuffType.Multipleication: iValue += iValue * sBuffType.iValue; break;
 			}
 			return iValue;
 		}

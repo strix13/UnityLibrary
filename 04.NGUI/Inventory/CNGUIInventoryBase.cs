@@ -199,7 +199,7 @@ abstract public class CNGUIInventoryBase<CLASS_Data> : CObjectBase
 		_eOption = OnInitInventory();
 
 		GetComponentsInChildren(true, _listInventorySlot);
-		bool bAddClone = (_eOption & EInventoryOption.MoveSlotItem) == EInventoryOption.MoveSlotItem;
+		//bool bAddClone = (_eOption & EInventoryOption.MoveSlotItem) == EInventoryOption.MoveSlotItem;
 		for (int i = 0; i < _listInventorySlot.Count; i++)
 			_listInventorySlot[i].p_EVENT_OnPress += OnSlot_Press;
 	}

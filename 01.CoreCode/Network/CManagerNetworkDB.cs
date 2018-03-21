@@ -46,7 +46,7 @@ public delegate bool delDBRequest_GenericArray<T>( bool bResult, int iRequestCou
 public class CManagerNetworkDB_Common : CManagerNetworkDB_Base<CManagerNetworkDB_Common> { }
 public class CManagerNetworkDB_Project : CManagerNetworkDB_Base<CManagerNetworkDB_Project> { }
 
-public class CManagerNetworkDB_Base<CLASS_Driven> : CSingletonBase_Not_UnityComponent<CLASS_Driven>
+public class CManagerNetworkDB_Base<CLASS_Driven> : CSingletonNotMonoBase<CLASS_Driven>
     where CLASS_Driven : CManagerNetworkDB_Base<CLASS_Driven>, new()
 {
 	// ===================================== //
@@ -128,19 +128,24 @@ public class CManagerNetworkDB_Base<CLASS_Driven> : CSingletonBase_Not_UnityComp
 		int iRequestCount = 0;
 		while(true)
 		{
+#if UNITY_2017_1
 			UnityEngine.Networking.UnityWebRequest www = GetWWWNew( hID, strPHPName, strTableName, arrParameter );
 			yield return www.SendWebRequest();
-			//WWW www = GetWWW( hID, strPHPName, strTableName, arrParameter );
-			//yield return www;
-			//bool bSuccess = www.error == null && (www.text.Contains( "false" ) == false);
-
 			bool bSuccess = www.error == null && (www.downloadHandler.text.Contains( "false" ) == false);
-
-			// Debug.Log(strPHPName + " result : " + www.text);
 
 			if (bSuccess == false)
 				Debug.Log( "DBParser Error " + www.downloadHandler.text + " php : " + strPHPName + " TableName : " + strTableName );
-				//Debug.Log( "DBParser Error " + www.text + " php : " + strPHPName + " TableName : " + strTableName );
+#else
+			WWW www = GetWWW( hID, strPHPName, strTableName, arrParameter );
+			yield return www;
+			bool bSuccess = www.error == null && (www.text.Contains( "false" ) == false);
+
+			if (bSuccess == false)
+				Debug.Log( "DBParser Error " + www.text + " php : " + strPHPName + " TableName : " + strTableName );
+#endif
+
+			// Debug.Log(strPHPName + " result : " + www.text);
+			//Debug.Log( "DBParser Error " + www.text + " php : " + strPHPName + " TableName : " + strTableName );
 
 			if (OnFinishLoad == null)
 				break;

@@ -20,8 +20,8 @@ public class CShakeObject : CObjectBase
     private float _fDefaultShakePow = 1f;
     [SerializeField]
     private float _fShakeMinusDelta = 0.1f;
-	[SerializeField]
-	private bool _bMachineShaking = false;
+	//[SerializeField]
+	//private bool _bMachineShaking = false;
 
 	private Vector3 _vecOriginPos;
     private float _fRemainShakePow;
@@ -31,13 +31,13 @@ public class CShakeObject : CObjectBase
 
 	public void DoSetShakeOnMobileShake(bool bEnable)
 	{
-		_bMachineShaking = bEnable;
+		//_bMachineShaking = bEnable;
 	}
 
 	public void DoShakeObject(bool bBackToOriginPos)
     {
         if (_bBackToOriginPos)
-            _pTransformCached.localPosition = _vecOriginPos;
+            transform.localPosition = _vecOriginPos;
 
         _bBackToOriginPos = bBackToOriginPos;
         _fRemainShakePow = _fDefaultShakePow;
@@ -51,7 +51,7 @@ public class CShakeObject : CObjectBase
 	public void DoShakeObject(float fShakePow, bool bReverseOrigin)
     {
         if (_bBackToOriginPos)
-            _pTransformCached.localPosition = _vecOriginPos;
+            transform.localPosition = _vecOriginPos;
 
         _bBackToOriginPos = bReverseOrigin;
         _fRemainShakePow = fShakePow;
@@ -63,10 +63,10 @@ public class CShakeObject : CObjectBase
     
     private IEnumerator CoStartShake()
     {
-        _vecOriginPos = _pTransformCached.localPosition;
+        _vecOriginPos = transform.localPosition;
         while (_fRemainShakePow > 0f)
         {
-            Vector3 vecOriginPos = _pTransformCached.localPosition;
+            Vector3 vecOriginPos = transform.localPosition;
             Vector3 vecShakePos = PrimitiveHelper.RandomRange(vecOriginPos.AddFloat(-_fRemainShakePow), vecOriginPos.AddFloat(_fRemainShakePow));
             if(_eShakePosType != EShakePos.All)
             {
@@ -80,14 +80,14 @@ public class CShakeObject : CObjectBase
                     vecShakePos.z = vecOriginPos.z;
             }
 
-            _pTransformCached.localPosition = vecShakePos;
+            transform.localPosition = vecShakePos;
             _fRemainShakePow -= _fShakeMinusDelta;
 
             yield return null;
         }
 
         if (_bBackToOriginPos)
-            _pTransformCached.localPosition = _vecOriginPos;
+            transform.localPosition = _vecOriginPos;
 
         yield break;
     }

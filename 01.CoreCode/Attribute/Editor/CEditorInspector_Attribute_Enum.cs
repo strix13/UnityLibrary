@@ -17,7 +17,6 @@ using UnityEditor;
 using System.Collections;
 using System.Collections.Generic;
 
-
 public class CEditorEnumToStringHelper
 {
     const string strFileName = "EnumToStringHelper";
@@ -69,13 +68,13 @@ public class CEditorEnumToStringHelper
     }
 }
 
-[CustomPropertyDrawer( typeof( Rename_InpectorAttribute ) )]
+[CustomPropertyDrawer( typeof( Rename_InspectorAttribute) )]
 public class CEditorInspector_Attribute_Rename : PropertyDrawer
 {
 	public override void OnGUI( Rect position,
 				   SerializedProperty property, GUIContent label )
 	{
-		Rename_InpectorAttribute pAttributeTarget = (Rename_InpectorAttribute)attribute;
+		Rename_InspectorAttribute pAttributeTarget = (Rename_InspectorAttribute)attribute;
 		label.text = pAttributeTarget.strInspectorName;
 
 		GUI.enabled = pAttributeTarget.bIsEditPossibleInspector;

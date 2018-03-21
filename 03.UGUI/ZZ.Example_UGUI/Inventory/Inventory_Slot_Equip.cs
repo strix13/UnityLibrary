@@ -36,8 +36,8 @@ public class Inventory_Slot_Equip : CUGUIInventorySlot<Inventory_Slot_Equip, Inv
 	/* private - Field declaration           */
 
 	private GameObject _pGoImage_Icon;
-	private GameObject _pGoImage_Slot;
-	private GameObject _pGoImage_Rune;
+	//private GameObject _pGoImage_Slot;
+	//private GameObject _pGoImage_Rune;
 
 	#endregion Field
 
@@ -66,9 +66,9 @@ public class Inventory_Slot_Equip : CUGUIInventorySlot<Inventory_Slot_Equip, Inv
 	{
 		base.OnAwake();
 
-		_pGoImage_Icon = GetGameObject( EImage.Image_Icon );
-		_pGoImage_Slot = GetGameObject( EImage.Image_Slot );
-		_pGoImage_Rune = GetGameObject( EImage.Image_Rune );
+		_pGoImage_Icon = this.GetGameObject( EImage.Image_Icon );
+		//_pGoImage_Slot = GetGameObject( EImage.Image_Slot );
+		//_pGoImage_Rune = GetGameObject( EImage.Image_Rune );
 	}
 
 	protected override bool OnSetDataOrNull_And_CheckHasData( Inventory_Item.SDataInventory pData )

@@ -18,8 +18,13 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 
-abstract public partial class CManagerUIBase<CLASS_Instance, ENUM_Panel_Name, CLASS_Panel, Class_Button> : CSingletonBase<CLASS_Instance>
-    where CLASS_Instance : CManagerUIBase<CLASS_Instance, ENUM_Panel_Name, CLASS_Panel, Class_Button>
+public interface IManagerUI
+{
+	void IManagerUI_ShowHide_Panel( int iPanelHashCode, bool bShow, System.Action OnFinishAnimation = null );
+}
+
+abstract public partial class CManagerUIBase<CLASS_Instance, ENUM_Panel_Name, CLASS_Panel, Class_Button> : CSingletonMonoBase<CLASS_Instance>, IManagerUI
+	where CLASS_Instance : CManagerUIBase<CLASS_Instance, ENUM_Panel_Name, CLASS_Panel, Class_Button>
     where ENUM_Panel_Name : System.IFormattable, System.IConvertible, System.IComparable
     where CLASS_Panel : CObjectBase, IUIPanel
 {
@@ -62,7 +67,7 @@ abstract public partial class CManagerUIBase<CLASS_Instance, ENUM_Panel_Name, CL
     /// </summary>
     /// <param name="ePanel">Panel 이름의 Enum</param>
     /// <param name="bShow"></param>
-    public CLASS_Panel DoShowHide_Panel(ENUM_Panel_Name ePanel, bool bShow)
+    public CLASS_Panel DoShowHide_Panel(ENUM_Panel_Name ePanel, bool bShow, System.Action OnFinishAnimation = null)
     {
         CUIPanelData pPanel = _mapPanelData[ePanel];
         if (pPanel == null)
@@ -81,6 +86,9 @@ abstract public partial class CManagerUIBase<CLASS_Instance, ENUM_Panel_Name, CL
         }
         else
             pPanel.DoHide();
+
+		if(OnFinishAnimation != null)
+			pPanel.DoSetFinishAnimationEvent( OnFinishAnimation );
 
         return pPanel.p_pPanel;
     }
@@ -131,10 +139,10 @@ abstract public partial class CManagerUIBase<CLASS_Instance, ENUM_Panel_Name, CL
             iSortOrder = CaculateSortOrder_Top();
 
         pPanelShow.EventSetOrder(iSortOrder);
-        AutoFade.DoStartFade(fFadeTime, Color.black, pPanelHide.DoHide, pPanelShow.DoShow);
+        AutoFade.DoStartFade(fFadeTime, Color.black, pPanelHide.DoHide_IgnoreAnimation, pPanelShow.DoShow);
     }
 
-    public void DoShowPanel_FadeIn(ENUM_Panel_Name ePanel, float fFadeTime = 1f)
+    public void DoShowPanel_FadeIn(ENUM_Panel_Name ePanel, System.Action OnFinishFadeIn, float fFadeTime = 1f)
     {
         CUIPanelData pPanel = _mapPanelData[ePanel];
 
@@ -143,13 +151,13 @@ abstract public partial class CManagerUIBase<CLASS_Instance, ENUM_Panel_Name, CL
             iSortOrder = CaculateSortOrder_Top();
 
         pPanel.EventSetOrder(iSortOrder);
-        AutoFade.DoStartFade(fFadeTime, Color.black, pPanel.DoShow);
+        AutoFade.DoStartFade(fFadeTime, Color.black, pPanel.DoShow, OnFinishFadeIn );
     }
 
-    public void DoHidePanel_FadeOut(ENUM_Panel_Name ePanel, float fFadeTime = 1f)
+    public void DoHidePanel_FadeOut(ENUM_Panel_Name ePanel, System.Action OnFinishFadeOut, float fFadeTime = 1f)
     {
         CUIPanelData pPanel = _mapPanelData[ePanel];
-        AutoFade.DoStartFade(fFadeTime, Color.black, pPanel.DoHide);
+        AutoFade.DoStartFade(fFadeTime, Color.black, pPanel.DoHide_IgnoreAnimation, OnFinishFadeOut );
     }
 
     /// <summary>
@@ -184,7 +192,7 @@ abstract public partial class CManagerUIBase<CLASS_Instance, ENUM_Panel_Name, CL
             Debug.Log(string.Format("{0}을 찾을 수 없습니다.", strKey), this);
         }
         else
-            pUIPanelOut = pFindPanel as CUIPanel;
+            pUIPanelOut = pFindPanel.p_pPanel as CUIPanel;
 
         return bResult;
     }
@@ -205,9 +213,17 @@ abstract public partial class CManagerUIBase<CLASS_Instance, ENUM_Panel_Name, CL
         return pTransTarget.localPosition;
     }
 
-    // ========================== [ Division ] ========================== //
+	// ========================== [ Division ] ========================== //
 
-    protected override void OnAwake()
+	public void IManagerUI_ShowHide_Panel( int iPanelHashCode, bool bShow, System.Action OnFinishAnimation = null )
+	{
+		ENUM_Panel_Name ePanelName = _mapPanelData.ConvertHashCodeToEnum( iPanelHashCode );
+		DoShowHide_Panel( ePanelName, bShow, OnFinishAnimation );
+	}
+
+	// ========================== [ Division ] ========================== //
+
+	protected override void OnAwake()
     {
         base.OnAwake();
 
@@ -236,12 +252,12 @@ abstract public partial class CManagerUIBase<CLASS_Instance, ENUM_Panel_Name, CL
             CLASS_Panel pPanel = arrPanelInstance[i];
             pPanel.EventOnAwake();
 
-            string strComponentName = pPanel.GetType().Name;
+			string strComponentName = pPanel.GetType().Name;
             ENUM_Panel_Name ePanelName;
-            if (strComponentName.ConvertEnum_IgnoreError(out ePanelName))
+            if (strComponentName.ConvertEnum(out ePanelName))
 			{
+				pPanel.IUIPanel_Init(this, ePanelName.GetHashCode());
 				_mapPanelData.Add( ePanelName, new CUIPanelData( ePanelName, pPanel ) );
-				pPanel.EventOnAwake();
 			}
 		}
     }
@@ -259,7 +275,7 @@ abstract public partial class CManagerUIBase<CLASS_Instance, ENUM_Panel_Name, CL
                 if (pUIPanelData.p_pPanel.p_bIsFixedSortOrder)
                     ++_iSortOrderTop;
                 else
-                    pUIPanelData.DoShow(++_iSortOrderTop);
+                    pUIPanelData.EventSetOrder(++_iSortOrderTop);
             }
         }
 
@@ -267,5 +283,5 @@ abstract public partial class CManagerUIBase<CLASS_Instance, ENUM_Panel_Name, CL
         return _iSortOrderTop;
     }
 
-    // ========================== [ Division ] ========================== //
+	// ========================== [ Division ] ========================== //
 }

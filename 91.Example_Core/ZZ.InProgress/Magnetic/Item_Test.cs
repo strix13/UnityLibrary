@@ -50,7 +50,7 @@ public class Item_Test : CObjectBase, IMagneticListener
 	{
 		print("OnAttracted");
 
-		_pGameObjectCached.SetActive(false);
+        gameObject.SetActive(false);
 	}
 
 	/* protected - Override & Unity API         */

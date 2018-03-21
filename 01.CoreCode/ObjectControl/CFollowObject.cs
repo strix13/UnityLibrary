@@ -103,7 +103,7 @@ public class CFollowObject : CObjectBase
 			ProcFollow_Normal( ref vecFollowPos, vecTargetPos );
 
 		vecFollowPos = ProcShake( vecFollowPos );
-		_pTransformCached.position = vecFollowPos;
+        transform.position = vecFollowPos;
     }
 
     // ========================== [ Division ] ========================== //
@@ -120,7 +120,7 @@ public class CFollowObject : CObjectBase
 		}
 	}
 
-    protected override void OnUpdate()
+    public override void OnUpdate()
     {
         base.OnUpdate();
 
@@ -140,7 +140,7 @@ public class CFollowObject : CObjectBase
 	{
 		Vector3 vecDestPos = vecFollowPos;
 		ProcFollow_Normal( ref vecDestPos, vecTargetPos );
-		vecFollowPos = Vector3.Lerp( _pTransformCached.position, vecDestPos, _fSmoothFollowDelta );
+		vecFollowPos = Vector3.Lerp(transform.position, vecDestPos, _fSmoothFollowDelta );
 	}
 
 	private void ProcFollow_Normal( ref Vector3 vecFollowPos, Vector3 vecTargetPos )

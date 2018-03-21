@@ -10,12 +10,6 @@ using System.Collections.Generic;
 // Edit Log    : 
 // ============================================ 
 
-public enum ELogWriter
-{
-	Strix,
-	KJH,
-}
-
 [System.Flags]
 public enum EVolumeOff
 {
@@ -83,7 +77,7 @@ public struct StringPair
 }
 
 [RequireComponent( typeof( CCompoDontDestroyObj ) )]
-public class CManagerFrameWorkBase<CLASS_Framework, ENUM_Scene_Name, ENUM_Sound_Name, ENUM_DataField, CLASS_SoundPlayer> : CSingletonBase<CLASS_Framework>
+public class CManagerFrameWorkBase<CLASS_Framework, ENUM_Scene_Name, ENUM_Sound_Name, ENUM_DataField, CLASS_SoundPlayer> : CSingletonMonoBase<CLASS_Framework>
 	where CLASS_Framework : CManagerFrameWorkBase<CLASS_Framework, ENUM_Scene_Name, ENUM_Sound_Name, ENUM_DataField, CLASS_SoundPlayer>
 	where ENUM_Sound_Name : System.IFormattable, System.IConvertible, System.IComparable
 	where ENUM_Scene_Name : System.IFormattable, System.IConvertible, System.IComparable
@@ -161,7 +155,7 @@ public class CManagerFrameWorkBase<CLASS_Framework, ENUM_Scene_Name, ENUM_Sound_
 
 	protected string _strID; public string p_strID { get { return _strID; } }
 
-	static private List<AsyncOperation> _listAsyncLoadScene = new List<AsyncOperation>();
+	//static private List<AsyncOperation> _listAsyncLoadScene = new List<AsyncOperation>();
 	//static private ESceneLoadState _eSceneLoadState = ESceneLoadState.None;
 
 	// static private bool _bManualCall_EventOnFinishLoadScene;
@@ -606,7 +600,9 @@ public class CManagerFrameWorkBase<CLASS_Framework, ENUM_Scene_Name, ENUM_Sound_
 	static private void ProcOnSceneLoaded( UnityEngine.SceneManagement.Scene arg0, UnityEngine.SceneManagement.LoadSceneMode arg1 )
 	{
 		if (CManagerUILocalize.instance != null)
+		{
 			CManagerUILocalize.instance.DoSetLocalize_CurrentScene();
+		}
 
 		p_pManagerScene.EventCheckIsLoadComplete();
 
@@ -621,7 +617,7 @@ public class CManagerFrameWorkBase<CLASS_Framework, ENUM_Scene_Name, ENUM_Sound_
 	}
 
 
-	protected override void OnUpdate()
+    public override void OnUpdate()
 	{
 		base.OnUpdate();
 

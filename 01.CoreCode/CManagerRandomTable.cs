@@ -14,7 +14,7 @@ public interface IRandomItem
     int IRandomItem_GetPercent();
 }
 
-public class CManagerRandomTable<CLASS_Resource> : CSingletonBase_Not_UnityComponent<CManagerRandomTable<CLASS_Resource>>
+public class CManagerRandomTable<CLASS_Resource> : CSingletonNotMonoBase<CManagerRandomTable<CLASS_Resource>>
     where CLASS_Resource : class, IRandomItem
 {
     /* const & readonly declaration             */

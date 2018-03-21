@@ -18,15 +18,19 @@ using System.Collections.Generic;
 
 public interface IUIPanel
 {
-	void IUIPanel_SetOrder( int iSetSortOrder );
 	bool p_bIsAlwaysShow { get; }
 	bool p_bIsFixedSortOrder { get; }
 
+	int p_iHashCode { get; }
+	IManagerUI p_pManagerUI { get; }
+
+	void IUIPanel_Init( IManagerUI pManagerUI, int iHashCode );
+	void IUIPanel_SetOrder( int iSetSortOrder );
 	IEnumerator IUIPanel_OnShowPanel_PlayingAnimation( int iSortOrder );
 	IEnumerator IUIPanel_OnHidePanel_PlayingAnimation();
 }
 
-abstract public partial class CManagerUIBase<CLASS_Instance, ENUM_Panel_Name, CLASS_Panel, Class_Button> : CSingletonBase<CLASS_Instance>
+abstract public partial class CManagerUIBase<CLASS_Instance, ENUM_Panel_Name, CLASS_Panel, Class_Button> : CSingletonMonoBase<CLASS_Instance>
 	where CLASS_Instance : CManagerUIBase<CLASS_Instance, ENUM_Panel_Name, CLASS_Panel, Class_Button>
 	where ENUM_Panel_Name : System.IFormattable, System.IConvertible, System.IComparable
 	where CLASS_Panel : CObjectBase, IUIPanel
@@ -45,17 +49,22 @@ abstract public partial class CManagerUIBase<CLASS_Instance, ENUM_Panel_Name, CL
 		private bool _bIsShowCurrent = false; public bool p_bIsShowCurrent { get { return _bIsShowCurrent; } }
 		private bool _bIsPlayUIAnimation = false; public bool p_bIsPlayingUIAnimation { get { return _bIsPlayUIAnimation; } }
 
+		private System.Action _OnFinishAnimation;
+
 		public CUIPanelData( ENUM_Panel_Name ePanelName, CLASS_Panel pPanel )
 		{
 			_ePanelName = ePanelName;
 			_pPanel = pPanel;
 		}
 
+		public void DoSetFinishAnimationEvent(System.Action OnFinishAnimation)
+		{
+			_OnFinishAnimation = OnFinishAnimation;
+		}
+
 		public void DoShow()
 		{
 			_pPanel.gameObject.SetActive( true );
-			_bIsShowCurrent = true;
-			
 			_pPanel.StartCoroutine( CoProcShowPanel( _iCurrentSortOrder ) );
 		}
 
@@ -65,13 +74,22 @@ abstract public partial class CManagerUIBase<CLASS_Instance, ENUM_Panel_Name, CL
 			DoShow();
 		}
 
-		public void DoHide()
+		public void DoHide(bool bAnimationPlay = true)
 		{
-			if (_pPanel.gameObject.activeSelf == false) return;
 			_bIsShowCurrent = false;
+			if (_pPanel.gameObject.activeSelf == false) return;
 			
-			_pPanel.StartCoroutine( CoProcHidePanel() );
+			_pPanel.StartCoroutine( CoProcHidePanel( true ) );
 		}
+
+		public void DoHide_IgnoreAnimation()
+		{
+			_bIsShowCurrent = false;
+			if (_pPanel.gameObject.activeSelf == false) return;
+
+			_pPanel.StartCoroutine( CoProcHidePanel( false ) );
+		}
+
 
 		public void DoHide( int iSortOrder )
 		{
@@ -96,17 +114,36 @@ abstract public partial class CManagerUIBase<CLASS_Instance, ENUM_Panel_Name, CL
 
 		protected IEnumerator CoProcShowPanel( int iSortOrder )
 		{
+			if (_bIsShowCurrent) yield break;
+
+			_bIsShowCurrent = true;
 			_bIsPlayUIAnimation = true;
 			yield return _pPanel.StartCoroutine( _pPanel.IUIPanel_OnShowPanel_PlayingAnimation( iSortOrder ) );
 			_bIsPlayUIAnimation = false;
+
+			if (_OnFinishAnimation != null)
+			{
+				_OnFinishAnimation();
+				_OnFinishAnimation = null;
+			}
 		}
 
-		protected IEnumerator CoProcHidePanel()
+		protected IEnumerator CoProcHidePanel(bool bAnimationPlay)
 		{
-			_bIsPlayUIAnimation = true;
-			yield return _pPanel.StartCoroutine( _pPanel.IUIPanel_OnHidePanel_PlayingAnimation() );
+			if(bAnimationPlay)
+			{
+				_bIsPlayUIAnimation = true;
+				yield return _pPanel.StartCoroutine( _pPanel.IUIPanel_OnHidePanel_PlayingAnimation() );
+				_bIsPlayUIAnimation = false;
+			}
+
+			if (_OnFinishAnimation != null)
+			{
+				_OnFinishAnimation();
+				_OnFinishAnimation = null;
+			}
+
 			_pPanel.gameObject.SetActive( false );
-			_bIsPlayUIAnimation = false;
 		}
 	}
 }

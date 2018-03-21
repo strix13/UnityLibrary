@@ -8,7 +8,7 @@ using System.Collections.Generic;
    Edit Log    : 
    ============================================ */
 
-public class CManagerPooling<ENUM_Resource_Name, Class_Resource> : CSingletonBase_Not_UnityComponent<CManagerPooling<ENUM_Resource_Name, Class_Resource>>
+public class CManagerPooling<ENUM_Resource_Name, Class_Resource> : CSingletonNotMonoBase<CManagerPooling<ENUM_Resource_Name, Class_Resource>>
 	where ENUM_Resource_Name : System.IComparable, System.IConvertible
 	where Class_Resource : Component
 {
@@ -83,7 +83,7 @@ public class CManagerPooling<ENUM_Resource_Name, Class_Resource> : CSingletonBas
 		for (int i = 0; i < arrResources.Length; i++)
 		{
 			ENUM_Resource_Name eResourceName;
-			if (arrResources[i].name.ConvertEnum_IgnoreError( out eResourceName ))
+			if (arrResources[i].name.ConvertEnum( out eResourceName ))
 			{
 				if(listPoolingObject.Contains( eResourceName ))
 					listObject.Add( arrResources[i] );

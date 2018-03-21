@@ -143,6 +143,14 @@ public class CAnimatorController : CObjectBase, IAnimationController
 		ProcPlayAnim( eAnimName, false );
 	}
 
+	public void DoPlayAnimation_Default()
+	{
+		if (bDefaultIsLoop)
+			DoPlayAnimation_Loop( strDefaultAnimation );
+		else
+			DoPlayAnimation( strDefaultAnimation );
+	}
+
 	/// <summary>
 	/// 애니메이션을 반복으로 실행합니다.
 	/// </summary>
@@ -220,22 +228,21 @@ public class CAnimatorController : CObjectBase, IAnimationController
 		DoInitAnimator();
 
 		if(bPlayDefaultOnAwake)
-		{
-			if(bDefaultIsLoop)
-				DoPlayAnimation_Loop( strDefaultAnimation );
-			else
-				DoPlayAnimation( strDefaultAnimation );
-		}
+			DoPlayAnimation_Default();
 	}
 
 	// ========================== [ Division ] ========================== //
 
 	private void ProcPlayAnim<ENUM_ANIMATION_NAME>( ENUM_ANIMATION_NAME eAnimName, bool bIsLoop, int iAnimationLayer = 0 )
 	{
-		if (gameObject.activeInHierarchy == false) return;
+		if (gameObject.activeInHierarchy == false)
+		{
+			Debug.LogWarning( name + " ProcPlayAnim - gameObject.activeInHierarchy == false", this );
+			return;
+		}
 		if (_pAnimator.isInitialized == false) // Animator does not have an AnimatorController 관련 에러 잡기 위함
 		{
-			Debug.Log( "Before : " + name + _pAnimator.isInitialized );
+			Debug.LogWarning( "Before : " + name + _pAnimator.isInitialized );
 			StartCoroutine( CoDelayPlayAnimation( eAnimName.ToString(), bIsLoop, iAnimationLayer ) );
 			return;
 		}
@@ -252,12 +259,12 @@ public class CAnimatorController : CObjectBase, IAnimationController
 		_strCurrentAnimName = eAnimName.ToString();
 		_pAnimator.Play( _strCurrentAnimName, iAnimationLayer, 0f );
 
-		//_pAnimator.Update(0);
+		_pAnimator.Update(0);
 		_bIsLoop = bIsLoop;
 		_fCurrentAnimation_NomalizeTime = 0f;
 
-		StopAllCoroutines();
-		StartCoroutine( CoUpdateAnimation() );
+		StopCoroutine( "CoUpdateAnimation");
+		StartCoroutine( "CoUpdateAnimation" );
 	}
 
 	private IEnumerator CoDelayPlayAnimation( string strAnimationName, bool bIsLoop, int iAnimationLayer )
@@ -270,9 +277,8 @@ public class CAnimatorController : CObjectBase, IAnimationController
 
 	private IEnumerator CoUpdateAnimation()
 	{
-		// 바로 시작하면 Animator가 갱신이 안되서 플레이중인 애니메이션을 못찾는다..
-		yield return new WaitForSeconds(0.1f);
-
+		//// 바로 시작하면 Animator가 갱신이 안되서 플레이중인 애니메이션을 못찾는다..
+		//yield return new WaitForSeconds(0.1f);
 		while (true)
 		{
 			yield return null;
@@ -293,6 +299,7 @@ public class CAnimatorController : CObjectBase, IAnimationController
 			// 에러인 경우
 			if (bFindAnimation == false)
 			{
+				Debug.LogWarning( "Error!!" );
 			}
 
 			_fCurrentAnimation_NomalizeTime = sCurrentState.normalizedTime;

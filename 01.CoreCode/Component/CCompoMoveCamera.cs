@@ -34,7 +34,7 @@ public class CCompoMoveCamera : CObjectBase
         _pCam = GetComponent<Camera>();
     }
 
-    protected override void OnUpdate()
+    public override void OnUpdate()
     {
         base.OnUpdate();
 
@@ -79,19 +79,19 @@ public class CCompoMoveCamera : CObjectBase
 				Vector2 newTouchVector = newTouchPositions[0] - newTouchPositions[1];
 				float newTouchDistance = newTouchVector.magnitude;
 
-                Vector3 vecConvert = _pTransformCached.TransformDirection((Vector3)((oldTouchPositions[0] + oldTouchPositions[1] - screen) * _pCam.orthographicSize / screen.y));
+                Vector3 vecConvert = transform.TransformDirection((Vector3)((oldTouchPositions[0] + oldTouchPositions[1] - screen) * _pCam.orthographicSize / screen.y));
                 vecConvert.z = vecConvert.y;
                 vecConvert.y = 0f;
 
-                _pTransformCached.position += vecConvert;
+                transform.position += vecConvert;
                 if(bRotateEnable)
-                    _pTransformCached.localRotation *= Quaternion.Euler(new Vector3(0, 0, Mathf.Asin(Mathf.Clamp((oldTouchVector.y * newTouchVector.x - oldTouchVector.x * newTouchVector.y) / oldTouchDistance / newTouchDistance, -1f, 1f)) / 0.0174532924f));
+                    transform.localRotation *= Quaternion.Euler(new Vector3(0, 0, Mathf.Asin(Mathf.Clamp((oldTouchVector.y * newTouchVector.x - oldTouchVector.x * newTouchVector.y) / oldTouchDistance / newTouchDistance, -1f, 1f)) / 0.0174532924f));
                 _pCam.fieldOfView *= oldTouchDistance / newTouchDistance;
 
-                vecConvert = _pTransformCached.TransformDirection((newTouchPositions[0] + newTouchPositions[1] - screen) * _pCam.orthographicSize / screen.y);
+                vecConvert = transform.TransformDirection((newTouchPositions[0] + newTouchPositions[1] - screen) * _pCam.orthographicSize / screen.y);
                 vecConvert.z = vecConvert.y;
                 vecConvert.y = 0f;
-                _pTransformCached.position -= vecConvert;
+                transform.position -= vecConvert;
 
 				oldTouchPositions[0] = newTouchPositions[0];
 				oldTouchPositions[1] = newTouchPositions[1];
@@ -106,12 +106,12 @@ public class CCompoMoveCamera : CObjectBase
             _pCam.fieldOfView++;
 
 
-        Vector3 vecPos = _pTransformCached.position;
+        Vector3 vecPos = transform.position;
         if (vecPos.x < vecPosLimitMin.x) vecPos.x = vecPosLimitMin.x;
         if (vecPos.x > vecPosLimitMax.x) vecPos.x = vecPosLimitMax.x;
         if (vecPos.z < vecPosLimitMin.z) vecPos.z = vecPosLimitMin.z;
         if (vecPos.z > vecPosLimitMax.z) vecPos.z = vecPosLimitMax.z;
-        _pTransformCached.position = vecPos;
+        transform.position = vecPos;
 
         float fFOV = _pCam.fieldOfView;
         if (fFOV < fZoomLimitMin) fFOV = fZoomLimitMin;

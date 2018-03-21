@@ -12,7 +12,7 @@ using System.Text;
    ============================================ */
 
 [RequireComponent(typeof(CCompoDontDestroyObj))]
-public class CManagerUILocalize : CSingletonBase<CManagerUILocalize>
+public class CManagerUILocalize : CSingletonMonoBase<CManagerUILocalize>
 {
 	/* const & readonly declaration             */
 	private const string const_strLocalePath = "Locale";
@@ -44,7 +44,8 @@ public class CManagerUILocalize : CSingletonBase<CManagerUILocalize>
     private static bool _bIsFinishParse = false;    public static bool p_bIsFinishParse {  get { return _bIsFinishParse; } }
 
     private StringBuilder _pStrBuilder = new StringBuilder();
-    private System.Action _OnFinishParse_First;
+
+	private int _iParsingFinishCount = 0;
 
     // ========================================================================== //
 
@@ -54,8 +55,9 @@ public class CManagerUILocalize : CSingletonBase<CManagerUILocalize>
 	{
 		_eCurrentLocalize = SystemLanguage.Unknown;
 
-		_OnFinishParse_First = OnFinishParse;
-        for (int i = 0; i <= (int)SystemLanguage.Unknown; i++)
+		p_EVENT_OnFinishParse_LocFile += OnFinishParse;
+		_iParsingFinishCount = 0;
+		for (int i = 0; i <= (int)SystemLanguage.Unknown; i++)
             StartCoroutine(CoProcParse_Locale((SystemLanguage)i));
 
 		//System.IO.Directory.GetFiles(path)
@@ -77,6 +79,8 @@ public class CManagerUILocalize : CSingletonBase<CManagerUILocalize>
 
     public void DoRegist_CompoLocalize(CUICompoLocalize pCompo)
     {
+		pCompo.EventOnAwake();
+
 		string strKey = pCompo.name;
 		if (_mapCompoLocalizeData.ContainsKey(strKey) == false)
 			_mapCompoLocalizeData.Add(strKey, new List<CUICompoLocalize>());
@@ -86,6 +90,12 @@ public class CManagerUILocalize : CSingletonBase<CManagerUILocalize>
 
 	public void DoSetLocalize_CurrentScene()
 	{
+		if(_bIsFinishParse == false)
+		{
+			p_EVENT_OnFinishParse_LocFile += DoSetLocalize_CurrentScene;
+			return;
+		}
+
 		// 우선 클리어 해준다
 		_mapCompoLocalizeData.Clear();
 
@@ -205,6 +215,13 @@ public class CManagerUILocalize : CSingletonBase<CManagerUILocalize>
 
 	/* protected - Override & Unity API         */
 
+	protected override void OnAwake()
+	{
+		base.OnAwake();
+
+		GetComponent<CCompoDontDestroyObj>()._bIsSingleton = true;
+	}
+
 	// ========================================================================== //
 
 	/* private - [Proc] Function             
@@ -213,40 +230,32 @@ public class CManagerUILocalize : CSingletonBase<CManagerUILocalize>
 	private IEnumerator CoProcParse_Locale(SystemLanguage eLocale)
 	{
 		_pStrBuilder.Length = 0;
-
-        if (Application.isEditor)
-    		_pStrBuilder.Append("file://");
-
-        _pStrBuilder.Append(Application.streamingAssetsPath).Append("/").Append(const_strLocalePath).Append("/")
+		
+#if UNITY_EDITOR
+		_pStrBuilder.Append("file://");
+#endif
+		_pStrBuilder.Append(Application.streamingAssetsPath).Append("/").Append(const_strLocalePath).Append("/")
 					.Append(eLocale.ToString()).Append(const_strLocaleFileExtension);
 		
 		WWW pReader = new WWW(_pStrBuilder.ToString());
 		yield return pReader;
+		_iParsingFinishCount++;
 
-        if (pReader.error != null && pReader.error.Length != 0)
-        {
-			// Unknown이 Language List의 마지막이기 때문에 완료 함수를 호출
-			if (eLocale == SystemLanguage.Unknown)
-            {
-                _bIsFinishParse = true;
-
-				Debug.Log( "로컬라이징 파싱이 완료됨.");
-
-                _OnFinishParse_First();
-
-                if (p_EVENT_OnFinishParse_LocFile != null)
-				{
-					p_EVENT_OnFinishParse_LocFile();
-					p_EVENT_OnFinishParse_LocFile = null;
-				}
-			}
-            yield break;
-        }
-
-		if (pReader.bytes.Length == 0)
+		if (_iParsingFinishCount >= (int)SystemLanguage.Unknown + 1)
 		{
-			yield break;
+			_bIsFinishParse = true;
+
+			Debug.Log( "로컬라이징 파싱이 완료됨." );
+
+			if (p_EVENT_OnFinishParse_LocFile != null)
+			{
+				p_EVENT_OnFinishParse_LocFile();
+				p_EVENT_OnFinishParse_LocFile = null;
+			}
 		}
+
+		if (pReader.error != null || pReader.bytes.Length == 0)
+			yield break;
 
 		string strText = pReader.text;
 		if (pReader.bytes.Length >= 3 && pReader.bytes[0] == 239 && pReader.bytes[1] == 187 && pReader.bytes[2] == 191)   // UTF8 코드 확인

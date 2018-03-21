@@ -8,7 +8,7 @@ using System.Collections.Generic;
    Version	   :
    ============================================ */
    
-abstract public class CManagerSpawnBase<Class_Manager, Enum_SpawnName, Class_SpawnTarget> : CSingletonBase<Class_Manager>
+abstract public class CManagerSpawnBase<Class_Manager, Enum_SpawnName, Class_SpawnTarget> : CSingletonMonoBase<Class_Manager>
 	where Class_Manager : CManagerSpawnBase<Class_Manager, Enum_SpawnName, Class_SpawnTarget>
 	where Enum_SpawnName : System.IConvertible, System.IComparable
 	where Class_SpawnTarget : Component
