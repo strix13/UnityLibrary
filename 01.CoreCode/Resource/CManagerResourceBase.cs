@@ -2,7 +2,7 @@
 using System.Collections;
 using System;
 
-abstract public class CManagerResourceBase<CLASS, ENUM_RES_NAME, RESOURCE> : CSingletonBase<CLASS>
+abstract public class CManagerResourceBase<CLASS, ENUM_RES_NAME, RESOURCE> : CSingletonMonoBase<CLASS>
     where CLASS : CManagerResourceBase<CLASS, ENUM_RES_NAME, RESOURCE>
     where ENUM_RES_NAME : System.IConvertible, System.IComparable
     where RESOURCE : UnityEngine.Component

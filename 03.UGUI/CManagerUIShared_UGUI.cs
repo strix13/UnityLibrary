@@ -27,13 +27,15 @@ public class CManagerUIShared_UGUI : CManagerUGUIBase<CManagerUIShared_UGUI, CMa
 		CUIPopupShared_LoginBar
 	}
 
-	/* public - Variable declaration            */
+    /* public - Variable declaration            */
 
-	/* protected - Variable declaration         */
+    public bool bIsDefaultShow_DebugPopup = false;
 
-	/* private - Variable declaration           */
+    /* protected - Variable declaration         */
 
-	private CUIPopupShared_DebugConsole_UGUI _pUIPopup_DebugConsole = null;
+    /* private - Variable declaration           */
+
+    private CUIPopupShared_DebugConsole_UGUI _pUIPopup_DebugConsole = null;
 	private float fConsoleDelay;
 
 	// ========================================================================== //
@@ -76,6 +78,7 @@ public class CManagerUIShared_UGUI : CManagerUGUIBase<CManagerUIShared_UGUI, CMa
 	{
 		base.OnUpdate();
 
+        // 순간 가속도 흔들기 힘이 특정치 이상일 때
 		if ((Input.acceleration.magnitude > 5 && fConsoleDelay < Time.time) ||
 			 Application.isEditor && Input.GetKeyDown(KeyCode.BackQuote))
 		{
@@ -87,14 +90,15 @@ public class CManagerUIShared_UGUI : CManagerUGUIBase<CManagerUIShared_UGUI, CMa
 
 	protected override void OnDefaultPanelShow()
 	{
+        if(bIsDefaultShow_DebugPopup)
+            DoShowHide_Panel(EFrame.CUIPopupShared_DebugConsole_UGUI, true );
+    }
 
-	}
+    // ========================================================================== //
 
-	// ========================================================================== //
-
-	/* private - [Proc] Function             
+    /* private - [Proc] Function             
        중요 로직을 처리                         */
 
-	/* private - Other[Find, Calculate] Func 
+    /* private - Other[Find, Calculate] Func 
        찾기, 계산 등의 비교적 단순 로직         */
 }

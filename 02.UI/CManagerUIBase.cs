@@ -30,8 +30,8 @@ abstract public partial class CManagerUIBase<CLASS_Instance, ENUM_Panel_Name, CL
 {
     protected CDictionary_ForEnumKey<ENUM_Panel_Name, CUIPanelData> _mapPanelData = new CDictionary_ForEnumKey<ENUM_Panel_Name, CUIPanelData>();
 
-    private Camera _pUIcamera; public Camera p_pUICamera { get { return _pUIcamera; } }
-    private int _iSortOrderTop; public int p_iSortOrderTop { get { return _iSortOrderTop; } }
+    public Camera p_pUICamera { get; private set; }
+    public int p_iSortOrderTop { get; private set; }
 
     // ========================== [ Division ] ========================== //
 
@@ -206,7 +206,7 @@ abstract public partial class CManagerUIBase<CLASS_Instance, ENUM_Panel_Name, CL
     /// <returns></returns>
     public Vector3 DoSetUIToInGame3D(Camera pCameraTarget, Transform pTransTarget, Vector3 vecTargetPos)
     {
-        Vector3 v3UIpos = _pUIcamera.ViewportToWorldPoint(pCameraTarget.WorldToViewportPoint(vecTargetPos));
+        Vector3 v3UIpos = p_pUICamera.ViewportToWorldPoint(pCameraTarget.WorldToViewportPoint(vecTargetPos));
         pTransTarget.position = new Vector3(v3UIpos.x, v3UIpos.y, 0);
         pTransTarget.localPosition = new Vector3(pTransTarget.localPosition.x, pTransTarget.localPosition.y, 0);
 
@@ -228,7 +228,7 @@ abstract public partial class CManagerUIBase<CLASS_Instance, ENUM_Panel_Name, CL
         base.OnAwake();
 
         InitUIPanelInstance();
-        _pUIcamera = GetComponentInChildren<Camera>();
+        p_pUICamera = GetComponentInChildren<Camera>();
     }
 
     protected override void OnEnableObject()
@@ -264,7 +264,7 @@ abstract public partial class CManagerUIBase<CLASS_Instance, ENUM_Panel_Name, CL
 
     private int CaculateSortOrder_Top()
     {
-        _iSortOrderTop = 0;
+        p_iSortOrderTop = 0;
         List<CUIPanelData> listUIPanel = _mapPanelData.Values.ToList();
 
         for (int i = 0; i < listUIPanel.Count; i++)
@@ -273,14 +273,14 @@ abstract public partial class CManagerUIBase<CLASS_Instance, ENUM_Panel_Name, CL
             if (pUIPanelData.p_pPanel.isActiveAndEnabled)
             {
                 if (pUIPanelData.p_pPanel.p_bIsFixedSortOrder)
-                    ++_iSortOrderTop;
+                    ++p_iSortOrderTop;
                 else
-                    pUIPanelData.EventSetOrder(++_iSortOrderTop);
+                    pUIPanelData.EventSetOrder(++p_iSortOrderTop);
             }
         }
 
-        _iSortOrderTop += 1;
-        return _iSortOrderTop;
+        p_iSortOrderTop += 1;
+        return p_iSortOrderTop;
     }
 
 	// ========================== [ Division ] ========================== //

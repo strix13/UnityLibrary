@@ -59,18 +59,18 @@ public class Test_PrimitiveHelper
 	{
 		Random pRandom = new Random();
 		float fTestNum = (float)pRandom.NextDouble();
-		float fTestSimlarDelta = (float)pRandom.NextDouble();
+		float fTestSimlarGap = (float)pRandom.NextDouble();
 
 		ETestCase_FloatExtension eRandomTest = (ETestCase_FloatExtension)(pRandom.Next() % 2);
 		if(eRandomTest == ETestCase_FloatExtension.NotSimilar)
 		{
-			float fSimilarValueNot = fTestNum * (fTestSimlarDelta * 2f);
-			Assert.IsFalse( fTestNum.IsSimilar( fSimilarValueNot, fTestSimlarDelta ) );
+			float fSimilarValueNot = fTestNum + (fTestSimlarGap * 2f);
+			Assert.IsFalse( fTestNum.IsSimilar( fSimilarValueNot, fTestSimlarGap ) );
 		}
 		else if(eRandomTest == ETestCase_FloatExtension.Similar)
 		{
-			float fSimilarValue = fTestNum * ((float)pRandom.NextDouble() % fTestSimlarDelta);
-			Assert.IsTrue(fTestNum.IsSimilar( fSimilarValue, fTestSimlarDelta ));
+			float fSimilarValue = fTestNum + (fTestSimlarGap * 0.9f);
+			Assert.IsTrue(fTestNum.IsSimilar( fSimilarValue, fTestSimlarGap ));
 		}
 	}
 }

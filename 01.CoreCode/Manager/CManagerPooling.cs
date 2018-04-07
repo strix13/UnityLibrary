@@ -37,7 +37,7 @@ public class CManagerPooling<ENUM_Resource_Name, Class_Resource> : CSingletonNot
 	static private Dictionary<ENUM_Resource_Name, Queue<Class_Resource>> _queuePoolingDisable = new Dictionary<ENUM_Resource_Name, Queue<Class_Resource>>();
 	static private Dictionary<ENUM_Resource_Name, int> _mapResourcePoolingCount = new Dictionary<ENUM_Resource_Name, int>();
 
-	private int _iPopCount = 0;	public int p_iPopCount {  get { return _iPopCount; } }
+	public int p_iPopCount { get; private set; }
 
 	// ========================================================================== //
 
@@ -144,7 +144,7 @@ public class CManagerPooling<ENUM_Resource_Name, Class_Resource> : CSingletonNot
 			pFindResource.transform.SetParent(_pTransManager);
 
 		pFindResource.gameObject.SetActive(bGameObjectActive);
-		_iPopCount++;
+        p_iPopCount++;
 
 		if (p_EVENT_OnPopResource != null)
 			p_EVENT_OnPopResource(eResourceName, pFindResource);
@@ -407,24 +407,13 @@ public class CManagerPooling<ENUM_Resource_Name, Class_Resource> : CSingletonNot
 	
 	private void ProcReturnResource(Class_Resource pResource, bool bSetPaents_ManagerObject )
 	{
-		try
-		{
-			if (pResource.gameObject.activeSelf)
-				pResource.gameObject.SetActive( false );
-		}
-		catch
-		{
-			if (pResource.gameObject.activeSelf)
-				pResource.gameObject.SetActive( false );
-		}
+		if (pResource.gameObject.activeSelf)
+			pResource.gameObject.SetActive( false );
 
 		int hInstanceID = pResource.GetInstanceID();
 		if (_mapPoolingInstance.ContainsKey(hInstanceID) == false ||
 			_mapPoolingResourceType.ContainsKey(hInstanceID) == false)
-		{
-			//Debug.LogWarning(pResource.name + " Return fail!!");
 			return;
-		}
 
 		ENUM_Resource_Name eResourceName = _mapPoolingResourceType[hInstanceID];
 		if (_queuePoolingDisable.ContainsKey( eResourceName) == false || 
@@ -439,10 +428,6 @@ public class CManagerPooling<ENUM_Resource_Name, Class_Resource> : CSingletonNot
 		if (p_EVENT_OnPushResource != null)
 			p_EVENT_OnPushResource(eResourceName, pResource);
 
-		//if (typeof( ENUM_Resource_Name ) == typeof( string ))
-		//	Debug.Log( "Push" + eResourceName + " Count : " + _queuePoolingDisable[eResourceName].Count, pResource );
-
-		//if (_queuePoolingDisable[eResourceName].Count <= 1)
-		//	Debug.Log( eResourceName + " [Push Remain Count <= 1] Total Pooling Count : " + _mapResourcePoolingCount[eResourceName]);
-	}
+        p_iPopCount--;
+    }
 }

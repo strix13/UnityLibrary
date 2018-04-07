@@ -27,16 +27,16 @@ public static class SCEnumeratorHelper
 {
 	public static TSource[] ToArray<TSource>( this IEnumerable<TSource> source )
 	{
-		int iCapacity = 0;
+        int iCapacity = 0;
 		IEnumerator<TSource> pIter = source.GetEnumerator();
 		while (pIter.MoveNext())
 		{
 			iCapacity++;
 		}
 
-		TSource[] arrReturn = new TSource[iCapacity];
+        pIter = source.GetEnumerator();
+        TSource[] arrReturn = new TSource[iCapacity];
 		int iIndex = 0;
-		pIter = source.GetEnumerator();
 		while (pIter.MoveNext())
 		{
 			arrReturn[iIndex++] = pIter.Current;
@@ -239,7 +239,7 @@ public static class SCEnumeratorHelper
 		return pStringBuilder.ToString();
 	}
 
-	static public T GetRandomItem<T>( this List<T> list )
+	static public T GetRandom<T>( this List<T> list )
 	{
 		if (list.Count == 0)
 			return default( T );
@@ -248,7 +248,7 @@ public static class SCEnumeratorHelper
 		return list[iRandomIndex];
 	}
 
-	static public T GetRandomItem<T>( this IEnumerable<T> source )
+	static public T GetRandom<T>( this IEnumerable<T> source )
 	{
 		int iTotalCount = 0;
 		IEnumerator<T> pIter = source.GetEnumerator();

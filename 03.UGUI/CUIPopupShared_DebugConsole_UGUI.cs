@@ -32,7 +32,7 @@ public class CUIPopupShared_DebugConsole_UGUI : CUGUIPanelHasInputBase<CUIPopupS
 
 	[GetComponentInChildren]
 	private ScrollRect _pScrollView = null;
-	[GetComponentInChildren( "Content" )]
+	[GetComponentInChildren( "Text_Log" )]
 	static private Text _pUIText = null;
 
     private Vector3 _vecPos_DragStart;

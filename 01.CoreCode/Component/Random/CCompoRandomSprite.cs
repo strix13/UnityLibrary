@@ -57,7 +57,7 @@ public class CCompoRandomSprite : CCompoEventTrigger
 	{
 		base.OnPlayEventMain();
 
-		Sprite pSprite = _listRandomSprite.GetRandomItem();
+		Sprite pSprite = _listRandomSprite.GetRandom();
 		UnityEngine.UI.Image pImage = GetComponent<UnityEngine.UI.Image>();
 		if (pImage != null)
 			pImage.sprite = pSprite;

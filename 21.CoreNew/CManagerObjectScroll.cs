@@ -102,8 +102,8 @@ public class CManagerObjectScroll : CObjectBase
 
 	public void DoGenerate_ScrollObject(string strObjectName)
 	{
-		CScrollObject pObjectRandom = CManagerRandomTable<CScrollObject>.instance[GetInstanceID()].GetItem( strObjectName );
-		ProcPlacement_ScrollObject( pObjectRandom );
+		//CScrollObject pObjectRandom = CManagerRandomTable<CScrollObject>.instance[GetInstanceID()].GetItem_AsMono( strObjectName );
+		//ProcPlacement_ScrollObject( pObjectRandom );
 	}
 
 	/* public - [Event] Function             
@@ -146,8 +146,8 @@ public class CManagerObjectScroll : CObjectBase
 		}
 
 		int iInstanceID = GetInstanceID();
-		CManagerRandomTable<CScrollObject>.instance[iInstanceID].DoClearRandomItemTable();
-		CManagerRandomTable<CScrollObject>.instance[iInstanceID].DoAddRandomItem_Range( _listScrollObject_Origin );
+		//CManagerRandomTable<CScrollObject>.instance[iInstanceID].DoClearRandomItemTable();
+		//CManagerRandomTable<CScrollObject>.instance[iInstanceID].DoAddRandomItem_Range( _listScrollObject_Origin );
 		CManagerPooling<string, CScrollObject>.DoInitPoolingObject( listObject );
 		CManagerPooling<string, CScrollObject>.instance.DoStartPooling( p_iPoolingCount, transform );
 
@@ -224,8 +224,8 @@ public class CManagerObjectScroll : CObjectBase
 
 	private void ProcGenerate_ScrollObject()
 	{
-		CScrollObject pObjectRandom = CManagerRandomTable<CScrollObject>.instance[GetInstanceID()].GetRandomItem();
-		ProcPlacement_ScrollObject( pObjectRandom );
+		//CScrollObject pObjectRandom = CManagerRandomTable<CScrollObject>.instance[GetInstanceID()].GetRandomItem();
+		//ProcPlacement_ScrollObject( pObjectRandom );
 	}
 
 	private void ProcPlacement_ScrollObject( CScrollObject pObjectRandom )

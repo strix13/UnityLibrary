@@ -52,16 +52,6 @@ public static class CExtension_Mono
         return pComponent != null;
     }
 
-    static public UnityEngine.Component GetComponentInChildren(this Component pTarget, string strObjectName, System.Type pComponentType)
-    {
-        GameObject pObjectFind = pTarget.GetGameObject(strObjectName, false);
-        UnityEngine.Component pComponentFind = null;
-        if (pObjectFind != null)
-            pComponentFind = pObjectFind.GetComponent(pComponentType);
-
-        return pComponentFind;
-    }
-
     static public bool GetComponentInChildren<COMPONENT>(this Component pTarget, string strObjectName, out COMPONENT pComponent)
     where COMPONENT : UnityEngine.Component
     {

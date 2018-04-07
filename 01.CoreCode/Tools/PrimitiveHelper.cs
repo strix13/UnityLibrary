@@ -12,10 +12,9 @@ using System.Text;
 
 public static class PrimitiveHelper
 {
-	static public bool IsSimilar( this float fValueTarget, float fValue, float fProximityDelta_0_1 = 0.1f )
+	static public bool IsSimilar( this float fValueTarget, float fValue, float fSimilarGap )
 	{
-		float fProximityValue = fValueTarget * fProximityDelta_0_1;
-		return System.Math.Abs( fValueTarget - fValue ) < fProximityValue;
+		return Mathf.Abs(fValueTarget - fValue) < fSimilarGap;
 	}
 
 	static public Vector3 Inverse( this Vector3 vecTarget )
