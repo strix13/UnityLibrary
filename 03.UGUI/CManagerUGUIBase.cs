@@ -16,6 +16,12 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
+
+#if UNITY_EDITOR
+using NUnit.Framework;
+using UnityEngine.TestTools;
+#endif
 
 [RequireComponent( typeof( CCompoEventSystemChecker ) )]
 [RequireComponent( typeof( Canvas ) )]
@@ -76,3 +82,57 @@ abstract public class CManagerUGUIBase<Class_Instance, Enum_Panel_Name> : CManag
 
 	#endregion Private
 }
+
+#region Test
+#if UNITY_EDITOR
+public class UGUI매니져테스트 : CManagerUGUIBase<UGUI매니져테스트, UGUI매니져테스트.EUIPanel>
+{
+    const float const_fShowAnimation_DurationSec = 0.1f;
+
+    public enum EUIPanel { None, 패널테스트_1, 패널테스트_2, }
+
+    public class 패널테스트_1 : CUGUIPanelBase
+    {
+        public bool p_bIsPlaying_Show_Animation { get; private set; }
+        protected override IEnumerator OnShowPanel_PlayingAnimation(int iSortOrder)
+        {
+            p_bIsPlaying_Show_Animation = true;
+            yield return new WaitForSeconds(const_fShowAnimation_DurationSec);
+            p_bIsPlaying_Show_Animation = false;
+        }
+    }
+    public class 패널테스트_2 : CUGUIPanelBase { }
+
+    [UnityTest] [Category("StrixLibrary")]
+    public IEnumerator 패널관리테스트()
+    {
+        GameObject pObjectManager = new GameObject();
+        패널테스트_1 pPanelTest = new GameObject(typeof(패널테스트_1).ToString()).AddComponent<패널테스트_1>();
+        패널테스트_2 pPanelTest2 = new GameObject(typeof(패널테스트_2).ToString()).AddComponent<패널테스트_2>();
+
+        pPanelTest.transform.SetParent(pObjectManager.transform);
+        pPanelTest2.transform.SetParent(pObjectManager.transform);
+
+        UGUI매니져테스트 pManager = pObjectManager.AddComponent<UGUI매니져테스트>();
+        yield return null;
+
+        Assert.AreEqual(pPanelTest.gameObject.activeSelf, true);
+        Assert.AreEqual(pPanelTest2.gameObject.activeSelf, false);
+        Assert.AreEqual(pPanelTest.transform.GetSiblingIndex(), pManager.transform.childCount - 1);
+
+        Assert.AreEqual(pPanelTest.p_bIsPlaying_Show_Animation, true);
+        yield return new WaitForSeconds(const_fShowAnimation_DurationSec); yield return null;
+        Assert.AreEqual(pPanelTest.p_bIsPlaying_Show_Animation, false);
+
+        pManager.DoShowHide_Panel(EUIPanel.패널테스트_1, false); yield return null;
+        Assert.AreEqual(pPanelTest.gameObject.activeSelf, false);
+
+        pManager.DoShowHide_Panel(EUIPanel.패널테스트_2, true); yield return null;
+        Assert.AreEqual(pPanelTest2.gameObject.activeSelf, true);
+        Assert.AreEqual(pPanelTest2.transform.GetSiblingIndex(), pManager.transform.childCount - 1);
+    }
+
+    protected override void OnDefaultPanelShow() { DoShowHide_Panel(EUIPanel.패널테스트_1, true); }
+}
+#endif
+#endregion Test

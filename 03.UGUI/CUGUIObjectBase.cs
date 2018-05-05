@@ -17,7 +17,7 @@ using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
 
-public class CUGUIObjectBase : CObjectBase
+public class CUGUIObjectBase : CUIObjectBase
 {
 	/* const & readonly declaration             */
 

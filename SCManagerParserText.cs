@@ -36,7 +36,10 @@ using System.IO;
 using System.Linq;
 
 using FileInfo = System.Reflection.FieldInfo;
-using UnityEngine.Assertions;
+
+#if UNITY_EDITOR
+using NUnit.Framework;
+#endif
 
 public class KeyAttribute : Attribute
 {
@@ -48,6 +51,7 @@ public class KeyAttribute : Attribute
     }
 }
 
+#if NET_4_6
 public class SCManagerParserText
 {
     // PropertyInfo, FieldInfo 를 동시에 담을만한 것이 API에 존재하지 않는다.
@@ -321,6 +325,7 @@ Int_Private = 7
         private int Int_Private;
 
         [UnityEngine.TestTools.UnityTest]
+        [Category("StrixLibrary")]
         public IEnumerator Test_ManagerParserText()
         {
             STestObject pTestObject = SCManagerParserText.ParsingObject<STestObject>(const_strTest);
@@ -336,3 +341,4 @@ Int_Private = 7
     #endif
     #endregion
 }
+#endif

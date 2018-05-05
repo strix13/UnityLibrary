@@ -42,6 +42,12 @@ public class CObjectBase : MonoBehaviour, IUpdateAble
             OnAwake();
     }
 
+    public void EventOnAwake_Force()
+    {
+        _bIsExcuteAwake = false;
+        OnAwake();
+    }
+
     // ========================== [ Division ] ========================== //
 
     void Awake()
@@ -75,15 +81,16 @@ public class CObjectBase : MonoBehaviour, IUpdateAble
 		if (_bIsExcuteAwake == false)
         {
             SCManagerGetComponent.DoUpdateGetComponentAttribute(this);
-			_bIsExcuteAwake = true;
+            _bIsExcuteAwake = true;
 
-            if(isActiveAndEnabled)
+            if (isActiveAndEnabled)
             {
                 if (_pCoroutineOnAwake != null)
                     StopCoroutine(OnAwakeCoroutine());
                 _pCoroutineOnAwake = StartCoroutine(OnAwakeCoroutine());
             }
         }
+
 	}
 
     virtual protected IEnumerator OnAwakeCoroutine() { yield break; }
@@ -115,7 +122,7 @@ public class CObjectBase : MonoBehaviour, IUpdateAble
 
 		OnAfterDelayAction();
 		_mapCoroutinePlaying.Remove( OnAfterDelayAction );
-	}
+	}    
 }
 
 #region Test

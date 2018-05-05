@@ -17,6 +17,12 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.UI;
 using System;
+using UnityEngine.EventSystems;
+
+#if UNITY_EDITOR
+using NUnit.Framework;
+using UnityEngine.TestTools;
+#endif
 
 public interface IDropDownInitializer
 {
@@ -248,3 +254,42 @@ abstract public class CUGUIPanelHasInputBase<Enum_InputName> : CUGUIPanelBase, I
 	}
 	#endregion Private
 }
+
+#region Test
+#if UNITY_EDITOR
+public class UGUI인풋패널테스트 : CUGUIPanelHasInputBase<UGUI인풋패널테스트.EInput>
+{
+    public enum EInput
+    {
+        None, Button_Test, Button_Test2,
+    }
+    static EInput eLastInput;
+
+    [UnityTest] [Category("StrixLibrary")]
+    public IEnumerator 인풋입력테스트()
+    {
+        EventSystem.current = new GameObject().AddComponent<EventSystem>();
+        UGUI인풋패널테스트 pTestPanel = new GameObject().AddComponent<UGUI인풋패널테스트>();
+        Button pButtonTest = new GameObject(EInput.Button_Test.ToString()).AddComponent<Button>();
+        Button pButtonTest2 = new GameObject(EInput.Button_Test2.ToString()).AddComponent<Button>();
+
+        pButtonTest.transform.SetParent(pTestPanel.transform);
+        pButtonTest2.transform.SetParent(pTestPanel.transform);
+        pTestPanel.EventOnAwake_Force();
+
+        eLastInput = EInput.None;
+        Assert.AreEqual(eLastInput, EInput.None);
+
+        pButtonTest.OnPointerClick(new PointerEventData(EventSystem.current));
+        Assert.AreEqual(eLastInput, EInput.Button_Test);
+
+        pButtonTest2.OnPointerClick(new PointerEventData(EventSystem.current));
+        Assert.AreEqual(eLastInput, EInput.Button_Test2);
+
+        yield break;
+    }
+
+    public override void OnButtons_Click(EInput eButtonName) { eLastInput = eButtonName; }
+}
+#endif
+#endregion Test

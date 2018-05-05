@@ -51,7 +51,10 @@ abstract public partial class CManagerUIBase<CLASS_Instance, ENUM_Panel_Name, CL
 
 		private System.Action _OnFinishAnimation;
 
-		public CUIPanelData( ENUM_Panel_Name ePanelName, CLASS_Panel pPanel )
+        private Coroutine _pCoroutine_ShowAnimation;
+        private Coroutine _pCoroutine_HideAnimation;
+
+        public CUIPanelData( ENUM_Panel_Name ePanelName, CLASS_Panel pPanel )
 		{
 			_ePanelName = ePanelName;
 			_pPanel = pPanel;
@@ -65,7 +68,9 @@ abstract public partial class CManagerUIBase<CLASS_Instance, ENUM_Panel_Name, CL
 		public void DoShow()
 		{
 			_pPanel.gameObject.SetActive( true );
-			_pPanel.StartCoroutine( CoProcShowPanel( _iCurrentSortOrder ) );
+
+            StopAnimationCoroutine();
+            _pCoroutine_ShowAnimation = _pPanel.StartCoroutine( CoProcShowPanel( _iCurrentSortOrder ) );
 		}
 
 		public void DoShow( int iSortOrder )
@@ -78,8 +83,9 @@ abstract public partial class CManagerUIBase<CLASS_Instance, ENUM_Panel_Name, CL
 		{
 			_bIsShowCurrent = false;
 			if (_pPanel.gameObject.activeSelf == false) return;
-			
-			_pPanel.StartCoroutine( CoProcHidePanel( true ) );
+
+            StopAnimationCoroutine();
+            _pCoroutine_HideAnimation = _pPanel.StartCoroutine( CoProcHidePanel( true ) );
 		}
 
 		public void DoHide_IgnoreAnimation()
@@ -87,7 +93,8 @@ abstract public partial class CManagerUIBase<CLASS_Instance, ENUM_Panel_Name, CL
 			_bIsShowCurrent = false;
 			if (_pPanel.gameObject.activeSelf == false) return;
 
-			_pPanel.StartCoroutine( CoProcHidePanel( false ) );
+            StopAnimationCoroutine();
+            _pCoroutine_HideAnimation = _pPanel.StartCoroutine( CoProcHidePanel( false ) );
 		}
 
 
@@ -145,5 +152,13 @@ abstract public partial class CManagerUIBase<CLASS_Instance, ENUM_Panel_Name, CL
 
 			_pPanel.gameObject.SetActive( false );
 		}
-	}
+
+        private void StopAnimationCoroutine()
+        {
+            if (_pCoroutine_HideAnimation != null)
+                _pPanel.StopCoroutine(_pCoroutine_HideAnimation);
+            if (_pCoroutine_ShowAnimation != null)
+                _pPanel.StopCoroutine(_pCoroutine_ShowAnimation);
+        }
+    }
 }

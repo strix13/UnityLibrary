@@ -463,10 +463,11 @@ public struct SHangulChar
     // ========================================================================== //
 }
 
+#region Test
+#if UNITY_EDITOR
 public class SHangulTest
 {
-    #region Test
-#if UNITY_EDITOR
+
 
     [Test]
     [Category("StrixLibrary")]
@@ -646,7 +647,6 @@ public class SHangulTest
         pHangul.DoRemove(); Assert.AreEqual("ㅃ", pHangul.ToString());
         pHangul.DoRemove(); Assert.AreEqual("", pHangul.ToString());
     }
-
-#endif
-    #endregion Test
 }
+#endif
+#endregion Test

@@ -12,12 +12,12 @@
    ============================================ */
 #endregion Header
 
-   #if NGUI
+#if NGUI
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 
-public class CNGUIObjectBase : CObjectBase
+public class CNGUIObjectBase : CUIObjectBase
 {
 	/* const & readonly declaration             */
 
@@ -140,7 +140,7 @@ public class CNGUIObjectBase : CObjectBase
 
 	// ========================================================================== //
 
-	#region Protected
+#region Protected
 
 	/* protected - [abstract & virtual]         */
 
@@ -148,23 +148,12 @@ public class CNGUIObjectBase : CObjectBase
        자식 객체가 호출(For Child class call)		*/
 
 	/* protected - Override & Unity API         */
-	
-	void OnClick() { OnUIClick(); }
-	void OnPress( bool bPress ) { OnUIPress( bPress ); }
-	void OnHover( bool bHover ) { OnUIHover( bHover ); }
-	void OnDragStart() { OnUIDrag( true ); }
-	void OnDragEnd() { OnUIDrag( false ); }
 
-	virtual protected void OnUIClick() { }
-	virtual protected void OnUIPress( bool bPress ) { }
-	virtual protected void OnUIHover( bool bHover ) { }
-	virtual protected void OnUIDrag( bool bIsDrag ) { }
-
-	#endregion Protected
+#endregion Protected
 
 	// ========================================================================== //
 
-	#region Private
+#region Private
 
 	/* private - [Proc] Function             
        로직을 처리(Process Local logic)           */
@@ -172,6 +161,6 @@ public class CNGUIObjectBase : CObjectBase
 	/* private - Other[Find, Calculate] Func 
        찾기, 계산등 단순 로직(Simpe logic)         */
 
-	#endregion Private
+#endregion Private
 }
-   #endif
+#endif
