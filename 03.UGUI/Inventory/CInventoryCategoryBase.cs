@@ -89,9 +89,9 @@ public abstract class CInventoryCategoryBase<ENUM_CATEGORY, CLASS_DATA, CLASS_SL
 		return listInventoryDataTab;
 	}
 
-	protected override void OnInventory_SetData(CLASS_DATA sInfoData, CLASS_SLOT pSlot)
+    protected override void OnInventory_SetData(CLASS_SLOT pSlot, CLASS_DATA sInfoData)
 	{
-		base.OnInventory_SetData(sInfoData, pSlot);
+        base.OnInventory_SetData(pSlot, sInfoData);
 
 		OnSetInventoryCategory(_eCurrentCategory, sInfoData, pSlot);
 	}

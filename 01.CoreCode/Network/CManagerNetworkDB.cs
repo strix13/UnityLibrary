@@ -301,9 +301,21 @@ public class CManagerNetworkDB_Base<CLASS_Driven> : CSingletonNotMonoBase<CLASS_
 	// 찾기, 계산 등의 비교적 단순 로직      //
 	// ===================================== //
 
+    private bool CheckIsValidDB()
+    {
+        if (string.IsNullOrEmpty(_strDBName) || string.IsNullOrEmpty(_strDBName))
+            return false;
+
+        return true;
+    }
+
 	private UnityEngine.Networking.UnityWebRequest GetWWWNew( string hID, string strPHPName, string strTableName, params StringPair[] arrParameter )
 	{
-		WWWForm form = new WWWForm();
+        if (CheckIsValidDB() == false)
+            Debug.LogError("DB 정보를 세팅해 주시기 바랍니다.");
+
+
+        WWWForm form = new WWWForm();
 		if ((hID == null || hID.Length == 0) == false)
 			form.AddField( "id", hID );
 
@@ -335,6 +347,9 @@ public class CManagerNetworkDB_Base<CLASS_Driven> : CSingletonNotMonoBase<CLASS_
 
 	private WWW GetWWW(string hID, string strPHPName, string strTableName, params StringPair[] arrParameter)
     {
+        if (CheckIsValidDB() == false)
+            Debug.LogError("DB 정보를 세팅해 주시기 바랍니다.");
+
         WWWForm form = new WWWForm();
         if((hID == null || hID.Length == 0) == false)
 			form.AddField("id", hID);

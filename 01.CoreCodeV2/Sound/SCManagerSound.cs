@@ -124,7 +124,7 @@ public class SCManagerSound<ENUM_SOUND_NAME> : SCManagerResourceBase<SCManagerSo
     {
 		if (_bIsMute) return null;
 
-		string strSoundName = eSound.ToString();
+		// string strSoundName = eSound.ToString();
         //Debug.Log("Play Sound : " + eSound);
         CSoundSlot pSoundSlot = FindDisableSlot_OrMakeSlot();
 		if (pSoundSlot == null) return null;

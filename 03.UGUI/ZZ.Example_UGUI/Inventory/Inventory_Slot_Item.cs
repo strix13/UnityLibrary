@@ -74,9 +74,9 @@ public class Inventory_Slot_Item : CUGUIInventorySlot<Inventory_Slot_Item, Inven
 		_pPopupOwner = GetComponentInParent<Popup_Inventory>();
 	}
 
-	public override void IInventorySlot_OnEnableSlot( bool bEnable )
+	public override void IInventorySlot_OnFillSlot( bool bEnable )
 	{
-		base.IInventorySlot_OnEnableSlot( bEnable );
+		base.IInventorySlot_OnFillSlot( bEnable );
 
 		_pGoImage_Icon.SetActive( bEnable );
 		_pGoImage_Selected.SetActive( false );
@@ -87,9 +87,9 @@ public class Inventory_Slot_Item : CUGUIInventorySlot<Inventory_Slot_Item, Inven
 		//	Debug.Log( name + "IInventorySlot_OnEnableSlot" + bEnable );
 	}
 
-	protected override bool OnSetDataOrNull_And_CheckHasData( Inventory_Item.SDataInventory pData )
+	protected override bool OnSetDataOrNull_And_CheckIsValidData( Inventory_Item.SDataInventory pData )
 	{
-		base.OnSetDataOrNull_And_CheckHasData( pData );
+		base.OnSetDataOrNull_And_CheckIsValidData( pData );
 
 		if (pData == null) return false;
 

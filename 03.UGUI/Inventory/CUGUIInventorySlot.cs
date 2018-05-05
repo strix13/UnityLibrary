@@ -19,8 +19,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System;
 
-public class CUGUIInventorySlot<Class_Slot, Class_Data> : CUGUIObjectBase, IInventorySlot<Class_Slot, Class_Data>, IPointerClickHandler
-	where Class_Slot : CUGUIInventorySlot<Class_Slot, Class_Data>
+public class CUGUIInventorySlot<Class_Slot, Class_Data> : CUGUIObjectBase, IInventorySlot<Class_Slot, Class_Data>, IPointerClickHandler, IPointerDownHandler, IPointerUpHandler
+    where Class_Slot : CUGUIInventorySlot<Class_Slot, Class_Data>
 	where Class_Data : IInventoryData<Class_Data>
 {
 	/* const & readonly declaration             */
@@ -68,7 +68,7 @@ public class CUGUIInventorySlot<Class_Slot, Class_Data> : CUGUIObjectBase, IInve
 
 	public void IInventorySlot_OnSetData( Class_Data pData, string strImageName )
 	{
-		if(OnSetDataOrNull_And_CheckHasData( pData ))
+		if(OnSetDataOrNull_And_CheckIsValidData( pData ))
 			_pData = pData;
 	}
 
@@ -77,17 +77,28 @@ public class CUGUIInventorySlot<Class_Slot, Class_Data> : CUGUIObjectBase, IInve
 		_pInventory.IInventory_OnClickSlot( _pSlot );
 	}
 
-	#endregion Public
+    public void OnPointerDown(PointerEventData eventData)
+    {
+        _pInventory.IInventory_OnPressSlot(_pSlot, true);
+    }
 
-	// ========================================================================== //
+    public void OnPointerUp(PointerEventData eventData)
+    {
+        _pInventory.IInventory_OnPressSlot(_pSlot, false);
+    }
 
-	#region Protected
+    #endregion Public
 
-	/* protected - [abstract & virtual]         */
-	
-	public virtual void IInventorySlot_OnEnableSlot( bool bEnable ) { }
+    // ========================================================================== //
+
+    #region Protected
+
+    /* protected - [abstract & virtual]         */
+
+    public virtual void IInventorySlot_OnFillSlot( bool bIsFillData ) { }
 	public virtual void IInventorySlot_OnClickSlot( bool bIsCurrentSelectedSlot ) { }
-	protected virtual bool OnSetDataOrNull_And_CheckHasData( Class_Data pData ) { return true; }
+    public virtual void IInventorySlot_OnPressSlot(bool bIsCurrentSelectedSlot, bool bPressDown) { }
+    protected virtual bool OnSetDataOrNull_And_CheckIsValidData( Class_Data pData ) { return true; }
 
 	protected override void OnAwake()
 	{
@@ -96,20 +107,20 @@ public class CUGUIInventorySlot<Class_Slot, Class_Data> : CUGUIObjectBase, IInve
 		_pSlot = this as Class_Slot;
 	}
 
-	/* protected - [Event] Function           
+    /* protected - [Event] Function           
        자식 객체가 호출(For Child class call)		*/
 
-	#endregion Protected
+    #endregion Protected
 
-	// ========================================================================== //
+    // ========================================================================== //
 
-	#region Private
+    #region Private
 
-	/* private - [Proc] Function             
+    /* private - [Proc] Function             
        로직을 처리(Process Local logic)           */
 
-	/* private - Other[Find, Calculate] Func 
+    /* private - Other[Find, Calculate] Func 
        찾기, 계산등 단순 로직(Simpe logic)         */
 
-	#endregion Private
+    #endregion Private
 }

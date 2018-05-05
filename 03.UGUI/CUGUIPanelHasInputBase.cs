@@ -23,101 +23,107 @@ public interface IDropDownInitializer
 	void IDropDownInitializer_Regist_DropDownItem( CUGUIDropdownItem pItem );
 }
 
-[RequireComponent( typeof( GraphicRaycaster ) )]
+[RequireComponent(typeof(GraphicRaycaster))]
 abstract public class CUGUIPanelHasInputBase<Enum_InputName> : CUGUIPanelBase, IDropDownInitializer
 {
-	/* const & readonly declaration             */
+    /* const & readonly declaration             */
 
-	/* enum & struct declaration                */
+    /* enum & struct declaration                */
 
-	#region Field
+    #region Field
 
-	/* public - Field declaration            */
+    /* public - Field declaration            */
 
-	/* protected - Field declaration         */
+    /* protected - Field declaration         */
 
-	/* private - Field declaration           */
+    /* private - Field declaration           */
 
-	private List<CUGUIScrollItem> _listScrollView = new List<CUGUIScrollItem>();
+    private List<CUGUIScrollItem> _listScrollView = new List<CUGUIScrollItem>();
 
-	#endregion Field
+    #endregion Field
 
-	#region Public
+    #region Public
 
-	// ========================================================================== //
+    // ========================================================================== //
 
-	/* public - [Do] Function
+    /* public - [Do] Function
      * 외부 객체가 호출(For External class call)*/
 
-	public void DoEnableButtons( bool bEnable )
-	{
-		List<Button> listButton = _mapButton.Values.ToList();
-		for (int i = 0; i < listButton.Count; i++)
-			listButton[i].enabled = bEnable;
-	}
+    public void DoEnableButtons(bool bEnable)
+    {
+        List<Button> listButton = _mapButton.Values.ToList();
+        for (int i = 0; i < listButton.Count; i++)
+            listButton[i].enabled = bEnable;
+    }
 
-	public Button GetButton<T_BUTTON>(T_BUTTON tButton)
-	{
-		 return this.GetComponentInChildren_Cashed(_mapButton, tButton.ToString());
-	}
+    public Button GetButton(Enum_InputName eButtonName)
+    {
+        return this.GetComponentInChildren_Cashed(_mapButton, eButtonName.ToString());
+    }
 
-	public Toggle GetToggle<T_TOGGLE>(T_TOGGLE tToggle)
-	{
-		return this.GetComponentInChildren_Cashed(_mapToggle, tToggle.ToString());
-	}
+    public Toggle GetToggle(Enum_InputName eToggleName)
+    {
+        return this.GetComponentInChildren_Cashed(_mapToggle, eToggleName.ToString());
+    }
 
-	/* public - [Event] Function             
+    public Slider GetSlider(Enum_InputName eSliderName)
+    {
+        return this.GetComponentInChildren_Cashed(_mapSlider, eSliderName.ToString());
+    }
+
+    /* public - [Event] Function             
        프랜드 객체가 호출(For Friend class call)*/
 
-	public void IDropDownInitializer_Regist_DropDownItem( CUGUIDropdownItem pItem)
-	{
-		Dropdown pDropDown = pItem.GetComponentInParent<Dropdown>();
-		Enum_InputName eDropDownName;
-		if (pDropDown.name.ConvertEnum( out eDropDownName ))
-			pItem.DoInitItem( eDropDownName.GetHashCode(), EventOnPointerEnter );
-	}
+    public void IDropDownInitializer_Regist_DropDownItem(CUGUIDropdownItem pItem)
+    {
+        Dropdown pDropDown = pItem.GetComponentInParent<Dropdown>();
+        Enum_InputName eDropDownName;
+        if (pDropDown.name.ConvertEnum(out eDropDownName))
+            pItem.DoInitItem(eDropDownName.GetHashCode(), EventOnPointerEnter);
+    }
 
-	public void EventOnPointerEnter(int iOwnerID, CUGUIDropDown.SDropDownData pData, string strText)
-	{
-		OnDropDown_HoverItem( (Enum_InputName)(object)iOwnerID, pData, strText);
-	}
+    public void EventOnPointerEnter(int iOwnerID, CUGUIDropDown.SDropDownData pData, string strText)
+    {
+        OnDropDown_HoverItem((Enum_InputName)(object)iOwnerID, pData, strText);
+    }
 
-	public void EventOnChangeDropDown( Enum_InputName eDropDownName, CUGUIDropDown pDropDown )
-	{
-		string strText = pDropDown.options[pDropDown.value].text;
-		OnDropDown_SelectItem( eDropDownName, pDropDown.GetData( strText), strText );
-	}
+    public void EventOnChangeDropDown(Enum_InputName eDropDownName, CUGUIDropDown pDropDown)
+    {
+        string strText = pDropDown.options[pDropDown.value].text;
+        OnDropDown_SelectItem(eDropDownName, pDropDown.GetData(strText), strText);
+    }
 
-	public void EventInitScrollView<Data_ScrollItem>( List<Data_ScrollItem> listDataScrollItem )
-		where Data_ScrollItem : IUGUIScrollItemData
-	{
-		listDataScrollItem.Sort( ComparerScrollItem );
-		for (int i = 0; i < _listScrollView.Count && i < listDataScrollItem.Count; i++)
-			_listScrollView[i].EventSetScrollData( listDataScrollItem[i] );
-	}
+    public void EventInitScrollView<Data_ScrollItem>(List<Data_ScrollItem> listDataScrollItem)
+        where Data_ScrollItem : IUGUIScrollItemData
+    {
+        listDataScrollItem.Sort(ComparerScrollItem);
+        for (int i = 0; i < _listScrollView.Count && i < listDataScrollItem.Count; i++)
+            _listScrollView[i].EventSetScrollData(listDataScrollItem[i]);
+    }
 
-	#endregion Public
+    #endregion Public
 
-	// ========================================================================== //
+    // ========================================================================== //
 
-	#region Protected
+    #region Protected
 
-	/* protected - [abstract & virtual]         */
+    /* protected - [abstract & virtual]         */
 
-	abstract public void OnClick_Buttons( Enum_InputName eButtonName );
-	protected virtual void OnClick_Toggles(Enum_InputName eToggle, bool bIsOn) { }
-	protected virtual void OnValueChanged_InputFields( Enum_InputName eToggle, string strInput ) { }
-	protected virtual void OnSubmit_InputFields( Enum_InputName eToggle, string strInput ) { }
+    abstract public void OnButtons_Click(Enum_InputName eButtonName);
+    protected virtual void OnToggles_Click(Enum_InputName eToggle, bool bIsOn) { }
+    protected virtual void OnInputFields_ValueChanged(Enum_InputName eToggle, string strInput) { }
+    protected virtual void OnInputFields_Submit(Enum_InputName eToggle, string strInput) { }
 
-	virtual public void OnPress_And_Hold_Buttons( Enum_InputName eButtonName, bool bPress ) { }
-	virtual public void OnScrollView_ClickItem( CUGUIScrollItem pScrollItem, IUGUIScrollItemData pScrollData, Enum_InputName eButtonName ) { }
-	virtual public void OnDropDown_SelectItem( Enum_InputName eDropDownName, CUGUIDropDown.SDropDownData pData, string strItemText) { }
-	virtual public void OnDropDown_HoverItem( Enum_InputName eDropDownName, CUGUIDropDown.SDropDownData pData, string strItemText ) { }
+    virtual public void OnButtons_Press_And_Hold(Enum_InputName eButtonName, bool bPress) { }
+    virtual public void OnScrollView_ClickItem(CUGUIScrollItem pScrollItem, IUGUIScrollItemData pScrollData, Enum_InputName eButtonName) { }
+    virtual public void OnDropDown_SelectItem(Enum_InputName eDropDownName, CUGUIDropDown.SDropDownData pData, string strItemText) { }
+    virtual public void OnDropDown_HoverItem(Enum_InputName eDropDownName, CUGUIDropDown.SDropDownData pData, string strItemText) { }
+    virtual public void OnSlider_SetValue(Enum_InputName eSliderName, float fSliderValue_0_1) { }
 
 	/* protected - [Event] Function           
        자식 객체가 호출(For Child class call)		*/
 
-	protected void OnClick_Buttons_Wrapper( Enum_InputName eButtonName, Button pButton ) { OnClick_Buttons( eButtonName ); }
+	protected void OnClick_Buttons_Wrapper( Enum_InputName eButtonName, Button pButton ) { OnButtons_Click( eButtonName ); }
 
 	/* protected - Override & Unity API         */
 
@@ -134,7 +140,7 @@ abstract public class CUGUIPanelHasInputBase<Enum_InputName> : CUGUIPanelBase, I
 			Enum_InputName eButtonName;
 			if (strButtonName.ConvertEnum( out eButtonName ))
 			{
-				pButton.onClick.AddListener(() => { OnClick_Buttons_Wrapper(eButtonName, pButton); });
+                pButton.onClick.AddListener(() => { OnClick_Buttons_Wrapper(eButtonName, pButton); });
 				if (_mapButton == null)
 					_mapButton = new Dictionary<string, Button>();
 
@@ -150,8 +156,8 @@ abstract public class CUGUIPanelHasInputBase<Enum_InputName> : CUGUIPanelBase, I
 				CUGUIButton_Press pButtonPress = pButton.GetComponent<CUGUIButton_Press>();
 				if (pButtonPress != null)
 				{
-					pButtonPress.p_Event_OnPress_Down.AddListener( delegate { OnPress_And_Hold_Buttons( eButtonName, true ); } );
-					pButtonPress.p_Event_OnPress_Up.AddListener( delegate { OnPress_And_Hold_Buttons( eButtonName, false ); } );
+					pButtonPress.p_Event_OnPress_Down.AddListener( delegate { OnButtons_Press_And_Hold( eButtonName, true ); } );
+					pButtonPress.p_Event_OnPress_Up.AddListener( delegate { OnButtons_Press_And_Hold( eButtonName, false ); } );
 				}
 			}
 		}
@@ -166,7 +172,7 @@ abstract public class CUGUIPanelHasInputBase<Enum_InputName> : CUGUIPanelBase, I
 
 			if (strToggleName.ConvertEnum(out eToggleName))
 			{
-				pToggle.onValueChanged.AddListener((bool bIsOn) => { OnClick_Toggles(eToggleName, bIsOn); });
+				pToggle.onValueChanged.AddListener((bool bIsOn) => { OnToggles_Click(eToggleName, bIsOn); });
 
 				if (_mapToggle == null)
 					_mapToggle = new Dictionary<string, Toggle>();
@@ -176,7 +182,7 @@ abstract public class CUGUIPanelHasInputBase<Enum_InputName> : CUGUIPanelBase, I
 			}
 		}
 
-		CUGUIDropDown[] arrDropDown = GetComponentsInChildren<CUGUIDropDown>();
+		CUGUIDropDown[] arrDropDown = GetComponentsInChildren<CUGUIDropDown>(true);
 		for (int i = 0; i < arrDropDown.Length; i++)
 		{
 			CUGUIDropDown pDropDown = arrDropDown[i];
@@ -189,19 +195,29 @@ abstract public class CUGUIPanelHasInputBase<Enum_InputName> : CUGUIPanelBase, I
 		for (int i = 0; i < _listScrollView.Count; i++)
 			_listScrollView[i].EventInitScrollItem<Enum_InputName>( OnScrollView_ClickItem );
 
-		InputField[] arrInputField = GetComponentsInChildren<InputField>();
+		InputField[] arrInputField = GetComponentsInChildren<InputField>(true);
 		for (int i = 0; i < arrInputField.Length; i++)
 		{
 			InputField pInputField = arrInputField[i];
-
 			Enum_InputName eInputField_Name;
 			if (pInputField.name.ConvertEnum( out eInputField_Name ))
 			{
-				pInputField.onValueChanged.AddListener( ( string strInput ) => { OnValueChanged_InputFields( eInputField_Name, strInput ); } );
-				pInputField.onEndEdit.AddListener( ( string strInput ) => { OnSubmit_InputFields( eInputField_Name, strInput ); } );
+				pInputField.onValueChanged.AddListener( ( string strInput ) => { OnInputFields_ValueChanged( eInputField_Name, strInput ); } );
+				pInputField.onEndEdit.AddListener( ( string strInput ) => { OnInputFields_Submit( eInputField_Name, strInput ); } );
 			}
 
 		}
+
+        Slider[] arrSlider = GetComponentsInChildren<Slider>();
+        for(int i = 0; i < arrSlider.Length; i++)
+        {
+            var pInput = arrSlider[i];
+            Enum_InputName eInputField_Name;
+            if (pInput.name.ConvertEnum(out eInputField_Name))
+            {
+                pInput.onValueChanged.AddListener((float fValue) => OnSlider_SetValue(eInputField_Name, pInput.value));
+            }
+        }
 	}
 
 	#endregion Protected

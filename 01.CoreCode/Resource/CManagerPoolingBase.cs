@@ -26,7 +26,7 @@ public class CManagerPoolingBase<CLASS, ENUM_RESOURCE_NAME, RESOURCE> : CManager
     private bool _bAutoPoolingOnAwake = true;
 
     protected CDictionary_ForEnumKey<ENUM_RESOURCE_NAME, List<SPoolingObject>> _mapPoolingInstance = new CDictionary_ForEnumKey<ENUM_RESOURCE_NAME, List<SPoolingObject>>();
-    protected CList<SPoolingObject> _listInstanceAll = new CList<SPoolingObject>();
+    protected List<SPoolingObject> _listInstanceAll = new List<SPoolingObject>();
 
     // ========================== [ Division ] ========================== //
 

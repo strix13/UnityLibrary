@@ -25,7 +25,16 @@ public class CSingletonDynamicMonoBase<CLASS_SingletoneTarget> : CObjectBase
             if (_instance == null)
             {
                 if(_bIsQuitApplication)
-                    _instance = new CLASS_SingletoneTarget();
+                {
+                    try
+                    {
+                        _instance = new CLASS_SingletoneTarget();
+                    }
+                    catch
+                    {
+
+                    }
+                }
                 else
                 {
                     _instance = FindObjectOfType<CLASS_SingletoneTarget>();

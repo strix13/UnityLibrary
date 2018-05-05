@@ -61,7 +61,7 @@ public class CUGUICategoryBase<ENUM_CATEGORY> : CUGUIPanelHasInputBase<ENUM_CATE
 	#region Protected
 	/* protected - [abstract & virtual]         */
 
-	public override void OnClick_Buttons(ENUM_CATEGORY eTabName)
+	public override void OnButtons_Click(ENUM_CATEGORY eTabName)
 	{
 		ProcSetCategory(eTabName);
 	}

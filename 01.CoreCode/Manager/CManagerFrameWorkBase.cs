@@ -179,17 +179,17 @@ public class CManagerFrameWorkBase<CLASS_Framework, ENUM_Scene_Name, ENUM_Sound_
 
 	static public float GetFloat_InGameData( ENUM_DataField eDataField)
 	{
-		return SGameData.GetFloat( eDataField );
+		return SAppConfig.GetFloat( eDataField );
 	}
 
 	static public int GetInt_InGameData( ENUM_DataField eDataField )
 	{
-		return SGameData.GetInt( eDataField );
+		return SAppConfig.GetInt( eDataField );
 	}
 
 	static public string GetString_GameData( ENUM_DataField eDataField )
 	{
-		return SGameData.GetString( eDataField );
+		return SAppConfig.GetString( eDataField );
 	}
 
 	static public void DoNetworkDB_CheckCount_IsEqualOrGreater<StructDB>( string strFieldName, object iCheckFieldCount, delDBRequest OnResult = null )

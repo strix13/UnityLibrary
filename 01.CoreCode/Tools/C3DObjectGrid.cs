@@ -54,9 +54,13 @@ public class C3DObjectGrid : CObjectBase
 		for (int i = 0; i < transform.childCount; i++)
 		{
 			Transform pTransformChild = transform.GetChild( i );
-			pTransformChild.localPosition = (_vecLocalPosOffset * i) - vecOffset;
+            RectTransform pTransformRect = pTransformChild as RectTransform;
 
-			if (_eCircleOption != ECircleOption.None)
+            pTransformChild.localPosition = (_vecLocalPosOffset * i) - vecOffset;
+            if(pTransformRect)
+                pTransformRect.localPosition = (_vecLocalPosOffset * i) - vecOffset;
+
+            if (_eCircleOption != ECircleOption.None)
 			{
 				pTransformChild.localRotation = Quaternion.Euler( _vecRotate_OnCircle * i );
 				Vector3 vecCurrentLocalPos = pTransformChild.localPosition;
@@ -65,8 +69,10 @@ public class C3DObjectGrid : CObjectBase
 				vecCurrentLocalPos += pTransformChild.up * _vecPos_OnCircle.y;
 				vecCurrentLocalPos += pTransformChild.right * _vecPos_OnCircle.x;
 				pTransformChild.localPosition = vecCurrentLocalPos;
+                if (pTransformRect)
+                    pTransformRect.localPosition = vecCurrentLocalPos;
 
-				if (_eCircleOption == ECircleOption.Rotate_Circle_Inverse_Y)
+                if (_eCircleOption == ECircleOption.Rotate_Circle_Inverse_Y)
 				{
 					Vector3 vecDirection = transform.position - pTransformChild.position;
 					pTransformChild.up = vecDirection.normalized;

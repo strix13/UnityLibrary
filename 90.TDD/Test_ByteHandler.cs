@@ -12,6 +12,7 @@ public class Test_ByteHandler
 
 	[Test]
 	[Repeat( 10 )]
+    [Category("StrixLibrary")]
 	static public void Test_Byte_To_BitArray()
 	{
 		Assert.IsTrue(SCByteHandler.ConvertByte_To_Int( 1 ) == 1);

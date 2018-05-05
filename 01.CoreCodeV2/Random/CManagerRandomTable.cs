@@ -2,7 +2,10 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+
+#if UNITY_EDITOR
 using NUnit.Framework;
+#endif
 
 /* ============================================ 
    Editor      : Strix                               
@@ -331,9 +334,10 @@ public class Test_CManagerRandomTable
     public IEnumerator Test_RandomItem_Peek()
     {
         HashSet<SItemData> setGetItem = new HashSet<SItemData>();
-        CManagerRandomTable<SItemData> pRandomItemTable;
+        CManagerRandomTable<SItemData> pRandomItemTable = CManagerRandomTable<SItemData>.instance;
+        CManagerRandomTable<SItemData>.instance.DoClearRandomItemTable();
+        pRandomItemTable.DoSetRandomMode(CManagerRandomTable<SItemData>.ERandomGetMode.Peek);
 
-        pRandomItemTable = CManagerRandomTable<SItemData>.instance;
         pRandomItemTable.DoAddRandomItem(new SItemData(EItemGrade.Common, "평범한 장갑", 40));  // Total
         pRandomItemTable.DoAddRandomItem(new SItemData(EItemGrade.Common, "평범한 신발", 40));  // 80
         pRandomItemTable.DoAddRandomItem(new SItemData(EItemGrade.Rare, "드문 장갑", 19));      // 95
@@ -355,9 +359,8 @@ public class Test_CManagerRandomTable
     public IEnumerator Test_RandomItem_Delete()
     {
         HashSet<SItemData> setGetItem = new HashSet<SItemData>();
-        CManagerRandomTable<SItemData> pRandomItemTable;
-
-        pRandomItemTable = CManagerRandomTable<SItemData>.instance;
+        CManagerRandomTable<SItemData> pRandomItemTable = CManagerRandomTable<SItemData>.instance;
+        CManagerRandomTable<SItemData>.instance.DoClearRandomItemTable();
         pRandomItemTable.DoSetRandomMode(CManagerRandomTable<SItemData>.ERandomGetMode.Delete);
 
         pRandomItemTable.DoAddRandomItem(new SItemData(EItemGrade.Common, "평범한 장갑", 40));  // Total

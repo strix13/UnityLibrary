@@ -22,15 +22,22 @@ public class CUIPopupShared_DebugConsole_UGUI : CUGUIPanelHasInputBase<CUIPopupS
 	public enum EUIInput
 	{
 		Button_Close,
-	}
+        Button_ScrollUp,
+        Button_ScrollDown,
 
-	/* public - Variable declaration            */
+        Button_ScrollUp_Double,
+        Button_ScrollDown_Double,
+    }
 
-	/* protected - Variable declaration         */
+    /* public - Variable declaration            */
 
-	/* private - Variable declaration           */
+    public bool _bIsMove = false;
 
-	[GetComponentInChildren]
+    /* protected - Variable declaration         */
+
+    /* private - Variable declaration           */
+
+    [GetComponentInChildren]
 	private ScrollRect _pScrollView = null;
 	[GetComponentInChildren( "Text_Log" )]
 	static private Text _pUIText = null;
@@ -52,10 +59,13 @@ public class CUIPopupShared_DebugConsole_UGUI : CUGUIPanelHasInputBase<CUIPopupS
     }
     public void OnDrag(PointerEventData eventData)
     {
-        Vector3 vecCurrentInputPos = GetInputPos();
+        if (_bIsMove)
+        {
+            Vector3 vecCurrentInputPos = GetInputPos();
 
-        transform.position += vecCurrentInputPos - _vecPos_DragStart;
-        _vecPos_DragStart = vecCurrentInputPos;
+            transform.position += vecCurrentInputPos - _vecPos_DragStart;
+            _vecPos_DragStart = vecCurrentInputPos;
+        }
     }
 
     // ========================================================================== //
@@ -84,8 +94,11 @@ public class CUIPopupShared_DebugConsole_UGUI : CUGUIPanelHasInputBase<CUIPopupS
 		string strDebugLog = string.Format("\n[시간]{0} -> {1}\n{2}\n[스택 트레이스]\n{3}", Time.time, strLogType, strLog, strStackTrace);
         strDebugLog += "</color>";
 
-		if(_pUIText != null)
+		if(_pUIText)
 	        _pUIText.text += strDebugLog;
+
+        if (_pScrollView)
+            _pScrollView.verticalNormalizedPosition = 0f;
 	}
 
 	/* protected - Override & Unity API         */
@@ -106,15 +119,21 @@ public class CUIPopupShared_DebugConsole_UGUI : CUGUIPanelHasInputBase<CUIPopupS
 
 	}
 
-	public override void OnClick_Buttons( EUIInput eButtonName )
+	public override void OnButtons_Click( EUIInput eButtonName )
 	{
 		switch (eButtonName)
 		{
 			case EUIInput.Button_Close:
 				CManagerUIShared_UGUI.instance.DoShowHide_Panel(CManagerUIShared_UGUI.EFrame.CUIPopupShared_DebugConsole_UGUI, false);
 				break;
-		}
-	}
+
+            case EUIInput.Button_ScrollUp:          _pScrollView.verticalNormalizedPosition += 0.1f; break;
+            case EUIInput.Button_ScrollUp_Double:   _pScrollView.verticalNormalizedPosition += 0.3f; break;
+
+            case EUIInput.Button_ScrollDown:        _pScrollView.verticalNormalizedPosition -= 0.1f; break;
+            case EUIInput.Button_ScrollDown_Double: _pScrollView.verticalNormalizedPosition -= 0.3f; break;
+        }
+    }
 
 	protected override IEnumerator OnShowPanel_PlayingAnimation( int iSortOrder )
 	{

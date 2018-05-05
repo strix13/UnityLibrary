@@ -16,8 +16,11 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
+
+#if UNITY_EDITOR
 using NUnit.Framework;
 using UnityEngine.TestTools;
+#endif
 
 public class CObjectBase : MonoBehaviour, IUpdateAble
 {
@@ -74,9 +77,12 @@ public class CObjectBase : MonoBehaviour, IUpdateAble
             SCManagerGetComponent.DoUpdateGetComponentAttribute(this);
 			_bIsExcuteAwake = true;
 
-            if(_pCoroutineOnAwake != null)
-                StopCoroutine(OnAwakeCoroutine());
-            _pCoroutineOnAwake = StartCoroutine(OnAwakeCoroutine());
+            if(isActiveAndEnabled)
+            {
+                if (_pCoroutineOnAwake != null)
+                    StopCoroutine(OnAwakeCoroutine());
+                _pCoroutineOnAwake = StartCoroutine(OnAwakeCoroutine());
+            }
         }
 	}
 
@@ -113,6 +119,7 @@ public class CObjectBase : MonoBehaviour, IUpdateAble
 }
 
 #region Test
+#if UNITY_EDITOR
 
 public class Test_CObjectBase : CObjectBase
 {
@@ -125,6 +132,7 @@ public class Test_CObjectBase : CObjectBase
     public CObjectBase pGetComponentParents;
 
     [UnityTest]
+    [Category("StrixLibrary")]
     public IEnumerator Test_ObjectBase_GetComponent_Attribute()
     {
         GameObject pObjectNew = new GameObject();
@@ -137,6 +145,7 @@ public class Test_CObjectBase : CObjectBase
     }
 
     [UnityTest]
+    [Category("StrixLibrary")]
     public IEnumerator Test_ObjectBase_GetComponentInChildren_Attribute()
     {
         GameObject pObjectNew = new GameObject();
@@ -152,4 +161,5 @@ public class Test_CObjectBase : CObjectBase
     }
 }
 
+#endif
 #endregion Test

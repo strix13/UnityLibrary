@@ -9,8 +9,8 @@ public class CEditorProjectView_GenerateParents : Editor
 {
 	static private LinkedList<Transform> _listObject = new LinkedList<Transform>();
 
-	[MenuItem( "GameObject/StrixTool/Generate Parents #&b", false, 0 )]
-	static public void DoGenerateParents()
+    [MenuItem("GameObject/StrixTool/Generate Empty Object Parents #&b", false, 0 )]
+	static public void DoGenerateParents_EmptyObject()
 	{
 		if (Init_And_CheckIsReady() == false) return;
 
@@ -21,8 +21,19 @@ public class CEditorProjectView_GenerateParents : Editor
 			ProcGenerateParents( pTransTarget );
 		}
 	}
-	
-	static private bool Init_And_CheckIsReady()
+
+    [MenuItem("GameObject/StrixTool/Generate Common Parents #&v", false, 0)]
+    static public void DoGenerateParents_CommonParents()
+    {
+        if (Init_And_CheckIsReady() == false) return;
+
+        Transform pTransformCommonParents = new GameObject("Group_" + _listObject.Count).transform;
+        foreach (Transform pTransformChild in _listObject)
+            pTransformChild.SetParent(pTransformCommonParents);
+
+    }
+
+    static private bool Init_And_CheckIsReady()
 	{
 		_listObject.Clear();
 		if (Selection.gameObjects == null)
@@ -45,7 +56,6 @@ public class CEditorProjectView_GenerateParents : Editor
 
 		pObjectNewParents.transform.SetParent( pObject.parent );
 		pObject.SetParent( pObjectNewParents.transform );
-		pObject.name += "_Child";
 
 		pObjectNewParents.transform.localScale = Vector3.one;
 		pObject.localScale = vecOriginScale;

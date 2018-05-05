@@ -31,7 +31,7 @@ public class Popup_Inventory : CUGUIPanelHasInputBase<Popup_Inventory.EInput>
 		_pInventory_Item.DoRefresh_InventoryData();
 	}
 
-	public override void OnClick_Buttons( EInput eButtonName )
+	public override void OnButtons_Click( EInput eButtonName )
 	{
 		_eInput = eButtonName;
 

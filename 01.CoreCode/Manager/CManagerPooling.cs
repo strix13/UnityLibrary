@@ -391,7 +391,7 @@ public class CManagerPooling<ENUM_Resource_Name, Class_Resource> : CSingletonNot
 
 		if(_mapResourceOriginCopy.ContainsKey( eResourceName ) == false)
 		{
-			Debug.LogError( "ManagerPool " + eResourceName );
+			Debug.LogError( "ManagerPool " + eResourceName + "Not Found Resources : " + eResourceName );
 			return null;
 		}
 

@@ -22,8 +22,10 @@ public interface IInventory<Class_Data, Class_Slot>
 	where Class_Data : IInventoryData<Class_Data>
 	where Class_Slot : IInventorySlot<Class_Slot, Class_Data>
 {
-	void IInventory_OnClickSlot( Class_Slot IInventorySlot );
-	void IInventory_RefreshData( );
+    void IInventory_OnClickSlot(Class_Slot pInventorySlot);
+    void IInventory_OnPressSlot(Class_Slot pInventorySlot, bool bPressDown);
+
+    void IInventory_RefreshData( );
 }
 
 public interface IInventorySlot<Class_Slot, Class_Data>
@@ -35,8 +37,9 @@ public interface IInventorySlot<Class_Slot, Class_Data>
 	void IInventorySlot_DoInit( IInventory<Class_Data, Class_Slot> pInventoryOwner );
 
 	void IInventorySlot_OnSetData( Class_Data pData, string strImageName );
-	void IInventorySlot_OnEnableSlot( bool bEnable );
+	void IInventorySlot_OnFillSlot( bool bEnable );
 	void IInventorySlot_OnClickSlot( bool bIsCurrentSelectedSlot );
+    void IInventorySlot_OnPressSlot(bool bIsCurrentSelectedSlot, bool bPressDown);
 }
 
 public interface IInventoryData<Class_Data>
@@ -73,7 +76,7 @@ public abstract class CInventoryBase<CLASS_Data, CLASS_Slot> : CSingletonMonoBas
 	/* private - Field declaration           */
 
 	private int _iMaxPage;	public int p_iMaxPage {  get { return _iMaxPage; } }
-	private int _iCurPage;  public int p_iCurPage { get { return _iCurPage; } }
+	private int _iCurPage = 1;  public int p_iCurPage { get { return _iCurPage; } }
 
 	private int _iMaxSlotCount;
 	private int _iTotalDataCount;
@@ -109,8 +112,21 @@ public abstract class CInventoryBase<CLASS_Data, CLASS_Slot> : CSingletonMonoBas
 		for (int i = 0; i < _listInventorySlot.Count; i++)
 			_listInventorySlot[i].IInventorySlot_OnClickSlot( _listInventorySlot[i] == pInventorySlot );
 	}
-	
-	public void IInventory_RefreshData()
+
+    public void IInventory_OnPressSlot(CLASS_Slot pInventorySlot, bool bPressDown)
+    {
+        if (pInventorySlot != null)
+        {
+            CLASS_Data pData = pInventorySlot.p_pInventoryData;
+            OnInventory_PressSlot(pInventorySlot, pData, bPressDown);
+        }
+
+        _mapInventorySlot.Values.ToList(_listInventorySlot);
+        for (int i = 0; i < _listInventorySlot.Count; i++)
+            _listInventorySlot[i].IInventorySlot_OnPressSlot(_listInventorySlot[i] == pInventorySlot, bPressDown);
+    }
+
+    public void IInventory_RefreshData()
 	{
 		_iTotalDataCount = GetInventoryData().Count;
 
@@ -123,11 +139,11 @@ public abstract class CInventoryBase<CLASS_Data, CLASS_Slot> : CSingletonMonoBas
 
 			case EInventoryType.Page:
 			case EInventoryType.Page_Auto:
-				ProcInit_InventoryData_Page( 1, eInventoryType == EInventoryType.Page_Auto );
+				ProcInit_InventoryData_Page( _iCurPage, eInventoryType == EInventoryType.Page_Auto );
 				break;
 		}
 
-		IInventory_OnClickSlot( null );
+		// IInventory_OnClickSlot( null );
 		OnInventory_RefreshInventoryData( GetInventoryData() );
 	}
 
@@ -143,7 +159,8 @@ public abstract class CInventoryBase<CLASS_Data, CLASS_Slot> : CSingletonMonoBas
 	abstract protected EInventoryType GetInventoryType();
 
 	virtual protected void OnInventory_ClickSlot( CLASS_Slot pInventorySlot, CLASS_Data pData ) { }
-	virtual protected void OnInventory_SetData( CLASS_Data sInfoData, CLASS_Slot pSlot ) { }
+    virtual protected void OnInventory_PressSlot(CLASS_Slot pInventorySlot, CLASS_Data pData, bool bPressDown) { }
+    virtual protected void OnInventory_SetData( CLASS_Slot pSlot, CLASS_Data pData ) { }
 	virtual protected void OnInventory_SetPage( int iCurPage, int iMaxPage ) { }
 	virtual protected void OnInventory_RefreshInventoryData( List<CLASS_Data> listData ) { }
 	
@@ -235,7 +252,7 @@ public abstract class CInventoryBase<CLASS_Data, CLASS_Slot> : CSingletonMonoBas
 
 				pSlot.EventOnAwake();
 				pSlot.IInventorySlot_DoInit( pInventory );
-				pSlot.IInventorySlot_OnEnableSlot( false );
+				pSlot.IInventorySlot_OnFillSlot( false );
 			}
 		}
 
@@ -250,12 +267,12 @@ public abstract class CInventoryBase<CLASS_Data, CLASS_Slot> : CSingletonMonoBas
 			CLASS_Data sInfoData = null;
 			CLASS_Slot pSlot = _mapInventorySlot[i];
 			bool bContains_InventoryData = i < iCount_InventoryData;
-			pSlot.IInventorySlot_OnEnableSlot( bContains_InventoryData );
+			pSlot.IInventorySlot_OnFillSlot( bContains_InventoryData );
 			if (bContains_InventoryData)
 			{
 				sInfoData = listInventoryData[i];
 				pSlot.IInventorySlot_OnSetData(sInfoData, sInfoData.IInventoryData_GetImageName());
-				OnInventory_SetData(sInfoData, pSlot);
+				OnInventory_SetData(pSlot, sInfoData);
 			}
 			else
 			{
@@ -264,18 +281,17 @@ public abstract class CInventoryBase<CLASS_Data, CLASS_Slot> : CSingletonMonoBas
 		}
 	}
 
-	private void ProcInit_InventoryData_Page( int iPage, bool bPageAuto = false )
+    List<CLASS_Data> _listNote = new List<CLASS_Data>();
+    private void ProcInit_InventoryData_Page( int iPage, bool bPageAuto = false )
 	{
-		if (bPageAuto)
-			ProcInit_Page_Auto();
-
 		int iPrev_PageSlotCount = Mathf.Max( 0, iPage - 1 ) * _iMaxSlotCount;
 		int iNext_PageSlotCount = iPage * _iMaxSlotCount;
 
 		List<CLASS_Data> listInventoryData = GetInventoryData();
-		List<CLASS_Data> listInventoryData_Page = new List<CLASS_Data>();
+        List<CLASS_Data> listInventoryData_Page = _listNote;
+        listInventoryData_Page.Clear();
 
-		for (int i = iPrev_PageSlotCount; i <= iNext_PageSlotCount; i++)
+        for (int i = iPrev_PageSlotCount; i <= iNext_PageSlotCount; i++)
 		{
 			if (i < _iTotalDataCount)
 			{
@@ -287,18 +303,20 @@ public abstract class CInventoryBase<CLASS_Data, CLASS_Slot> : CSingletonMonoBas
 		}
 
 		ProcInit_InventoryData( listInventoryData_Page );
-		OnInventory_SetPage( iPage, _iMaxPage );
-
+        OnInventory_SetPage( iPage, _iMaxPage );
 		_iCurPage = iPage;
-	}
 
-	/* private - Other[Find, Calculate] Func 
+        if (bPageAuto)
+            ProcInit_Page_Auto();
+    }
+
+    /* private - Other[Find, Calculate] Func 
        찾기, 계산등 단순 로직(Simpe logic)         */
 
-	private int GetPageClamped( int iPage )
+    private int GetPageClamped( int iPage )
 	{
 		return Mathf.Clamp( iPage, 1, _iMaxPage );
 	}
 
-	#endregion Private
+    #endregion Private
 }

@@ -71,9 +71,9 @@ public class Inventory_Slot_Equip : CUGUIInventorySlot<Inventory_Slot_Equip, Inv
 		//_pGoImage_Rune = GetGameObject( EImage.Image_Rune );
 	}
 
-	protected override bool OnSetDataOrNull_And_CheckHasData( Inventory_Item.SDataInventory pData )
+	protected override bool OnSetDataOrNull_And_CheckIsValidData( Inventory_Item.SDataInventory pData )
 	{
-		base.OnSetDataOrNull_And_CheckHasData( pData );
+		base.OnSetDataOrNull_And_CheckIsValidData( pData );
 
 		bool bExistNewData = pData != null;
 		bool bExistAlreadyData = p_pInventoryData != null;

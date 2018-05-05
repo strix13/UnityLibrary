@@ -6,11 +6,9 @@ using NUnit.Framework;
 public class Test_PrimitiveHelper
 {
 	[Test]
-	[Repeat( 10 )]
-	static public void Test_IntExtension_CutDigitString_Number()
+    [Category("StrixLibrary")]
+    static public void Test_IntExtension_CutDigitString_Number([Random(1000, 10000, 10)] int iTestNum)
 	{
-		Random pRandom = new Random();
-		int iTestNum = pRandom.Next( 1000, 10000000 );
 		System.Text.StringBuilder pStrBuilder = new System.Text.StringBuilder();
 		List<int> listTest = iTestNum.CutDigitString_Number();
 		for (int i = 0; i < listTest.Count; i++)
@@ -20,11 +18,9 @@ public class Test_PrimitiveHelper
 	}
 
 	[Test]
-	[Repeat( 10 )]
-	static public void Test_IntExtension_CutDigitString()
+    [Category("StrixLibrary")]
+    static public void Test_IntExtension_CutDigitString([Random(1000, 10000000, 10)] int iTestNum)
 	{
-		Random pRandom = new Random();
-		int iTestNum = pRandom.Next( 1000, 10000000 );
 		System.Text.StringBuilder pStrBuilder = new System.Text.StringBuilder();
 		List<string> listTest = iTestNum.CutDigitString();
 		for (int i = 0; i < listTest.Count; i++)
@@ -34,11 +30,9 @@ public class Test_PrimitiveHelper
 	}
 
 	[Test]
-	[Repeat( 10 )]
-	static public void Test_IntExtension_CutDigitString_WithComma()
+    [Category("StrixLibrary")]
+    static public void Test_IntExtension_CutDigitString_WithComma([Random(1000, 10000000, 10)] int iTestNum)
 	{
-		Random pRandom = new Random();
-		int iTestNum = pRandom.Next( 1000, 10000000 );
 		System.Text.StringBuilder pStrBuilder = new System.Text.StringBuilder();
 		List<string> listTest = iTestNum.CutDigitString_WithComma();
 		for (int i = 0; i < listTest.Count; i++)
@@ -55,7 +49,8 @@ public class Test_PrimitiveHelper
 
 	[Test]
 	[Repeat(10)]
-	static public void Test_FloatExtension_IsSimilar()
+    [Category("StrixLibrary")]
+    static public void Test_FloatExtension_IsSimilar()
 	{
 		Random pRandom = new Random();
 		float fTestNum = (float)pRandom.NextDouble();

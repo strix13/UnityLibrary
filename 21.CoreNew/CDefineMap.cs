@@ -36,7 +36,7 @@ public class SDBInfoBase
 }
 
 [System.Serializable]
-public class SGameData
+public class SAppConfig
 {
 	public string strKey;
 	public string strValue;
@@ -45,7 +45,7 @@ public class SGameData
 	static private Dictionary<string, int> _mapDataConfig_Int = new Dictionary<string, int>();
 	static private Dictionary<string, float> _mapDataConfig_Float = new Dictionary<string, float>();
 
-	static public void SetData( SGameData[] arrData )
+	static public void SetData( SAppConfig[] arrData )
 	{
 		if (arrData == null)
 		{

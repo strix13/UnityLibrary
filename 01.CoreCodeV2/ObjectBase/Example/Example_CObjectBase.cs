@@ -12,8 +12,11 @@
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+
+#if UNITY_EDITOR
 using UnityEngine.TestTools;
 using UnityEngine.Assertions;
+#endif
 
 public class Example_CObjectBase : CObjectBase
 {
