@@ -93,6 +93,8 @@ public class CSingletonDynamicMonoBase<CLASS_SingletoneTarget> : CObjectBase
     {
         _instance = null;
         _bIsExcuteAwake = false;
+
+        OnReleaseSingleton();
     }
 
     private void OnApplicationQuit()

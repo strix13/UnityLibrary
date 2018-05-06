@@ -128,7 +128,7 @@ public class CObjectBase : MonoBehaviour, IUpdateAble
 #region Test
 #if UNITY_EDITOR
 
-public class Test_CObjectBase : CObjectBase
+public class CObjectBase_테스트 : CObjectBase
 {
     [GetComponent]
     [HideInInspector]
@@ -143,7 +143,7 @@ public class Test_CObjectBase : CObjectBase
     public IEnumerator Test_ObjectBase_GetComponent_Attribute()
     {
         GameObject pObjectNew = new GameObject();
-        Test_CObjectBase pTarget = pObjectNew.AddComponent<Test_CObjectBase>();
+        CObjectBase_테스트 pTarget = pObjectNew.AddComponent<CObjectBase_테스트>();
         pTarget.EventOnAwake();
 
         yield return null;
@@ -156,9 +156,9 @@ public class Test_CObjectBase : CObjectBase
     public IEnumerator Test_ObjectBase_GetComponentInChildren_Attribute()
     {
         GameObject pObjectNew = new GameObject();
-        Test_CObjectBase pTargetParents = pObjectNew.AddComponent<Test_CObjectBase>();
+        CObjectBase_테스트 pTargetParents = pObjectNew.AddComponent<CObjectBase_테스트>();
 
-        Test_CObjectBase pTarget = pObjectNew.AddComponent<Test_CObjectBase>();
+        CObjectBase_테스트 pTarget = pObjectNew.AddComponent<CObjectBase_테스트>();
         pTarget.transform.SetParent(pTargetParents.transform);
         pTarget.EventOnAwake();
 

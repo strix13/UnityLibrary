@@ -59,7 +59,7 @@ public class CManagerObjectScroll : CObjectBase
 
 	static public void DoClearPoolingObject()
 	{
-		CManagerPooling<string, CScrollObject>.DoClearPoolingObject();
+		CManagerPooling<string, CScrollObject>.instance.DoPushAll();
 	}
 
 	public void DoResetScroll()
@@ -148,8 +148,8 @@ public class CManagerObjectScroll : CObjectBase
 		int iInstanceID = GetInstanceID();
 		//CManagerRandomTable<CScrollObject>.instance[iInstanceID].DoClearRandomItemTable();
 		//CManagerRandomTable<CScrollObject>.instance[iInstanceID].DoAddRandomItem_Range( _listScrollObject_Origin );
-		CManagerPooling<string, CScrollObject>.DoInitPoolingObject( listObject );
-		CManagerPooling<string, CScrollObject>.instance.DoStartPooling( p_iPoolingCount, transform );
+		CManagerPooling<string, CScrollObject>.instance.DoInitPoolingObject( listObject );
+		CManagerPooling<string, CScrollObject>.instance.DoStartPooling( p_iPoolingCount );
 
 		for (int i = 0; i < _listScrollObject_Origin.Count; i++)
 			_listScrollObject_Origin[i].SetActive( false );

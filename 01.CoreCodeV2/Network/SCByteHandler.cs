@@ -15,8 +15,14 @@
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
+using System;
 
-public static class SCByteHandler
+#if UNITY_EDITOR
+using NUnit.Framework;
+#endif
+
+public static class SCByteHelper
 {
 	static public int ConvertByte_To_Int( byte byteTarget, int iBitIndexFinish = 8, int iBitIndexStart = 0)
 	{
@@ -43,4 +49,57 @@ public static class SCByteHandler
 
 		return arrBit;
 	}
+
+    static public byte[] ConvertByteArray<Packet>(Packet pObject)
+    {
+        int iPacketSize = Marshal.SizeOf(pObject);
+        IntPtr pBuffer = Marshal.AllocHGlobal(iPacketSize);
+        Marshal.StructureToPtr(pObject, pBuffer, false);
+        byte[] arrData = new byte[iPacketSize];
+        Marshal.Copy(pBuffer, arrData, 0, iPacketSize);
+        Marshal.FreeHGlobal(pBuffer);
+
+        return arrData;
+    }
+
+
+    static public bool Convert_ToStruct<Packet>(this byte[] arrData, out Packet pObjectType)
+    {
+        return ConvertPacket(arrData, out pObjectType);
+    }
+
+    static public bool ConvertPacket<Packet>(byte[] arrData, out Packet pObjectType)
+    {
+        pObjectType = default(Packet);
+        int iPacketSize = Marshal.SizeOf(typeof(Packet));
+        if (iPacketSize > arrData.Length)
+            return false;
+
+        IntPtr pBuffer = Marshal.AllocHGlobal(iPacketSize);
+        Marshal.Copy(arrData, 0, pBuffer, iPacketSize);
+        pObjectType = (Packet)Marshal.PtrToStructure(pBuffer, typeof(Packet));
+        Marshal.FreeHGlobal(pBuffer);
+
+        return true;
+    }
 }
+
+#if UNITY_EDITOR
+public class 바이트핸들러_테스트
+{
+    public enum ETest
+    {
+        ETest1
+    }
+
+    [Test]
+    [Category("StrixLibrary")]
+    static public void 바이트_To_BitArray()
+    {
+        Assert.IsTrue(SCByteHelper.ConvertByte_To_Int(1) == 1);
+        Assert.IsTrue(SCByteHelper.ConvertByte_To_Int(1, 8, 1) == 0);
+        Assert.IsTrue(SCByteHelper.ConvertByte_To_Int(2, 8, 0) == 2);
+        Assert.IsTrue(SCByteHelper.ConvertByte_To_Int(127, 8, 2) == (127 - 3));
+    }
+}
+#endif

@@ -85,7 +85,7 @@ abstract public class CManagerUGUIBase<Class_Instance, Enum_Panel_Name> : CManag
 
 #region Test
 #if UNITY_EDITOR
-public class UGUI매니져테스트 : CManagerUGUIBase<UGUI매니져테스트, UGUI매니져테스트.EUIPanel>
+public class UGUI_매니져_테스트 : CManagerUGUIBase<UGUI_매니져_테스트, UGUI_매니져_테스트.EUIPanel>
 {
     const float const_fShowAnimation_DurationSec = 0.1f;
 
@@ -113,7 +113,7 @@ public class UGUI매니져테스트 : CManagerUGUIBase<UGUI매니져테스트, U
         pPanelTest.transform.SetParent(pObjectManager.transform);
         pPanelTest2.transform.SetParent(pObjectManager.transform);
 
-        UGUI매니져테스트 pManager = pObjectManager.AddComponent<UGUI매니져테스트>();
+        UGUI_매니져_테스트 pManager = pObjectManager.AddComponent<UGUI_매니져_테스트>();
         yield return null;
 
         Assert.AreEqual(pPanelTest.gameObject.activeSelf, true);

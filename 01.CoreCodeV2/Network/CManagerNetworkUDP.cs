@@ -61,7 +61,7 @@ abstract public class CManagerNetworkUDPBase<Class_Derived> : CSingletonMonoBase
     public void DoSendPacket_UDP<Packet>(string strIP, int iPort, Packet pPacket)
     {
         IPEndPoint pSendIP = new IPEndPoint(IPAddress.Parse(strIP), iPort);
-        byte[] arrData = ConvertByteArray(pPacket);
+        byte[] arrData = SCByteHelper.ConvertByteArray(pPacket);
 
         _pClientUDP_Send.Send(arrData, arrData.Length, pSendIP);
     }
@@ -102,33 +102,6 @@ abstract public class CManagerNetworkUDPBase<Class_Derived> : CSingletonMonoBase
         }
     }
 
-    public byte[] ConvertByteArray<Packet>(Packet pObject)
-    {
-        int iPacketSize = Marshal.SizeOf(pObject);
-        IntPtr pBuffer = Marshal.AllocHGlobal(iPacketSize);
-        Marshal.StructureToPtr(pObject, pBuffer, false);
-        byte[] arrData = new byte[iPacketSize];
-        Marshal.Copy(pBuffer, arrData, 0, iPacketSize);
-        Marshal.FreeHGlobal(pBuffer);
-
-        return arrData;
-    }
-
-    public bool ConvertPacket<Packet>(byte[] arrData, out Packet pObjectType)
-    {
-        pObjectType = default(Packet);
-        int iPacketSize = Marshal.SizeOf(typeof(Packet));
-        if (iPacketSize > arrData.Length)
-            return false;
-
-        IntPtr pBuffer = Marshal.AllocHGlobal(iPacketSize);
-        Marshal.Copy(arrData, 0, pBuffer, iPacketSize);
-        pObjectType = (Packet)Marshal.PtrToStructure(pBuffer, typeof(Packet));
-        Marshal.FreeHGlobal(pBuffer);
-
-        return true;
-    }
-
     public byte[] DequeuePacket_OrNull(int iDataSize)
     {
         return _pRecvBuffer.Dequeue_OrNull(iDataSize);
@@ -156,7 +129,7 @@ abstract public class CManagerNetworkUDPBase<Class_Derived> : CSingletonMonoBase
 #region Test
 #if UNITY_EDITOR
 
-public class CManagerNetworkUDPTest : CManagerNetworkUDPBase<CManagerNetworkUDPTest>
+public class 네트워크_UDP_테스트 : CManagerNetworkUDPBase<네트워크_UDP_테스트>
 {
     [System.Serializable]
     [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode, Pack = 1)]
@@ -183,12 +156,12 @@ public class CManagerNetworkUDPTest : CManagerNetworkUDPBase<CManagerNetworkUDPT
         bIsStackPacket = false;
         bIsRecievePacket = true;
         SPacketTest pPacket;
-        CManagerNetworkUDPTest.instance.ConvertPacket(arrRecieveData, out pPacket);
+        SCByteHelper.ConvertPacket(arrRecieveData, out pPacket);
 
         if (pPacket.iValue == 1)
         {
             pPacketCheckRecieve = pPacket;
-            CManagerNetworkUDPTest.instance.DoSendPacket_UDP(strTestTargetIP, iTestPort, new SPacketTest(2, "받았다"));
+            네트워크_UDP_테스트.instance.DoSendPacket_UDP(strTestTargetIP, iTestPort, new SPacketTest(2, "받았다"));
         }
     }
 
@@ -201,8 +174,8 @@ public class CManagerNetworkUDPTest : CManagerNetworkUDPBase<CManagerNetworkUDPT
 
         Assert.AreNotEqual(pPacket1, pPacket2);
 
-        byte[] arrData = ConvertByteArray(pPacket1);
-        ConvertPacket(arrData, out pPacket2);
+        byte[] arrData = SCByteHelper.ConvertByteArray(pPacket1);
+        SCByteHelper.ConvertPacket(arrData, out pPacket2);
 
         Assert.AreEqual(pPacket1, pPacket2);
 
@@ -223,8 +196,8 @@ public class CManagerNetworkUDPTest : CManagerNetworkUDPBase<CManagerNetworkUDPT
         pPacketCheckRecieve = SPacketTest.Dummy();
         Assert.AreEqual(pPacketCheckRecieve, SPacketTest.Dummy());
 
-        CManagerNetworkUDPTest.EventMakeSingleton();
-        CManagerNetworkUDPTest.instance.DoStartListen_UDP(iTestPort);
+        네트워크_UDP_테스트.EventMakeSingleton();
+        네트워크_UDP_테스트.instance.DoStartListen_UDP(iTestPort);
 
         bIsRecievePacket = false;
         SPacketTest pSendPacket = new SPacketTest(1, "보냈다");
@@ -233,7 +206,7 @@ public class CManagerNetworkUDPTest : CManagerNetworkUDPBase<CManagerNetworkUDPT
         Assert.AreNotEqual(pPacketCheckRecieve.iValue, pSendPacket.iValue);
         Assert.AreNotEqual(pPacketCheckRecieve.strValue, pSendPacket.strValue);
 
-        CManagerNetworkUDPTest.instance.DoSendPacket_UDP(strTestTargetIP, iTestPort, new SPacketTest(1, "보냈다"));
+        네트워크_UDP_테스트.instance.DoSendPacket_UDP(strTestTargetIP, iTestPort, new SPacketTest(1, "보냈다"));
         while (bIsRecievePacket == false)
         {
             yield return null;
@@ -251,7 +224,7 @@ public class CManagerNetworkUDPTest : CManagerNetworkUDPBase<CManagerNetworkUDPT
         SPacketTest pPacketTest = new SPacketTest(1, "인큐_디큐_테스트");
         SPacketTest pPacketTest2 = new SPacketTest(2, "더미데이터");
 
-        byte[] arrPacketData = ConvertByteArray(pPacketTest);
+        byte[] arrPacketData = SCByteHelper.ConvertByteArray(pPacketTest);
         int iDataSize = arrPacketData.Length;
 
         _pRecvBuffer.Enqueue(arrPacketData);
@@ -260,7 +233,7 @@ public class CManagerNetworkUDPTest : CManagerNetworkUDPBase<CManagerNetworkUDPT
         Assert.AreNotEqual(pPacketTest.strValue, pPacketTest2.strValue);
 
         byte[] arrPacketData2 = _pRecvBuffer.Dequeue_OrNull(iDataSize);
-        ConvertPacket(arrPacketData2, out pPacketTest2);
+        arrPacketData2.Convert_ToStruct(out pPacketTest2);
 
         Assert.AreEqual(pPacketTest.iValue, pPacketTest2.iValue);
         Assert.AreEqual(pPacketTest.strValue, pPacketTest2.strValue);
@@ -287,8 +260,8 @@ public class CManagerNetworkUDPTest : CManagerNetworkUDPBase<CManagerNetworkUDPT
         pPacketCheckRecieve = SPacketTest.Dummy();
         Assert.AreEqual(pPacketCheckRecieve, SPacketTest.Dummy());
 
-        CManagerNetworkUDPTest.EventMakeSingleton();
-        CManagerNetworkUDPTest.instance.DoStartListen_UDP(iTestPort);
+        네트워크_UDP_테스트.EventMakeSingleton();
+        네트워크_UDP_테스트.instance.DoStartListen_UDP(iTestPort);
 
         bIsRecievePacket = false;
         SPacketTest pSendPacket = new SPacketTest(1, "보냈다");
@@ -297,7 +270,7 @@ public class CManagerNetworkUDPTest : CManagerNetworkUDPBase<CManagerNetworkUDPT
         Assert.AreNotEqual(pPacketCheckRecieve.iValue, pSendPacket.iValue);
         Assert.AreNotEqual(pPacketCheckRecieve.strValue, pSendPacket.strValue);
 
-        CManagerNetworkUDPTest.instance.DoSendPacket_UDP(strTestTargetIP, iTestPort, new SPacketTest(1, "보냈다"));
+        네트워크_UDP_테스트.instance.DoSendPacket_UDP(strTestTargetIP, iTestPort, new SPacketTest(1, "보냈다"));
         while (bIsRecievePacket == false)
         {
             yield return null;

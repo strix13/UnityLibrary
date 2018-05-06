@@ -77,11 +77,9 @@ public struct StringPair
 }
 
 [RequireComponent( typeof( CCompoDontDestroyObj ) )]
-public class CManagerFrameWorkBase<CLASS_Framework, ENUM_Scene_Name, ENUM_Sound_Name, ENUM_DataField, CLASS_SoundPlayer> : CSingletonMonoBase<CLASS_Framework>
-	where CLASS_Framework : CManagerFrameWorkBase<CLASS_Framework, ENUM_Scene_Name, ENUM_Sound_Name, ENUM_DataField, CLASS_SoundPlayer>
-	where ENUM_Sound_Name : System.IFormattable, System.IConvertible, System.IComparable
+public class CManagerFrameWorkBase<CLASS_Framework, ENUM_Scene_Name, ENUM_DataField> : CSingletonMonoBase<CLASS_Framework>
+	where CLASS_Framework : CManagerFrameWorkBase<CLASS_Framework, ENUM_Scene_Name, ENUM_DataField>
 	where ENUM_Scene_Name : System.IFormattable, System.IConvertible, System.IComparable
-	where CLASS_SoundPlayer : CSoundPlayerBase<ENUM_Sound_Name>
 	where ENUM_DataField : System.IFormattable, System.IConvertible, System.IComparable
 {
 	private const string const_strLocalPath_INI = "INI";
@@ -106,7 +104,6 @@ public class CManagerFrameWorkBase<CLASS_Framework, ENUM_Scene_Name, ENUM_Sound_
 	// ===================================== //
 
 	static public CManagerNetworkDB_Project p_pNetworkDB { get { return CManagerNetworkDB_Project.instance; } }
-	static public SCManagerSound<ENUM_Sound_Name> p_pManagerSound { get { return _pManagerSound; } }
 	static public SCSceneLoader<ENUM_Scene_Name> p_pManagerScene { get { return _pManagerScene; } }
 	static public SCManagerParserJson p_pManagerJsonINI { get { return _pJsonParser_Persistent; } }
 
@@ -145,7 +142,6 @@ public class CManagerFrameWorkBase<CLASS_Framework, ENUM_Scene_Name, ENUM_Sound_
 	// private - Variable declaration        //
 	// ===================================== //
 
-	static protected SCManagerSound<ENUM_Sound_Name> _pManagerSound;
 	static protected SCSceneLoader<ENUM_Scene_Name> _pManagerScene;
 	static protected SCManagerParserJson _pJsonParser_Persistent;
 	static protected SCManagerParserJson _pJsonParser_StreammingAssets;
@@ -494,17 +490,7 @@ public class CManagerFrameWorkBase<CLASS_Framework, ENUM_Scene_Name, ENUM_Sound_
 
 		//System.GC.Collect(System.GC.GetGeneration(this), System.GCCollectionMode.Optimized);
 	}
-
-	public void EventOnSlotPlayClip( CSoundSlot pSlot )
-	{
-		_pManagerSound.EventOnSlotPlayClip( pSlot );
-	}
-
-	public void EventOnSlotFinishClip( CSoundSlot pSlot )
-	{
-		_pManagerSound.EventOnSlotFinishClip( pSlot );
-	}
-
+    
 	public void EventCall_OnFinishLoadScene()
 	{
 		if (p_EVENT_OnFinishLoadScene == null) return;
@@ -539,7 +525,6 @@ public class CManagerFrameWorkBase<CLASS_Framework, ENUM_Scene_Name, ENUM_Sound_
 
 		_pManagerScene = new SCSceneLoader<ENUM_Scene_Name>();
 		_pManagerScene.p_EVENT_OnSceneLoaded += ProcOnSceneLoaded;
-		_pManagerSound = SCManagerSound<ENUM_Sound_Name>.DoMakeInstance( this, "Sound", EResourcePath.Resources );
 
 		ProcParse_UserSetting();
 
@@ -567,8 +552,8 @@ public class CManagerFrameWorkBase<CLASS_Framework, ENUM_Scene_Name, ENUM_Sound_
 			_pJsonParser_Persistent.DoWriteJson( EINI_JSON_FileName.UserSetting, _pSetting_User );
 		}
 
-		_pManagerSound.DoSetVolumeEffect( _pSetting_User.fVolumeEffect );
-		_pManagerSound.DoSetVolumeBGM( _pSetting_User.fVolumeBGM );
+        CManagerSound.instance.DoSetVolumeEffect( _pSetting_User.fVolumeEffect );
+        CManagerSound.instance.DoSetVolumeBGM( _pSetting_User.fVolumeBGM );
 	}
 
 	private void CUIManagerLocalize_p_EVENT_OnChangeLocalize()
@@ -675,28 +660,27 @@ public class CManagerFrameWorkBase<CLASS_Framework, ENUM_Scene_Name, ENUM_Sound_
 	private void OnParseComplete_SoundSetting( bool bSuccess, SINI_Sound[] arrSound )
 	{
 		if (bSuccess)
-			_pManagerSound.EventSetINI( arrSound, _pSetting_User.fVolumeEffect, _pSetting_User.eVolumeOff );
+            CManagerSound.instance.EventSetSoundOption( arrSound, _pSetting_User.fVolumeEffect, _pSetting_User.eVolumeOff );
+//		ENUM_Sound_Name[] arrSoundName = PrimitiveHelper.GetEnumArray<ENUM_Sound_Name>();
+//#if UNITY_EDITOR
+//		if (arrSound == null || arrSound.Length < arrSoundName.Length)
+//		{
+//			Debug.Log( "Sound INI의 내용과 Enum SoundName과 길이가 맞지 않아 재조정" );
 
-		ENUM_Sound_Name[] arrSoundName = PrimitiveHelper.GetEnumArray<ENUM_Sound_Name>();
-#if UNITY_EDITOR
-		if (arrSound == null || arrSound.Length < arrSoundName.Length)
-		{
-			Debug.Log( "Sound INI의 내용과 Enum SoundName과 길이가 맞지 않아 재조정" );
+//			List<SINI_Sound> listINISound = arrSound == null ? new List<SINI_Sound>() : arrSound.ToList();
+//			Dictionary<string, SINI_Sound> mapINISound = new Dictionary<string, SINI_Sound>();
+//			mapINISound.DoAddItem( arrSound );
 
-			List<SINI_Sound> listINISound = arrSound == null ? new List<SINI_Sound>() : arrSound.ToList();
-			Dictionary<string, SINI_Sound> mapINISound = new Dictionary<string, SINI_Sound>();
-			mapINISound.DoAddItem( arrSound );
+//			for (int i = 0; i < arrSoundName.Length; i++)
+//			{
+//				string strSoundName = arrSoundName[i].ToString();
+//				if (mapINISound.ContainsKey( strSoundName ) == false)
+//					listINISound.Add( new SINI_Sound( strSoundName, 0.5f ) );
+//			}
 
-			for (int i = 0; i < arrSoundName.Length; i++)
-			{
-				string strSoundName = arrSoundName[i].ToString();
-				if (mapINISound.ContainsKey( strSoundName ) == false)
-					listINISound.Add( new SINI_Sound( strSoundName, 0.5f ) );
-			}
-
-			_pJsonParser_StreammingAssets.DoWriteJsonArray( EINI_JSON_FileName.Sound, listINISound.ToArray() );
-		}
-#endif
+//			_pJsonParser_StreammingAssets.DoWriteJsonArray( EINI_JSON_FileName.Sound, listINISound.ToArray() );
+//		}
+//#endif
 
 		CheckLoadFinish_LocalDataAll();
 	}

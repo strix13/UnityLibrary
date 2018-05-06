@@ -223,7 +223,7 @@ public class CircularBuffer<T> : ICircularBuffer<T>, IEnumerable<T>
 #region Test
 #if UNITY_EDITOR
 
-public class 환형큐테스트
+public class 환형큐_테스트
 {
     [Test]
     public void TestOverwrite()

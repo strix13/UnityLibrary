@@ -302,7 +302,7 @@ public class CManagerRandomTable<CLASS_Resource>
 #region Test
 #if UNITY_EDITOR
 
-public class Test_CManagerRandomTable
+public class 랜덤테이블_테스트
 {
     public enum EItemGrade
     {

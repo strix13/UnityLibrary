@@ -465,10 +465,8 @@ public struct SHangulChar
 
 #region Test
 #if UNITY_EDITOR
-public class SHangulTest
+public class 한글파서_테스트
 {
-
-
     [Test]
     [Category("StrixLibrary")]
     public void 한글컨버팅_테스트()

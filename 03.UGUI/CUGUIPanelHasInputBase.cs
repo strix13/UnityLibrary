@@ -257,7 +257,7 @@ abstract public class CUGUIPanelHasInputBase<Enum_InputName> : CUGUIPanelBase, I
 
 #region Test
 #if UNITY_EDITOR
-public class UGUI인풋패널테스트 : CUGUIPanelHasInputBase<UGUI인풋패널테스트.EInput>
+public class UGUI_인풋패널_테스트 : CUGUIPanelHasInputBase<UGUI_인풋패널_테스트.EInput>
 {
     public enum EInput
     {
@@ -269,7 +269,7 @@ public class UGUI인풋패널테스트 : CUGUIPanelHasInputBase<UGUI인풋패널
     public IEnumerator 인풋입력테스트()
     {
         EventSystem.current = new GameObject().AddComponent<EventSystem>();
-        UGUI인풋패널테스트 pTestPanel = new GameObject().AddComponent<UGUI인풋패널테스트>();
+        UGUI_인풋패널_테스트 pTestPanel = new GameObject().AddComponent<UGUI_인풋패널_테스트>();
         Button pButtonTest = new GameObject(EInput.Button_Test.ToString()).AddComponent<Button>();
         Button pButtonTest2 = new GameObject(EInput.Button_Test2.ToString()).AddComponent<Button>();
 
