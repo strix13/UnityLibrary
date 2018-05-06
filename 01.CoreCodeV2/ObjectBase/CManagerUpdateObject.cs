@@ -32,22 +32,10 @@ public class CManagerUpdateObject : CSingletonDynamicMonoBase<CManagerUpdateObje
 
     private List<IUpdateAble> _listObject = new List<IUpdateAble>();
 
-#if UNITY_EDITOR
-    private bool _bUpdateObjectName = true;
-    private string _strOriginName;
-#endif
-
     // ========================================================================== //
 
     /* public - [Do] Function
      * 외부 객체가 호출(For External class call)*/
-
-    public void DoSet_UpdateObjectName(bool bUpdate)
-    {
-#if UNITY_EDITOR
-        _bUpdateObjectName = bUpdate;
-#endif
-    }
 
     public void DoAddObject(IUpdateAble pObject)
     {
@@ -63,24 +51,19 @@ public class CManagerUpdateObject : CSingletonDynamicMonoBase<CManagerUpdateObje
 
     /* protected - Override & Unity API         */
 
-    protected override void OnAwake()
+    protected override IEnumerator OnEnableObjectCoroutine()
     {
-        base.OnAwake();
+        while(true)
+        {
+            for (int i = 0; i < _listObject.Count; i++)
+                _listObject[i].OnUpdate();
 
 #if UNITY_EDITOR
-        _strOriginName = GetType().Name;
+            name = string.Format("업데이트 매니져/{0}개 업데이트중", _listObject.Count - 1); // 한개는 자기 자신이기때문에 깎는다.
 #endif
-    }
 
-    private void Update()
-    {
-        for (int i = 0; i < _listObject.Count; i++)
-            _listObject[i].OnUpdate();
-
-#if UNITY_EDITOR
-        if(_bUpdateObjectName)
-            name = string.Format("{0} - Count : {1}", _strOriginName, _listObject.Count - 1); // 한개는 자기 자신이기때문에 깎는다.
-#endif
+            yield return null;
+        }
     }
 
     /* protected - [abstract & virtual]         */

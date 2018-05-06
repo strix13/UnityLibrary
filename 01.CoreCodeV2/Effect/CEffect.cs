@@ -9,9 +9,7 @@ using System.Collections.Generic;
    Edit Log    : 
    ============================================ */
 
-abstract public class CEffectBase<CLASS_EFFECT, ENUM_EFFECT_NAME> : CObjectBase
-	where CLASS_EFFECT : CEffectBase<CLASS_EFFECT, ENUM_EFFECT_NAME>
-	where ENUM_EFFECT_NAME : System.IConvertible, System.IComparable
+public class CEffect : CObjectBase
 {
 	/* const & readonly declaration             */
 
@@ -24,26 +22,30 @@ abstract public class CEffectBase<CLASS_EFFECT, ENUM_EFFECT_NAME> : CObjectBase
 		Spine,
 	}
 
-	/* public - Variable declaration            */
+    /* public - Variable declaration            */
 
-	public delegate void OnEventEffect( ENUM_EFFECT_NAME eEffect, CLASS_EFFECT pEffect, bool bEffectIsPlay);
+    public delegate void OnEventEffect(string strEffect, CEffect pEffect, bool bEffectIsPlay);
 
-	public event OnEventEffect p_Event_Effect_OnPlayStop;
+    public event OnEventEffect p_Event_Effect_OnPlayStop;
+    public event System.Action<CEffect> p_Event_Effect_OnDisable;
 
-	/* protected - Variable declaration         */
+    [Header("이펙트 끝날때 이벤트")]
+    public UnityEngine.Events.UnityEvent p_listEvent_FinishEffect = new UnityEngine.Events.UnityEvent();
 
-	protected EEffectType _eEffectType = EEffectType.None;
+    [Rename_Inspector("이펙트 이름", false)]
+    public string _strEffectName;
 
-	/* private - Variable declaration           */
-	[SerializeField]
-	private ENUM_EFFECT_NAME _eEffectName; public ENUM_EFFECT_NAME p_eEffectName { get { return _eEffectName; } set { _eEffectName = value; } }
+    /* protected - Variable declaration         */
 
-	private CLASS_EFFECT _pInstance;
+    protected EEffectType _eEffectType = EEffectType.None;
+
+    /* private - Variable declaration           */
+
 	private ParticleSystem _pParticleSystem;
 #if NGUI
 	private CUI2DSpriteAnimation _p2DSpriteAnimation;
 #endif
-	private System.Action _OnFinishEffect;
+	private System.Action _OnFinishEffect_OneShot;
 
 	// ========================================================================== //
 
@@ -54,35 +56,35 @@ abstract public class CEffectBase<CLASS_EFFECT, ENUM_EFFECT_NAME> : CObjectBase
 	{
         transform.SetParent( pTransParents );
 		Vector3 vecLocalPos = Vector3.zero;
-		OnPlayEffectBefore( _eEffectName, ref vecLocalPos );
+		OnPlayEffectBefore( _strEffectName, ref vecLocalPos );
 
         transform.localPosition = vecLocalPos;
         transform.localRotation = Quaternion.identity;
 
 		ProcPlayEffect();
 
-		OnPlayEffectAfter( _eEffectName );
+		OnPlayEffectAfter( _strEffectName );
 	}
 
 	public void DoPlayEffect( Vector3 V3Targetpos, System.Action OnFinishEffect = null )
 	{
-		OnPlayEffectBefore( _eEffectName, ref V3Targetpos );
+		OnPlayEffectBefore( _strEffectName, ref V3Targetpos );
 
-		_OnFinishEffect = OnFinishEffect;
+		_OnFinishEffect_OneShot = OnFinishEffect;
         transform.position = V3Targetpos;
 		ProcPlayEffect();
 
-		OnPlayEffectAfter( _eEffectName );
+		OnPlayEffectAfter( _strEffectName );
 	}
 	
 	public void DoPlayEffect( Transform pTransParents, Vector3 vecWorldPos )
 	{
         transform.SetParent( pTransParents );
-		OnPlayEffectBefore( _eEffectName, ref vecWorldPos );
+		OnPlayEffectBefore( _strEffectName, ref vecWorldPos );
         transform.position = vecWorldPos;
 		ProcPlayEffect();
 
-		OnPlayEffectAfter( _eEffectName );
+		OnPlayEffectAfter( _strEffectName );
 	}
 
 	/* public - [Event] Function             
@@ -91,15 +93,17 @@ abstract public class CEffectBase<CLASS_EFFECT, ENUM_EFFECT_NAME> : CObjectBase
 	public void DoResetEvent()
 	{
 		p_Event_Effect_OnPlayStop = null;
-	}
+        p_Event_Effect_OnDisable = null;
+
+    }
 
 	// ========================================================================== //
 
 	/* protected - [abstract & virtual]         */
 
 	virtual public void OnMakeEffect() { }
-	virtual protected void OnPlayEffectBefore( ENUM_EFFECT_NAME eEffectName, ref Vector3 V3Targetpos ) { }
-	virtual protected void OnPlayEffectAfter( ENUM_EFFECT_NAME eEffectName ) { }
+	virtual protected void OnPlayEffectBefore( string strEffectName, ref Vector3 V3Targetpos ) { }
+	virtual protected void OnPlayEffectAfter(string strEffectName ) { }
 
 	virtual protected void OnDefineEffect()
 	{
@@ -127,7 +131,7 @@ abstract public class CEffectBase<CLASS_EFFECT, ENUM_EFFECT_NAME> : CObjectBase
 		}
 
 		if (p_Event_Effect_OnPlayStop != null)
-			p_Event_Effect_OnPlayStop( _eEffectName, _pInstance, true );
+			p_Event_Effect_OnPlayStop( _strEffectName, this, true );
 	}
 
 	/* protected - [Event] Function           
@@ -139,7 +143,6 @@ abstract public class CEffectBase<CLASS_EFFECT, ENUM_EFFECT_NAME> : CObjectBase
 	{
 		base.OnAwake();
 
-		_pInstance = this as CLASS_EFFECT;
 		_pParticleSystem = GetComponentInChildren<ParticleSystem>();
 #if NGUI
 		_p2DSpriteAnimation = GetComponentInChildren<CUI2DSpriteAnimation>();
@@ -152,16 +155,18 @@ abstract public class CEffectBase<CLASS_EFFECT, ENUM_EFFECT_NAME> : CObjectBase
 	{
 		base.OnDisableObject();
 
-		DoResetEvent();
-		CManagerPooling<ENUM_EFFECT_NAME, CLASS_EFFECT>.instance.DoPush( _pInstance );
-	}
+        if(p_Event_Effect_OnDisable != null)
+            p_Event_Effect_OnDisable(this);
 
-	// ========================================================================== //
+        DoResetEvent();
+    }
 
-	/* private - [Proc] Function             
+    // ========================================================================== //
+
+    /* private - [Proc] Function             
        중요 로직을 처리                         */
 
-	private IEnumerator CoPlayParticleSystem()
+    private IEnumerator CoPlayParticleSystem()
 	{
 		if (_pParticleSystem.main.loop == false)
 		{
@@ -193,14 +198,16 @@ abstract public class CEffectBase<CLASS_EFFECT, ENUM_EFFECT_NAME> : CObjectBase
 	
 	private void ProcOnFinishEffect()
 	{
-		if (_OnFinishEffect != null)
+		if (_OnFinishEffect_OneShot != null)
 		{
-			_OnFinishEffect();
-			_OnFinishEffect = null;
+			_OnFinishEffect_OneShot();
+			_OnFinishEffect_OneShot = null;
 		}
 
-		if (p_Event_Effect_OnPlayStop != null)
-			p_Event_Effect_OnPlayStop( _eEffectName, _pInstance, false );
+        p_listEvent_FinishEffect.Invoke();
+
+        if (p_Event_Effect_OnPlayStop != null)
+			p_Event_Effect_OnPlayStop( _strEffectName, this, false );
 
 		gameObject.SetActive( false );
 	}

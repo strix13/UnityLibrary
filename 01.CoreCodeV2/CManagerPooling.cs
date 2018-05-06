@@ -14,7 +14,7 @@ using NUnit.Framework;
 using UnityEngine.TestTools;
 #endif
 
-public class CManagerPooling<ENUM_Resource_Name, Class_Resource> : CSingletonNotMonoBase<CManagerPooling<ENUM_Resource_Name, Class_Resource>>
+public class CManagerPooling<ENUM_Resource_Name, Class_Resource> : CSingletonNotMonoBase<CManagerPooling<ENUM_Resource_Name, Class_Resource>>, IUpdateAble
     where ENUM_Resource_Name : System.IComparable, System.IConvertible
     where Class_Resource : Component
 {
@@ -45,7 +45,7 @@ public class CManagerPooling<ENUM_Resource_Name, Class_Resource> : CSingletonNot
     public GameObject p_ObjectParents { get; private set; }
     private Transform _pTransManager { get { return p_ObjectParents.transform; } }
 
-    private string p_strManagerName { get { return string.Format("Pooling<{0}, {1}>({2}", typeof(ENUM_Resource_Name).Name, typeof(Class_Resource).Name, p_iPopCount); } }
+    private string p_strManagerName { get { return string.Format("풀링매니져<{0},{1}>/{2}개 활성", typeof(ENUM_Resource_Name).Name, typeof(Class_Resource).Name, p_iPopCount); } }
 
     // ========================================================================== //
 
@@ -220,7 +220,28 @@ public class CManagerPooling<ENUM_Resource_Name, Class_Resource> : CSingletonNot
     // ========================================================================== //
 
     /* protected - Override & Unity API         */
-    
+
+#if UNITY_EDITOR
+    protected override void OnMakeSingleton()
+    {
+        base.OnMakeSingleton();
+
+        CManagerUpdateObject.instance.DoAddObject(this);
+    }
+
+    protected override void OnReleaseSingleton()
+    {
+        base.OnReleaseSingleton();
+
+        CManagerUpdateObject.instance.DoRemoveObject(this);
+    }
+
+    public void OnUpdate()
+    {
+        _pTransManager.name = p_strManagerName;
+    }
+#endif
+
     // ========================================================================== //
 
     /* private - [Proc] Function             

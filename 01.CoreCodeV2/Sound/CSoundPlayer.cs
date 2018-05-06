@@ -23,7 +23,7 @@ public class CSoundPlayer : CCompoEventTrigger
 	[Header("사운드 끝날때 이벤트 - 루프시에도 적용")]
 	public UnityEngine.Events.UnityEvent p_listEvent_FinishSound = new UnityEngine.Events.UnityEvent();
 
-    [Rename_Inspector("플레이할 사운드 목록")]
+    [Header("플레이할 사운드 목록")]
     public AudioClip[] _arrPlayAudioClip;
 
 	[Range( 0f, 1f )]
@@ -131,7 +131,7 @@ public class CSoundPlayer : CCompoEventTrigger
 		}
 		else
 		{
-			EventDelayExcuteCallBack(DoPlayEvent_Main, 0.1f);
+			EventDelayExcuteCallBack(DoPlayEventTrigger, 0.1f);
 		}
 	}
 
@@ -154,9 +154,9 @@ public class CSoundPlayer : CCompoEventTrigger
 			if (_bIsLoop)
             {
                 if (_fLoopDelay != 0f)
-                    EventDelayExcuteCallBack(DoPlayEvent_Main, _fLoopDelay);
+                    EventDelayExcuteCallBack(DoPlayEventTrigger, _fLoopDelay);
                 else
-                    DoPlayEvent_Main();
+                    DoPlayEventTrigger();
             }
 			else
             {

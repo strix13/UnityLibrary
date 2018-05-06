@@ -396,7 +396,7 @@ public class CManagerSound : CSingletonDynamicMonoBase<CManagerSound>
                 iPlaySoundSlotCount++;
         }
 
-        name = string.Format("SoundManager/{0}개 재생중/Effect{1}/BGM{2}", iPlaySoundSlotCount, _fVolumeEffect, _fVolumeBGM);
+        name = string.Format("사운드 매니져/{0}개 재생중/Effect{1}/BGM{2}", iPlaySoundSlotCount, _fVolumeEffect, _fVolumeBGM);
     }
 #endif
 

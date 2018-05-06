@@ -43,7 +43,7 @@ public class Example_CManagerUpdateObject : MonoBehaviour
             Debug.Log(pTestObject.name + " Working..", pTestObject);
 
         int j = 0;
-        for(int i = 0; i < 1000; i++)
+        for(int i = 0; i < 100; i++)
             j += i;
     }
 
@@ -62,7 +62,5 @@ public class Example_CManagerUpdateObject : MonoBehaviour
             pObject_IUpdateAble.AddComponent<Test_UpdateAbleObject>().pManagerObject = this;
             pObject_IUpdateAble.transform.SetParent(transform);
         }
-
-        CManagerUpdateObject.instance.DoSet_UpdateObjectName(false);
     }
 }

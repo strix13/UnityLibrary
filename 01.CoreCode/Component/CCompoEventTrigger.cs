@@ -86,21 +86,21 @@ public class CCompoEventTrigger : CObjectBase, IPointerDownHandler, IPointerUpHa
 	public void DoRecieveMessage_OnShow()
 	{
 		if (p_eInputType_Main == EInputType.OnShow)
-			DoPlayEvent_Main();
+			DoPlayEventTrigger();
 	}
 
 	public void DoRecieveMessage_OnHide()
 	{
 		if (p_eInputType_Main == EInputType.OnHide)
-			DoPlayEvent_Main();
+			DoPlayEventTrigger();
 	}
 	
-	public void DoAddEvent_Main( UnityAction CallBack )
+	public void DoAddEventTrigger( UnityAction CallBack )
 	{
 		p_listEvent_Main.AddListener( CallBack );
 	}
 	
-	public void DoPlayEvent_Main()
+	public void DoPlayEventTrigger()
 	{
 		if (this == null) return;
 
@@ -129,7 +129,7 @@ public class CCompoEventTrigger : CObjectBase, IPointerDownHandler, IPointerUpHa
 		base.OnAwake();
 
 		if (p_eInputType_Main == EInputType.OnAwake)
-			DoPlayEvent_Main();
+			DoPlayEventTrigger();
 	}
 
 	protected override void OnEnableObject()
@@ -137,10 +137,10 @@ public class CCompoEventTrigger : CObjectBase, IPointerDownHandler, IPointerUpHa
         base.OnEnableObject();
 
 		if (p_eInputType_Main == EInputType.OnEnable)
-	        DoPlayEvent_Main();
+	        DoPlayEventTrigger();
 
         if (p_eInputType_Main == EInputType.OnEnableSecondAfter && _bIsEnableSecond)
-            DoPlayEvent_Main();
+            DoPlayEventTrigger();
 
         if (_bIsEnableSecond == false)
             _bIsEnableSecond = true;
@@ -151,20 +151,20 @@ public class CCompoEventTrigger : CObjectBase, IPointerDownHandler, IPointerUpHa
 		base.OnDisableObject();
 
 		if (p_eInputType_Main == EInputType.OnDisable)
-			DoPlayEvent_Main();
+			DoPlayEventTrigger();
 	}
 	
 	void OnClick()
 	{
 		if (p_eInputType_Main == EInputType.OnClick)
-			DoPlayEvent_Main();
+			DoPlayEventTrigger();
 	}
 
 	void OnPress( bool bPress )
 	{
 		if (p_eInputType_Main == EInputType.OnPress)
 		{
-			DoPlayEvent_Main();
+			DoPlayEventTrigger();
 			if (p_OnPress != null)
 				p_OnPress( bPress );
 		}
@@ -173,7 +173,7 @@ public class CCompoEventTrigger : CObjectBase, IPointerDownHandler, IPointerUpHa
 		{
 			if (p_eInputType_Main == EInputType.OnPress_True)
 			{
-				DoPlayEvent_Main();
+				DoPlayEventTrigger();
 				if (p_OnPress != null)
 					p_OnPress( bPress );
 			}
@@ -184,7 +184,7 @@ public class CCompoEventTrigger : CObjectBase, IPointerDownHandler, IPointerUpHa
 	{
 		if (p_eInputType_Main == EInputType.OnTriggerEnter)
 		{
-			DoPlayEvent_Main();
+			DoPlayEventTrigger();
 			if (p_OnPhysicsEnter != null)
 				p_OnPhysicsEnter( collision.gameObject );
 		}
@@ -194,7 +194,7 @@ public class CCompoEventTrigger : CObjectBase, IPointerDownHandler, IPointerUpHa
 	{
 		if (p_eInputType_Main == EInputType.OnTriggerEnter)
 		{
-			DoPlayEvent_Main();
+			DoPlayEventTrigger();
 			if (p_OnPhysicsEnter != null)
 				p_OnPhysicsEnter( collision.gameObject );
 		}
@@ -204,7 +204,7 @@ public class CCompoEventTrigger : CObjectBase, IPointerDownHandler, IPointerUpHa
 	{
 		if (p_eInputType_Main == EInputType.OnCollisionEnter)
 		{
-			DoPlayEvent_Main();
+			DoPlayEventTrigger();
 			if (p_OnPhysicsEnter != null)
 				p_OnPhysicsEnter( collision.gameObject );
 		}
@@ -214,7 +214,7 @@ public class CCompoEventTrigger : CObjectBase, IPointerDownHandler, IPointerUpHa
 	{
 		if (p_eInputType_Main == EInputType.OnCollisionEnter)
 		{
-			DoPlayEvent_Main();
+			DoPlayEventTrigger();
 			if (p_OnPhysicsEnter != null)
 				p_OnPhysicsEnter( collision.gameObject );
 		}
@@ -224,7 +224,7 @@ public class CCompoEventTrigger : CObjectBase, IPointerDownHandler, IPointerUpHa
 	private void OnDestroy()
 	{
 		if (p_eInputType_Main == EInputType.OnDestroy)
-			DoPlayEvent_Main();
+			DoPlayEventTrigger();
 	}
 
 	// ========================================================================== //
