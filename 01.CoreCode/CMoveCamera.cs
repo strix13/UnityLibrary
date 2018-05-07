@@ -190,7 +190,7 @@ public class CMoveCamera : CObjectBase
 
     /* protected - Override & Unity API         */
 
-    public override void OnUpdate()
+    public override bool OnUpdate()
 	{
 		base.OnUpdate();
 
@@ -209,6 +209,8 @@ public class CMoveCamera : CObjectBase
 
 			_pTransCamera.position = ProcClampCamPosition(_pTransCamera.position - _v3LastDragVelocity * Time.deltaTime);
 		}
+
+        return true;
 	}
 
 	protected override void OnAwake() 

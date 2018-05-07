@@ -120,12 +120,14 @@ public class CFollowObject : CObjectBase
 		}
 	}
 
-    public override void OnUpdate()
+    public override bool OnUpdate()
     {
         base.OnUpdate();
 
         if (_bUseFixedUpdate == EFollowMode.Update)
             DoUpdateFollow();
+
+        return true;
     }
 
     private void FixedUpdate()

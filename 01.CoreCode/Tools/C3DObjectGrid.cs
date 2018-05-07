@@ -128,13 +128,15 @@ public class C3DObjectGrid : CObjectBase
 		}
 	}
 
-    public override void OnUpdate()
+    public override bool OnUpdate()
 	{
 		base.OnUpdate();
 
-		if (transform.childCount == 0) return;
+		if (transform.childCount == 0) return true;
 
 		DoSetGrid();
+
+        return true;
 	}
 
 	// ========================================================================== //

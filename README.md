@@ -10,6 +10,11 @@
 -  깃허브 링크 :
 https://github.com/strix13/UnityLibrary
 
+## 루트 오브젝트
+
+
+
+---
 ## UI 클래스 관계도
 
 ![](
@@ -25,10 +30,11 @@ https://postfiles.pstatic.net/MjAxODA1MDZfODIg/MDAxNTI1NTg2NjI4NDg5.2-piThykc2EW
 
 **ㄴ 이미지를 클릭하시면 확대하실 수 있습니다.**
 
-
 [![Video Label](http://img.youtube.com/vi/TN145PFwvkI/0.jpg)](https://www.youtube.com/watch?v=TN145PFwvkI=0s)
 
 **ㄴ 이미지를 클릭하시면 유튜브에서 비디오를 시청하실 수 있습니다.**
+
+[코드 링크](https://github.com/strix13/UnityLibrary/tree/master/01.CoreCodeV2/Sound)
 
 ---
 ## 이펙트 시스템 클래스 관계도
@@ -39,6 +45,20 @@ https://postfiles.pstatic.net/MjAxODA1MDZfMzUg/MDAxNTI1NjEwMDU3MjQz.az-Y7SxCGDV-
 **ㄴ 이미지를 클릭하시면 확대하실 수 있습니다.**
 
 [![Video Label](http://img.youtube.com/vi/OQ8UpqBUIJQ/0.jpg)](https://www.youtube.com/watch?v=OQ8UpqBUIJQ=0s)
+
+**ㄴ 이미지를 클릭하시면 유튜브에서 비디오를 시청하실 수 있습니다.**
+
+[코드 링크](https://github.com/strix13/UnityLibrary/tree/master/01.CoreCodeV2/Effect)
+
+---
+## 로컬 라이징 시스템
+
+![](
+https://postfiles.pstatic.net/MjAxODA1MDdfMTUg/MDAxNTI1NjYxNjYzOTMw.uTGH7T0d2IFz7o5BHMhKqZndkZY1_XN_N9HF4FBF9VMg.hGGB_GJmzsuWrqreBhTW40fd806yUgnS4LFqL6gUlmkg.JPEG.strix13/StrixLibrary_-_%EB%A1%9C%EC%BB%AC%EB%9D%BC%EC%9D%B4%EC%A7%95_%EC%8B%9C%EC%8A%A4%ED%85%9C_%ED%81%B4%EB%9E%98%EC%8A%A4_%EA%B4%80%EA%B3%84%EB%8F%84.jpg?type=w773)
+
+**ㄴ 이미지를 클릭하시면 확대하실 수 있습니다.**
+
+[![Video Label](http://img.youtube.com/vi/mLQMwqKgh4I/0.jpg)](https://www.youtube.com/watch?v=mLQMwqKgh4I=0s)
 
 **ㄴ 이미지를 클릭하시면 유튜브에서 비디오를 시청하실 수 있습니다.**
 

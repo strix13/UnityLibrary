@@ -565,7 +565,7 @@ public class CManagerFrameWorkBase<CLASS_Framework, ENUM_Scene_Name, ENUM_DataFi
 		}
 		catch
 		{
-			List<SystemLanguage> listLocale = CManagerUILocalize.p_listLocale;
+			List<SystemLanguage> listLocale = CManagerUILocalize.instance.p_listLocale;
 
 			if (listLocale.Contains( eCurLanguage ) == false)
 				eCurLanguage = SystemLanguage.English;
@@ -585,9 +585,7 @@ public class CManagerFrameWorkBase<CLASS_Framework, ENUM_Scene_Name, ENUM_DataFi
 	static private void ProcOnSceneLoaded( UnityEngine.SceneManagement.Scene arg0, UnityEngine.SceneManagement.LoadSceneMode arg1 )
 	{
 		if (CManagerUILocalize.instance != null)
-		{
 			CManagerUILocalize.instance.DoSetLocalize_CurrentScene();
-		}
 
 		p_pManagerScene.EventCheckIsLoadComplete();
 
@@ -602,26 +600,28 @@ public class CManagerFrameWorkBase<CLASS_Framework, ENUM_Scene_Name, ENUM_DataFi
 	}
 
 
-    public override void OnUpdate()
+    public override bool OnUpdate()
 	{
 		base.OnUpdate();
 
-		//float fTotalProgress = 0f;
+        //float fTotalProgress = 0f;
 
-		//if (_eSceneLoadState == ESceneLoadState.SceneLoadStart)
-		//{
-		//	for (int i = 0; i < _iMaxLoadScene; i++)
-		//		fTotalProgress += _listAsyncLoadScene[i].progress;
+        //if (_eSceneLoadState == ESceneLoadState.SceneLoadStart)
+        //{
+        //	for (int i = 0; i < _iMaxLoadScene; i++)
+        //		fTotalProgress += _listAsyncLoadScene[i].progress;
 
-		//	if (p_EVENT_OnLoadSceneProgress != null)
-		//		p_EVENT_OnLoadSceneProgress( _fStackProgress / _iMaxLoadScene );
+        //	if (p_EVENT_OnLoadSceneProgress != null)
+        //		p_EVENT_OnLoadSceneProgress( _fStackProgress / _iMaxLoadScene );
 
-		//	if (_fStackProgress > 0.9f * _iMaxLoadScene)
-		//		StartCoroutine( ProcFinish_Loading() );
-		//}
+        //	if (_fStackProgress > 0.9f * _iMaxLoadScene)
+        //		StartCoroutine( ProcFinish_Loading() );
+        //}
 
-		//if (_fStackProgress < fTotalProgress)
-		//	_fStackProgress += Time.unscaledDeltaTime * _iMaxLoadScene;
+        //if (_fStackProgress < fTotalProgress)
+        //	_fStackProgress += Time.unscaledDeltaTime * _iMaxLoadScene;
+
+        return true;
 	}
 
 	// ========================================================================== //

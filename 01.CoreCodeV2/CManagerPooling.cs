@@ -236,9 +236,11 @@ public class CManagerPooling<ENUM_Resource_Name, Class_Resource> : CSingletonNot
         CManagerUpdateObject.instance.DoRemoveObject(this);
     }
 
-    public void OnUpdate()
+    public bool OnUpdate()
     {
         _pTransManager.name = p_strManagerName;
+
+        return true;
     }
 #endif
 

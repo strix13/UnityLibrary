@@ -97,12 +97,17 @@ public class CObjectBase : MonoBehaviour, IUpdateAble
     virtual protected void OnStart() { }
     virtual protected void OnEnableObject() {}
     virtual protected IEnumerator OnEnableObjectCoroutine() { yield break; }
-    virtual public void OnUpdate() { }
     virtual protected void OnDisableObject() { }
-	
-	// ========================== [ Division ] ========================== //
 
-	Dictionary<System.Action, Coroutine> _mapCoroutinePlaying = new Dictionary<System.Action, Coroutine>();
+    /// <summary>
+    /// Unity Update와 동일한 로직입니다.
+    /// </summary>
+    /// <returns>베이스의 경우 false, Update를 구현했는지 여부를 리턴형으로 체크.</returns>
+    virtual public bool OnUpdate() { return false; }
+
+    // ========================== [ Division ] ========================== //
+
+    Dictionary<System.Action, Coroutine> _mapCoroutinePlaying = new Dictionary<System.Action, Coroutine>();
 	protected void EventDelayExcuteCallBack(System.Action OnAfterDelayAction, float fDelaySec)
 	{
         if (this != null && gameObject.activeInHierarchy)

@@ -34,7 +34,7 @@ public class CCompoMoveCamera : CObjectBase
         _pCam = GetComponent<Camera>();
     }
 
-    public override void OnUpdate()
+    public override bool OnUpdate()
     {
         base.OnUpdate();
 
@@ -117,5 +117,7 @@ public class CCompoMoveCamera : CObjectBase
         if (fFOV < fZoomLimitMin) fFOV = fZoomLimitMin;
         if (fFOV > fZoomLimitMax) fFOV = fZoomLimitMax;
         _pCam.fieldOfView = fFOV;
+
+        return true;
     }
 }

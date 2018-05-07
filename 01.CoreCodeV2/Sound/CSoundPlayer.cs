@@ -95,7 +95,7 @@ public class CSoundPlayer : CCompoEventTrigger
 #endif
 
 #if UNITY_EDITOR
-    public override void OnUpdate()
+    public override bool OnUpdate()
     {
         base.OnUpdate();
 
@@ -108,6 +108,8 @@ public class CSoundPlayer : CCompoEventTrigger
 		}
 		else
 			name = _strOriginName;
+
+        return true;
 	}
 #endif
 

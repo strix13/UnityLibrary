@@ -95,11 +95,13 @@ public class CManagerEffect : CSingletonDynamicMonoBase<CManagerEffect>
     }
 
 #if UNITY_EDITOR
-    public override void OnUpdate()
+    public override bool OnUpdate()
     {
         base.OnUpdate();
 
         name = string.Format("이펙트 매니져/{0}개 재생중", _pManagerPooling.p_iPopCount);
+
+        return true;
     }
 #endif
 

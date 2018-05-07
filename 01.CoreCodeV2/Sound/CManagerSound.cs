@@ -385,7 +385,7 @@ public class CManagerSound : CSingletonDynamicMonoBase<CManagerSound>
     }
 
 #if UNITY_EDITOR
-    public override void OnUpdate()
+    public override bool OnUpdate()
     {
         base.OnUpdate();
 
@@ -397,6 +397,8 @@ public class CManagerSound : CSingletonDynamicMonoBase<CManagerSound>
         }
 
         name = string.Format("사운드 매니져/{0}개 재생중/Effect{1}/BGM{2}", iPlaySoundSlotCount, _fVolumeEffect, _fVolumeBGM);
+
+        return true;
     }
 #endif
 

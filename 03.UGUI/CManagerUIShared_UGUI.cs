@@ -74,7 +74,7 @@ public class CManagerUIShared_UGUI : CManagerUGUIBase<CManagerUIShared_UGUI, CMa
 		Input.gyro.enabled = true;
 	}
 
-    public override void OnUpdate()
+    public override bool OnUpdate()
 	{
 		base.OnUpdate();
 
@@ -86,6 +86,8 @@ public class CManagerUIShared_UGUI : CManagerUGUIBase<CManagerUIShared_UGUI, CMa
 
 			fConsoleDelay = Time.time + const_fConsoleDelay;
 		}
+
+        return true;
 	}
 
 	protected override void OnDefaultPanelShow()

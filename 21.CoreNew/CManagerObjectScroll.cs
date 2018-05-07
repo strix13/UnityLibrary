@@ -167,11 +167,11 @@ public class CManagerObjectScroll : CObjectBase
 		DoResetScroll();
 	}
 
-    public override void OnUpdate()
+    public override bool OnUpdate()
 	{
 		base.OnUpdate();
 
-		if (p_pTransTarget == null) return;
+		if (p_pTransTarget == null) return true;
 
 		float fTargetPos = p_pTransTarget.position.x;
 		//if (_fTargetPos_Last == fTargetPos) return;
@@ -195,7 +195,7 @@ public class CManagerObjectScroll : CObjectBase
 			ProcGenerate_ScrollObject();
 		}
 
-		if (_pScrollObject_Old == null) return;
+        if (_pScrollObject_Old == null) return true;
 
 		// 타겟의 위치 - 카메라 넓이가
 		// 가장 좌측의 스크롤 오브젝트의 위치 + 가장 좌측의 스크롤 오브젝트의 넓이보다 크다면
@@ -206,6 +206,8 @@ public class CManagerObjectScroll : CObjectBase
 
 			ProcDisable_ScrollObject();
 		}
+
+        return true;
 	}
 
 	private void OnDestroy()

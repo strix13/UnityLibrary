@@ -57,11 +57,13 @@ public class Example_CObjectBase : CObjectBase
         // gameObject.SetActive(false);
     }
 
-    public override void OnUpdate()
+    public override bool OnUpdate()
     {
         base.OnUpdate();
 
         PrintLog();
+
+        return true;
     }
 
     protected override void OnDisableObject()

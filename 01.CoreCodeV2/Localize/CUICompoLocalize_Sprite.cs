@@ -4,23 +4,22 @@
  *		https://github.com/strix13/UnityLibrary
  *	============================================
  *	작성자 : Strix
- *	작성일 : 2018-03-17 오후 10:36:36
+ *	작성일 : 2018-05-07 오전 9:59:24
  *	기능 : 
- *	https://blogs.unity3d.com/kr/2015/12/23/1k-update-calls/
    ============================================ */
 #endregion Header
 
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
-using System.Reflection;
+using System;
 
-public interface IUpdateAble
-{
-    bool OnUpdate();
-}
+#if UNITY_EDITOR
+using NUnit.Framework;
+using UnityEngine.TestTools;
+#endif
 
-public class CManagerUpdateObject : CSingletonDynamicMonoBase<CManagerUpdateObject>
+public class CUICompoLocalize_Sprite : CUICompoLocalizeBase
 {
     /* const & readonly declaration             */
 
@@ -30,44 +29,34 @@ public class CManagerUpdateObject : CSingletonDynamicMonoBase<CManagerUpdateObje
 
     /* protected & private - Field declaration         */
 
-    private List<IUpdateAble> _listObject = new List<IUpdateAble>();
+    static private CResourceGetter<Sprite> g_pResourceGetter = null;
+
 
     // ========================================================================== //
 
     /* public - [Do] Function
      * 외부 객체가 호출(For External class call)*/
 
-    public void DoAddObject(IUpdateAble pObject)
-    {
-        _listObject.Add(pObject);
-    }
-
-    public void DoRemoveObject(IUpdateAble pObject)
-    {
-        _listObject.Remove(pObject);
-    }
 
     // ========================================================================== //
 
     /* protected - Override & Unity API         */
 
-    protected override IEnumerator OnEnableObjectCoroutine()
+
+    public override void ILocalizeListner_ChangeLocalize(SystemLanguage eLanguage, string strLocalizeValue)
     {
-        while(true)
-        {
-            int iUpdateObjectCount = 0;
-            for (int i = 0; i < _listObject.Count; i++)
-            {
-                if (_listObject[i].OnUpdate())
-                    iUpdateObjectCount++;
-            }
+        if (g_pResourceGetter == null)
+            g_pResourceGetter = new CResourceGetter<Sprite>("Sprite");
 
-#if UNITY_EDITOR
-            name = string.Format("업데이트 매니져/{0}개 업데이트중", iUpdateObjectCount);
+        UnityEngine.UI.Image pImage_UGUI = GetComponent<UnityEngine.UI.Image>();
+        if (pImage_UGUI)
+            pImage_UGUI.sprite = g_pResourceGetter.GetResource_Origin(strLocalizeValue);
+
+    #if NGUI
+        _pSprite_NGUI = GetComponent<UISprite>();
+        if(_pSprite_NGUI)
+            _pSprite_NGUI.sprite = g_pResourceGetter.GetResource_Origin(strText);
 #endif
-
-            yield return null;
-        }
     }
 
     /* protected - [abstract & virtual]         */
@@ -78,4 +67,13 @@ public class CManagerUpdateObject : CSingletonDynamicMonoBase<CManagerUpdateObje
     #region Private
 
     #endregion Private
+
+    // ========================================================================== //
+
+    #region Test
+#if UNITY_EDITOR
+
+#endif
+    #endregion Test
+
 }

@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-#if CUSTOMLOG
-
 public class CustomLog_Test : MonoBehaviour
 {
     public enum ETestLogWriter
@@ -68,4 +66,3 @@ public class CustomLog_Test : MonoBehaviour
         Debug.LogError("Unity Error!!", this);
     }
 }
-#endif

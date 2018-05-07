@@ -23,7 +23,7 @@ public enum EStateTouch
 	Pinching
 }
 
-public class CCompoEventTouch : CObjectBase//CFSMBase<EStateTouch>
+public class CCompoEventTouch : CObjectBase
 {
 	/* const & readonly declaration             */
 
@@ -87,7 +87,7 @@ public class CCompoEventTouch : CObjectBase//CFSMBase<EStateTouch>
 
     /* protected - Override & Unity API         */
 
-    public override void OnUpdate()
+    public override bool OnUpdate()
 	{
 		base.OnUpdate();
 
@@ -182,6 +182,8 @@ public class CCompoEventTouch : CObjectBase//CFSMBase<EStateTouch>
 			if (_eStateTouch != EStateTouch.None)
 				_eStateTouch = EStateTouch.None;
 		}
+
+        return true;
 	}
 
 #endregion Protected
