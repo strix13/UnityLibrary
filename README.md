@@ -16,10 +16,9 @@ https://github.com/strix13/UnityLibrary
 
 **ㄴ 이미지를 클릭하시면 확대하실 수 있습니다.**
 
-- [링크 - 유니티 블로그 - 10000번의 Update() 호출](
-https://blogs.unity3d.com/kr/2015/12/23/1k-update-calls/)
-
+- [링크 - 유니티 블로그 - 10000번의 Update() 호출](https://blogs.unity3d.com/kr/2015/12/23/1k-update-calls/)
 - [링크 - Unity3D 자동 GetComponent](https://openlevel.postype.com/post/683269)
+- [코드 링크](https://github.com/strix13/UnityLibrary/tree/master/01.CoreCodeV2/ObjectBase)
 
 ---
 ## UI 클래스 관계도
