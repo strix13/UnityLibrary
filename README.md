@@ -199,6 +199,7 @@ https://postfiles.pstatic.net/MjAxODA1MDdfMTc4/MDAxNTI1Njc5NDU5MzMz.4WXQCeIXmSfG
 ### 랜덤 2D 섹터
 
 - 섹터의 경우, 인스펙터에서 몇 바이 몇 섹터인지, 섹터 당 사이즈가 몇인지를 설정합니다.
+
 - 그 외 주변 섹터 체크옵션으로 주위 4타일(위 아래, 양 옆), 주위 8타일(4타일에서 대각선 4타일 추가)를 지원합니다.
 
 - 섹터에게 랜덤 포지션을 요청 시, **직전의 섹터가 같은 섹터가 아니고, 주변 섹터도 아닌 섹터 내의 랜덤 위치만 리턴**합니다.
@@ -206,6 +207,26 @@ https://postfiles.pstatic.net/MjAxODA1MDdfMTc4/MDAxNTI1Njc5NDU5MzMz.4WXQCeIXmSfG
 - **이펙트, 몬스터 스폰 등에 쓰입니다.** ( 스폰 시 주변에 골고루 나오게 하기 위한 로직 )
 
 - [코드 링크](https://github.com/strix13/UnityLibrary/tree/master/01.CoreCodeV2/Random)
+
+---
+## 한글 파서
+
+![](
+https://postfiles.pstatic.net/MjAxODA1MDdfNjAg/MDAxNTI1NjgzNDYwNTkx.7LVx1ndhvjxdw2992EqJKUM_u6ZZSuYqaGKxwlNv-Cwg.ieXZO9IUNCEUPh_ut5VM-TEf1GaUJknekDBuKTyQUxIg.JPEG.strix13/bandicam_2018-05-07_17-57-24-601.jpg?type=w773)
+
+**ㄴ 이미지를 클릭하시면 확대하실 수 있습니다.**
+
+- VR, 모바일 등에서 커스터마이징 된 키보드로 한글 혹은 영어를 입력할 수 있기 위해 제작하였습니다.
+
+- 한글Char와 한글String으로 이루어져 있습니다.
+
+- 한글Char의 경우 한글의 초, 중, 종성 및 모음 등을 파싱합니다.
+
+- [참고한 코드 링크 1](http://plog2012.blogspot.kr/2012/11/c.html)
+
+- [참고한 코드 링크 2](http://ehclub.co.kr/2484?category=658554)
+
+- [작성한 코드 링크](https://github.com/strix13/UnityLibrary/blob/master/SHangul.cs)
 
 ---
 ## 작업 스타일
@@ -265,7 +286,7 @@ https://postfiles.pstatic.net/MjAxODA1MDdfMTc4/MDAxNTI1Njc5NDU5MzMz.4WXQCeIXmSfG
   - 누워서 읽는 알고리즘, 윤성우의 열혈 자료구조, 뇌를 자극하는 알고리즘
 
 - 코드 스타일
- - 클린 코드, 리펙토링, 좋은 코딩 나쁜 코딩
+  - 클린 코드, 리펙토링, 좋은 코딩 나쁜 코딩
 
 - 아키텍트
   - HeadFirst DesignPattern, 소프트웨어 설계 테크닉, 프로그래밍 패턴

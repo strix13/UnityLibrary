@@ -10,6 +10,7 @@
 #endregion Header
 
 using UnityEngine;
+using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -20,11 +21,41 @@ using UnityEngine.Assertions;
 
 public class Example_CObjectBase : CObjectBase
 {
+    public enum EObjectName
+    {
+        Text1,
+        Text2,
+        Text3,
+    }
+
+    [GetComponentInChildren("Text1")]
+    public Text pText_1;
+    [GetComponentInChildren("Text2")]
+    public Text pText_2;
+    [GetComponentInChildren("Text3")]
+    public Text pText_3;
+
+    [GetComponentInChildren()]
+    public Text[] arrText;
+
+    [GetComponentInChildren()]
+    public List<Text> listText;
+
+    [GetComponentInChildren()]
+    public Dictionary<string, Text> mapText_Key_Is_String;
+
+    [GetComponentInChildren()]
+    public Dictionary<EObjectName, Text> mapText_Key_Is_Dictionary;
+
+
     protected override void OnAwake()
     {
         base.OnAwake();
 
         PrintLog();
+
+        Debug.LogWarning("mapText_Key_Is_String.Count : " + mapText_Key_Is_String.Count);
+        Debug.LogWarning("mapText_Key_Is_Dictionary.Count : " + mapText_Key_Is_Dictionary.Count);
     }
 
     protected override IEnumerator OnAwakeCoroutine()

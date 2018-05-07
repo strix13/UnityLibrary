@@ -143,12 +143,17 @@ public class CEditorInspector_MarkdownViewer : Editor
         strLine = strLine.Replace("</li>", "");
 
         strLine = strLine.Replace("![](", "Image Link : ");
+        strLine = strLine.Replace("<img src=", "Image Link : ");
 
         // <ol>
         // <li> </li>
         // </ol>
 
         // <a herf=" ... ">
+        strLine = strLine.Replace("● <a href=", "");
+        strLine = strLine.Replace("<a href=", "");
+        strLine = strLine.Replace("\"", "");
+
 
         if (bIsHeader)
         {
@@ -171,7 +176,14 @@ public class CEditorInspector_MarkdownViewer : Editor
                 iIndex = strLine.IndexOf("http://");
 
             string strLink = strLine.Substring(iIndex, strLine.Length - iIndex - 1);
+            int iIndexCut = strLink.IndexOf(">");
+            if (iIndexCut != -1)
+                strLink = strLink.Substring(0, iIndexCut);
 
+            iIndexCut = strLink.IndexOf(")");
+            if (iIndexCut != -1)
+                strLink = strLink.Substring(0, iIndexCut);
+            
             EditorGUILayout.BeginHorizontal();
             EditorGUILayout.LabelField(strLine.Substring(0, iIndex), _pGUIStyle_Normal);
             EditorGUILayout.EndHorizontal();

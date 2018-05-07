@@ -252,9 +252,14 @@ static public class SCManagerGetComponent
                 for (int k = 0; k < arrComponent.Length; k++)
                 {
                     Component pComponentChild = arrComponent.GetValue(k) as Component;
-                    Method_Add.Invoke(pInstanceDictionary, new object[] {
-                                    System.Enum.Parse(pType_DictionaryKey, pComponentChild.name),
+                    try
+                    {
+                        var pEnum = System.Enum.Parse(pType_DictionaryKey, pComponentChild.name, true);
+                        Method_Add.Invoke(pInstanceDictionary, new object[] {
+                                    pEnum,
                                     pComponentChild });
+                    }
+                    catch { }
                 }
             }
         }
