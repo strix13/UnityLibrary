@@ -8,7 +8,7 @@
 - 이 프로젝트는 프로그래머를 대상으로 설명합니다.
 
 - 하단에 있는 구현 목록외의 사항도 있으나, 정리가 덜 되어 따로 작성하지 않았습니다.
- - 하단에 있는 구현 목록의 경우 비교적 최근에 리펙토링한 결과입니다.
+  - 하단에 있는 구현 목록의 경우 비교적 최근에 리펙토링한 결과입니다.
 
 -  깃허브 링크 :
 https://github.com/strix13/UnityLibrary
@@ -103,23 +103,23 @@ https://postfiles.pstatic.net/MjAxODA1MDZfODIg/MDAxNTI1NTg2NjI4NDg5.2-piThykc2EW
 
 - 사운드 시스템의 경우, SoundManager가 SoundSlot 클래스를 관리하는 형태입니다.
 
-- Instnace 요청 시 없을 경우 Instance를 생성하여 Initialize하여 플레이 할 수 있게끔 적용하였습니다.
+- **Instnace 요청 시 없을 경우 Instance를 생성하여 Initialize하여 플레이 할 수 있게끔 적용**하였습니다.
 
-- SoundManager는 외부에서 사운드 플레이 요청 시 AudioClip을 얻고, SoundSlot을 풀링하여 Slot에게 플레이 합니다.
+- SoundManager는 외부에서 사운드 플레이 요청 시 AudioClip을 얻고, **SoundSlot을 풀링**하여 Slot에게 플레이 합니다.
 
-- MainVolume, 개개별 사운드 Volume, Effect Volume, BGM Volume을 지원합니다.
+- **MainVolume, 개개별 사운드 Volume, Effect Volume, BGM Volume을 지원합니다.**
 
 
 - SoundSlot의 경우 AudioClip과 AudioSource를 관리하는 클래스입니다.
 
-- 사운드가 끝날 때 이벤트 통보를 지원합니다.
+- **사운드가 끝날 때 이벤트 통보를 지원**합니다.
 
-- FadeIn / Out 효과를 지원합니다.
+- **FadeIn / Out** 효과를 지원합니다.
 
 
-- SoundPlayer의 경우 임의의 게임오브젝트에 추가하여 쉽게 사운드를 플레이할 수 있는 클래스입니다.
+- **SoundPlayer의 경우 임의의 게임오브젝트에 추가하여 쉽게 사운드를 플레이할 수 있는 클래스**입니다.
 
-- 인스펙터에 세팅한 값을 토대로 SoundManager에게 요청하는 형태이기 때문에, SoundManager에서 관리하는 옵션값(MainVolume, 개개별 사운드 Volume, Effect Volume 등)을 지원합니다.
+- 인스펙터에 세팅한 값을 토대로 SoundManager에게 요청하는 형태이기 때문에, **SoundManager에서 관리하는 옵션값(MainVolume, 개개별 사운드 Volume, Effect Volume 등) 및 SoundSlot 풀링을 지원**합니다.
 
 - 그 외로 그룹 내 랜덤 사운드 플레이, 사운드가 끝났을 때 이벤트 통보를 지원합니다.
 
@@ -142,17 +142,19 @@ https://postfiles.pstatic.net/MjAxODA1MDZfMzUg/MDAxNTI1NjEwMDU3MjQz.az-Y7SxCGDV-
 
 - 이펙트 시스템은 사운드 시스템과 비슷한 설계입니다.
 
-- Instnace 요청 시 없을 경우 Instance를 생성하여 Initialize하여 플레이 할 수 있게끔 적용하였습니다.
+- **Instnace 요청 시 없을 경우 Instance를 생성하여 Initialize하여 플레이 할 수 있게끔 적용**하였습니다.
 
 
-- EffectManager는 CEffect라는 유니티 이펙트 클래스를 관리하는 클래스를 관리합니다.
+- EffectManager는 CEffect라는 클래스를 관리합니다.
 
-- EffectManager에 이펙트를 요청시, 원하는 위치에 이펙트를 실행하며, 풀링합니다.
+- EffectManager에 이펙트를 요청시, 원하는 위치에 이펙트를 실행하며, **풀링**합니다.
 
 
 - CEffect의 경우 NGUI, Spine, Particle System을 래핑하였습니다.
 
 - CEffect는 이펙트가 끝날 때 이벤트 통보를 지원합니다.
+
+- EffectPlayer의 경우 SoundPlayer와 비슷한 기능이므로 생략합니다.
 
 - [코드 링크](https://github.com/strix13/UnityLibrary/tree/master/01.CoreCodeV2/Effect)
 
