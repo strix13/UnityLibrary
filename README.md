@@ -7,6 +7,9 @@
 
 - 이 프로젝트는 프로그래머를 대상으로 설명합니다.
 
+- 하단에 있는 구현 목록외의 사항도 있으나, 정리가 덜 되어 따로 작성하지 않았습니다.
+ - 하단에 있는 구현 목록의 경우 비교적 최근에 리펙토링한 결과입니다.
+
 -  깃허브 링크 :
 https://github.com/strix13/UnityLibrary
 
@@ -16,9 +19,27 @@ https://github.com/strix13/UnityLibrary
 
 **ㄴ 이미지를 클릭하시면 확대하실 수 있습니다.**
 
+[![Video Label](http://img.youtube.com/vi/xuhKn5H6ck4/0.jpg)](https://www.youtube.com/watch?v=xuhKn5H6ck4=0s)
+
+**ㄴ 이미지를 클릭하시면 유튜브에서 비디오를 시청하실 수 있습니다.**
+
+- 기존 Unity의 **MonoBehaviour의 기능을 확장** 시킨 루트 클래스입니다.
+
+- **이 클래스를 상속받은 뒤 Update문을 작성하면, 매니져 클래스 한곳의 코루틴에서 Update를 루프로 돌며, 몇 개가 업데이트 중인지 하이어라키 뷰에서 실시간으로 체크할 수 있습니다.**
+ - MonoBehaviour가 아닌 클래스도 IUpdateAble을 구현하여 업데이트 매니져에 등록하면 Update처럼 사용할 수 있습니다.
+
+- 이 클래스는 **GetComponentAttribute를 지원**합니다.
+  - GetComponentAttribute는 GetComponent, GetComponentInParents, GetComponentInChildren이 있습니다.
+  - GetComponentInChildren은 자식 중 첫번째를 찾기, 이름으로 찾기, **복수형 자료형**을 지원하며, **Dictionary도 지원**합니다.
+  - Dictionary의 경우 **string을 키값으로 두면 오브젝트의 이름, Enum으로 두면 오브젝트의 이름을 Enum으로 파싱에 성공한 것들만** 저장합니다.
+  **- 만약 하나도 못찾을 시 경고 로그를 출력합니다.**
+
+- 그 외 UnityEvent 함수를 가상함수로 지원합니다.
+
+
 - [링크 - 유니티 블로그 - 10000번의 Update() 호출](https://blogs.unity3d.com/kr/2015/12/23/1k-update-calls/)
 - [링크 - Unity3D 자동 GetComponent](https://openlevel.postype.com/post/683269)
-- [코드 링크](https://github.com/strix13/UnityLibrary/tree/master/01.CoreCodeV2/ObjectBase)
+- [작성한 코드 링크](https://github.com/strix13/UnityLibrary/tree/master/01.CoreCodeV2/ObjectBase)
 
 ---
 ## UI 클래스 관계도
@@ -27,6 +48,22 @@ https://github.com/strix13/UnityLibrary
 https://blogfiles.pstatic.net/MjAxODA1MDVfNSAg/MDAxNTI1NDk2MjEzMzk4.YBGR9hSvFoGqEg5lUCeF346bvZ3x9EEgLQSfjWcyFPsg.DdcKOk5Ml-eeOorUOfqwJcJnscZGxqmvC_Ol40H9eZ4g.PNG.strix13/StrixLibrary_-_UI_%ED%81%B4%EB%9E%98%EC%8A%A4_%EA%B4%80%EA%B3%84%EB%8F%84.png)
 
 **ㄴ 이미지를 클릭하시면 확대하실 수 있습니다.**
+
+- 구조는 크게 Manager, Panel로 이루어져 있으며 Manager는 Panel을 관리하는 싱글톤 패턴입니다.
+
+- Manager의 경우 Panel을 Show / Hide 시키며, Panel의 레이어를 관리합니다.
+
+- Panel을 Show / Hide 시 FadeIn / Out 효과도 지원합니다.
+
+
+- Panel의 경우 NGUI로는 NGUIPanel, UGUI로는 Canvas 단위로 된 하나의 Window 단위 입니다.
+
+- Panel의 경우 하위 **UI Element의 이벤트 ( 버튼, DropItem, Input 입력 ) 등을 쉽게 override하여 쉽게 사용할 수 있도록 지원**합니다.
+
+- Panel의 경우 그 외 **UI Element를 쉽게 Get**할 수 있도록 지원합니다.
+
+- Panel의 경우 OnShow / OnHide의 이벤트가 있으며, **Show / Hide 시 코루틴이 동작합니다. ( 애니메이션을 기다리기 위함, 코루틴 끝날 때 콜백 지원 )**
+
 
 - [UI 베이스 코드 링크](https://github.com/strix13/UnityLibrary/tree/master/02.UI)
 - [UGUI 베이스 코드 링크](https://github.com/strix13/UnityLibrary/tree/master/03.UGUI)
@@ -44,6 +81,12 @@ https://postfiles.pstatic.net/MjAxODA1MDdfMTUg/MDAxNTI1NjYxNjYzOTMw.uTGH7T0d2IFz
 
 **ㄴ 이미지를 클릭하시면 유튜브에서 비디오를 시청하실 수 있습니다.**
 
+- 로컬라이징의 경우 Key, Value를 가진 임의의 Text파일을 파싱한 데이터를 기반으로 동작합니다.
+
+- 외부에서 Instance 요청 시 자동으로 생성되서 파일을 파싱 후, 자동으로 로컬라이징이 될 수 있게끔 작업하였습니다.
+
+- 작성한 Text, Sprite 컴포넌트 외에 이벤트를 받고 싶으면 ILocalizeListner를 구현하고, Manager에 등록하면 됩니다.
+
 - [코드 링크](https://github.com/strix13/UnityLibrary/tree/master/01.CoreCodeV2/Localize)
 
 ---
@@ -58,6 +101,31 @@ https://postfiles.pstatic.net/MjAxODA1MDZfODIg/MDAxNTI1NTg2NjI4NDg5.2-piThykc2EW
 
 **ㄴ 이미지를 클릭하시면 유튜브에서 비디오를 시청하실 수 있습니다.**
 
+- 사운드 시스템의 경우, SoundManager가 SoundSlot 클래스를 관리하는 형태입니다.
+
+- Instnace 요청 시 없을 경우 Instance를 생성하여 Initialize하여 플레이 할 수 있게끔 적용하였습니다.
+
+- SoundManager는 외부에서 사운드 플레이 요청 시 AudioClip을 얻고, SoundSlot을 풀링하여 Slot에게 플레이 합니다.
+
+- MainVolume, 개개별 사운드 Volume, Effect Volume, BGM Volume을 지원합니다.
+
+
+- SoundSlot의 경우 AudioClip과 AudioSource를 관리하는 클래스입니다.
+
+- 사운드가 끝날 때 이벤트 통보를 지원합니다.
+
+- FadeIn / Out 효과를 지원합니다.
+
+
+- SoundPlayer의 경우 임의의 게임오브젝트에 추가하여 쉽게 사운드를 플레이할 수 있는 클래스입니다.
+
+- 인스펙터에 세팅한 값을 토대로 SoundManager에게 요청하는 형태이기 때문에, SoundManager에서 관리하는 옵션값(MainVolume, 개개별 사운드 Volume, Effect Volume 등)을 지원합니다.
+
+- 그 외로 그룹 내 랜덤 사운드 플레이, 사운드가 끝났을 때 이벤트 통보를 지원합니다.
+
+- 사운드 플레이 조건은 EventTrigger 클래스의 트리거 발동 조건 내에 가능합니다.
+ - 트리거 발동 조건 : 유니티 이벤트(OnAwake ~ OnDisable), 물리 이벤트(Triger / Collision Enter), UI 이벤트(Click, Press) 등
+
 - [코드 링크](https://github.com/strix13/UnityLibrary/tree/master/01.CoreCodeV2/Sound)
 
 ---
@@ -71,6 +139,20 @@ https://postfiles.pstatic.net/MjAxODA1MDZfMzUg/MDAxNTI1NjEwMDU3MjQz.az-Y7SxCGDV-
 [![Video Label](http://img.youtube.com/vi/OQ8UpqBUIJQ/0.jpg)](https://www.youtube.com/watch?v=OQ8UpqBUIJQ=0s)
 
 **ㄴ 이미지를 클릭하시면 유튜브에서 비디오를 시청하실 수 있습니다.**
+
+- 이펙트 시스템은 사운드 시스템과 비슷한 설계입니다.
+
+- Instnace 요청 시 없을 경우 Instance를 생성하여 Initialize하여 플레이 할 수 있게끔 적용하였습니다.
+
+
+- EffectManager는 CEffect라는 유니티 이펙트 클래스를 관리하는 클래스를 관리합니다.
+
+- EffectManager에 이펙트를 요청시, 원하는 위치에 이펙트를 실행하며, 풀링합니다.
+
+
+- CEffect의 경우 NGUI, Spine, Particle System을 래핑하였습니다.
+
+- CEffect는 이펙트가 끝날 때 이벤트 통보를 지원합니다.
 
 - [코드 링크](https://github.com/strix13/UnityLibrary/tree/master/01.CoreCodeV2/Effect)
 
