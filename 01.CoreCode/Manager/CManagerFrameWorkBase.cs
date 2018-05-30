@@ -151,13 +151,6 @@ public class CManagerFrameWorkBase<CLASS_Framework, ENUM_Scene_Name, ENUM_DataFi
 
 	protected string _strID; public string p_strID { get { return _strID; } }
 
-	//static private List<AsyncOperation> _listAsyncLoadScene = new List<AsyncOperation>();
-	//static private ESceneLoadState _eSceneLoadState = ESceneLoadState.None;
-
-	// static private bool _bManualCall_EventOnFinishLoadScene;
-	// static private int _iMaxLoadScene;
-	// static private float _fStackProgress = 0f;
-
 	static private int _iLocalDataLoadingCount_Request;
 	static private int _iLocalDataLoadingCount_Finish;
 
@@ -293,10 +286,11 @@ public class CManagerFrameWorkBase<CLASS_Framework, ENUM_Scene_Name, ENUM_DataFi
 		instance.StartCoroutine( p_pNetworkDB.CoExcutePHP( instance._strID, EPHPName.Update_Set_ServerTime, typeof( StructDB ).ToString(), OnResult, new StringPair( strFieldName, "" ) ) );
 	}
 
-	static public void DoNetworkDB_Insert<StructDB>( delDBRequest OnResult, StructDB pStructDB )
+    static public void DoNetworkDB_Insert<StructDB>( delDBRequest OnResult, StructDB pStructDB )
 		where StructDB : IDB_Insert
 	{
-		instance.StartCoroutine( p_pNetworkDB.CoExcutePHP( instance._strID, EPHPName.Insert, typeof( StructDB ).ToString(), OnResult, pStructDB.IDB_Insert_GetField() ) );
+        if(instance.isActiveAndEnabled)
+            instance.StartCoroutine( p_pNetworkDB.CoExcutePHP( instance._strID, EPHPName.Insert, typeof( StructDB ).ToString(), OnResult, pStructDB.IDB_Insert_GetField() ) );
 	}
 
 	static public void DoNetworkDB_Insert_Get_InsertData<StructDB>( delDBRequest_Generic<StructDB> OnResult, StructDB pStructDB )
@@ -335,28 +329,6 @@ public class CManagerFrameWorkBase<CLASS_Framework, ENUM_Scene_Name, ENUM_DataFi
 	// public - [Event] Function             //
 	// 프랜드 객체가 요청                    //
 	// ===================================== //
-
-	static public void DoSetTimeScale(float fTimeScale)
-	{
-		// ITween에서 흔들리는 모션을 TimeScale에 조종하기 위해..
-		//if (Time.timeScale != 0f && fTimeScale == 0f) // 플레이 중에 멈출때
-		//{
-		//	iTween[] arrTween = FindObjectsOfType<iTween>();
-		//	_listTween.Clear();
-		//	for (int i = 0; i < arrTween.Length; i++)
-		//	{
-		//		_listTween.Add(arrTween[i]);
-		//		arrTween[i].isRunning = false;
-		//	}
-		//}
-		//else if (Time.timeScale != 0f) // 중지상태에서 플레이 할 때
-		//{
-		//	for (int i = 0; i < _listTween.Count; i++)
-		//		_listTween[i].isRunning = true;
-		//}
-
-		Time.timeScale = fTimeScale;
-	}
 
 	static public void DoLoadScene(ENUM_Scene_Name eSceneName, LoadSceneMode eLoadSceneMode, System.Action OnFinishLoading = null)
 	{
@@ -428,53 +400,6 @@ public class CManagerFrameWorkBase<CLASS_Framework, ENUM_Scene_Name, ENUM_DataFi
 
 		yield return SceneManager.UnloadSceneAsync(const_strEmptySceneName);
 
-		//float fStackProgress = 0f;
-		//while (fStackProgress < 0.9f * iMaxLoadScene)
-		//{
-		//	float fTotalProgress = 0f;
-		//	for (int i = 0; i < iMaxLoadScene; i++)
-		//		fTotalProgress += listAsyncLoadScene[i].progress;
-
-		//	if (fStackProgress < fTotalProgress)
-		//		fStackProgress += Time.unscaledDeltaTime * iMaxLoadScene;
-
-		//	if (p_EVENT_OnLoadSceneProgress != null)
-		//		p_EVENT_OnLoadSceneProgress(fStackProgress / iMaxLoadScene);
-
-		//	yield return null;
-		//}
-
-		//Scene pScene_Empty = SceneManager.GetSceneByName(const_strEmptySceneName);
-		//Scene pScene_First = SceneManager.GetSceneByName(arrSceneName[0].ToString());
-
-		//for (int i = 0; i < iMaxLoadScene; i++)
-		//{
-		//	AsyncOperation pAsyncOperation = listAsyncLoadScene[i];
-		//	pAsyncOperation.allowSceneActivation = true;
-
-		//	yield return pAsyncOperation;
-
-		//	fStackProgress += 0.1f;
-
-		//	if (p_EVENT_OnLoadSceneProgress != null)
-		//		p_EVENT_OnLoadSceneProgress(fStackProgress / iMaxLoadScene);
-
-		//	yield return null;
-
-		//	if (i == 0)
-		//	{
-		//		GameObject[] arrGameObject = pScene_Empty.GetRootGameObjects();
-		//		int iLen = arrGameObject.Length;
-		//		for (int j = 0; j < iLen; j++)
-		//		{
-		//			GameObject pGameObject = arrGameObject[j];
-		//			if (pGameObject.name.Equals("Camera")) { Destroy(pGameObject); continue; }
-		//		}
-
-		//		SceneManager.MergeScenes(pScene_Empty, pScene_First);
-		//	}
-		//}
-
 		// 로딩 끝난후 먼저 실행되는 이벤트
 		if (p_EVENT_OnFinishPreLoadScene != null)
 			p_EVENT_OnFinishPreLoadScene();
@@ -526,27 +451,25 @@ public class CManagerFrameWorkBase<CLASS_Framework, ENUM_Scene_Name, ENUM_DataFi
 		_pManagerScene = new SCSceneLoader<ENUM_Scene_Name>();
 		_pManagerScene.p_EVENT_OnSceneLoaded += ProcOnSceneLoaded;
 
-		ProcParse_UserSetting();
+        ProcParse_UserSetting();
 
-		_pJsonParser_StreammingAssets.DoStartCo_GetStreammingAssetResource_Array<SINI_Sound>( EINI_JSON_FileName.Sound.ToString(), OnParseComplete_SoundSetting );
-		_iLocalDataLoadingCount_Request++;
-
-		_pJsonParser_StreammingAssets.DoStartCo_GetStreammingAssetResource<SINI_ApplicationSetting>( EINI_JSON_FileName.ApplicationSetting.ToString(), OnFinishParse_AppSetting );
-		_iLocalDataLoadingCount_Request++;
+        _iLocalDataLoadingCount_Request++;
+        _iLocalDataLoadingCount_Request++;
+        _iLocalDataLoadingCount_Request++;
+        _pJsonParser_StreammingAssets.DoStartCo_GetStreammingAssetResource_Array<SINI_Sound>(EINI_JSON_FileName.Sound.ToString(), OnParseComplete_SoundSetting);
+        _pJsonParser_StreammingAssets.DoStartCo_GetStreammingAssetResource<SINI_ApplicationSetting>( EINI_JSON_FileName.ApplicationSetting.ToString(), OnFinishParse_AppSetting );
 
 		if (CManagerUILocalize.instance == null)
 			CManagerUILocalize.EventMakeSingleton();
 
-		CManagerUILocalize.instance.DoStartParse_Locale( CUIManagerLocalize_p_EVENT_OnChangeLocalize );
-		_iLocalDataLoadingCount_Request++;
-		//_pJsonParserINI.DoStartCo_GetStreammingAssetResource<SINI_UserSetting>(EINI_JSON_FileName.UserSetting.ToString(), OnParseComplete_UserSetting);
+        CManagerUILocalize.instance.DoStartParse_Locale( CUIManagerLocalize_p_EVENT_OnChangeLocalize );
 	}
 
 	private void ProcParse_UserSetting()
 	{
 		if (_pJsonParser_Persistent.DoReadJson_FromResource( EINI_JSON_FileName.UserSetting, out _pSetting_User ) == false)
 		{
-			Debug.Log( "UserInfo - bParsingResult Is Fail" );
+			Debug.Log( "UserInfo - bParsingResult is Fail" );
 
 			_pSetting_User = new SINI_UserSetting();
 			_pJsonParser_Persistent.DoWriteJson( EINI_JSON_FileName.UserSetting, _pSetting_User );
@@ -554,10 +477,12 @@ public class CManagerFrameWorkBase<CLASS_Framework, ENUM_Scene_Name, ENUM_DataFi
 
         CManagerSound.instance.DoSetVolumeEffect( _pSetting_User.fVolumeEffect );
         CManagerSound.instance.DoSetVolumeBGM( _pSetting_User.fVolumeBGM );
-	}
+    }
 
 	private void CUIManagerLocalize_p_EVENT_OnChangeLocalize()
 	{
+        // Debug.Log("CUIManagerLocalize_p_EVENT_OnChangeLocalize");
+
 		SystemLanguage eCurLanguage = SystemLanguage.Unknown; // Application.systemLanguage
 		try
 		{
@@ -576,7 +501,7 @@ public class CManagerFrameWorkBase<CLASS_Framework, ENUM_Scene_Name, ENUM_DataFi
 			_pJsonParser_Persistent.DoWriteJson( EINI_JSON_FileName.UserSetting, _pSetting_User );
 		}
 
-		Debug.Log( "언어 설정 " + eCurLanguage );
+		Debug.Log( "Set Language " + eCurLanguage );
 
 		CManagerUILocalize.instance.DoSet_Localize( eCurLanguage );
 		CheckLoadFinish_LocalDataAll();
@@ -598,32 +523,7 @@ public class CManagerFrameWorkBase<CLASS_Framework, ENUM_Scene_Name, ENUM_DataFi
 			OnFinishCurrentScene();
 		}
 	}
-
-
-    public override bool OnUpdate()
-	{
-		base.OnUpdate();
-
-        //float fTotalProgress = 0f;
-
-        //if (_eSceneLoadState == ESceneLoadState.SceneLoadStart)
-        //{
-        //	for (int i = 0; i < _iMaxLoadScene; i++)
-        //		fTotalProgress += _listAsyncLoadScene[i].progress;
-
-        //	if (p_EVENT_OnLoadSceneProgress != null)
-        //		p_EVENT_OnLoadSceneProgress( _fStackProgress / _iMaxLoadScene );
-
-        //	if (_fStackProgress > 0.9f * _iMaxLoadScene)
-        //		StartCoroutine( ProcFinish_Loading() );
-        //}
-
-        //if (_fStackProgress < fTotalProgress)
-        //	_fStackProgress += Time.unscaledDeltaTime * _iMaxLoadScene;
-
-        return true;
-	}
-
+    
 	// ========================================================================== //
 
 	// ===================================== //
@@ -633,9 +533,11 @@ public class CManagerFrameWorkBase<CLASS_Framework, ENUM_Scene_Name, ENUM_DataFi
 
 	static private void CheckLoadFinish_LocalDataAll()
 	{
-		if (_iLocalDataLoadingCount_Request <= ++_iLocalDataLoadingCount_Finish)
+        // Debug.Log("CheckLoadFinish_LocalDataAll _iLocalDataLoadingCount_Finish : " + (_iLocalDataLoadingCount_Finish + 1) + " _iLocalDataLoadingCount_Request : " + _iLocalDataLoadingCount_Request);
+
+        if (_iLocalDataLoadingCount_Request <= ++_iLocalDataLoadingCount_Finish)
 		{
-			if (p_EVENT_OnLoadFinish_LocalData != null)
+            if (p_EVENT_OnLoadFinish_LocalData != null)
 				p_EVENT_OnLoadFinish_LocalData();
 
 			instance.OnLoadFinish_LocalData();
@@ -659,35 +561,43 @@ public class CManagerFrameWorkBase<CLASS_Framework, ENUM_Scene_Name, ENUM_DataFi
 
 	private void OnParseComplete_SoundSetting( bool bSuccess, SINI_Sound[] arrSound )
 	{
+        // Debug.Log("OnParseComplete_SoundSetting");
+
 		if (bSuccess)
             CManagerSound.instance.EventSetSoundOption( arrSound, _pSetting_User.fVolumeEffect, _pSetting_User.eVolumeOff );
-//		ENUM_Sound_Name[] arrSoundName = PrimitiveHelper.GetEnumArray<ENUM_Sound_Name>();
-//#if UNITY_EDITOR
-//		if (arrSound == null || arrSound.Length < arrSoundName.Length)
-//		{
-//			Debug.Log( "Sound INI의 내용과 Enum SoundName과 길이가 맞지 않아 재조정" );
+        //		ENUM_Sound_Name[] arrSoundName = PrimitiveHelper.GetEnumArray<ENUM_Sound_Name>();
+        //#if UNITY_EDITOR
+        //		if (arrSound == null || arrSound.Length < arrSoundName.Length)
+        //		{
+        //			Debug.Log( "Sound INI의 내용과 Enum SoundName과 길이가 맞지 않아 재조정" );
 
-//			List<SINI_Sound> listINISound = arrSound == null ? new List<SINI_Sound>() : arrSound.ToList();
-//			Dictionary<string, SINI_Sound> mapINISound = new Dictionary<string, SINI_Sound>();
-//			mapINISound.DoAddItem( arrSound );
+        //			List<SINI_Sound> listINISound = arrSound == null ? new List<SINI_Sound>() : arrSound.ToList();
+        //			Dictionary<string, SINI_Sound> mapINISound = new Dictionary<string, SINI_Sound>();
+        //			mapINISound.DoAddItem( arrSound );
 
-//			for (int i = 0; i < arrSoundName.Length; i++)
-//			{
-//				string strSoundName = arrSoundName[i].ToString();
-//				if (mapINISound.ContainsKey( strSoundName ) == false)
-//					listINISound.Add( new SINI_Sound( strSoundName, 0.5f ) );
-//			}
+        //			for (int i = 0; i < arrSoundName.Length; i++)
+        //			{
+        //				string strSoundName = arrSoundName[i].ToString();
+        //				if (mapINISound.ContainsKey( strSoundName ) == false)
+        //					listINISound.Add( new SINI_Sound( strSoundName, 0.5f ) );
+        //			}
 
-//			_pJsonParser_StreammingAssets.DoWriteJsonArray( EINI_JSON_FileName.Sound, listINISound.ToArray() );
-//		}
-//#endif
+        //_pJsonParser_StreammingAssets.DoWriteJsonArray(EINI_JSON_FileName.Sound, listINISound.ToArray());
+        //		}
+        //#endif
 
-		CheckLoadFinish_LocalDataAll();
+#if UNITY_EDITOR
+        _pJsonParser_StreammingAssets.DoWriteJsonArray(EINI_JSON_FileName.Sound, new SINI_Sound[] { new SINI_Sound(), new SINI_Sound() });
+#endif
+
+        CheckLoadFinish_LocalDataAll();
 	}
 
 	private void OnFinishParse_AppSetting( bool bResult, SINI_ApplicationSetting sAppSetting )
 	{
-		_pSetting_App = sAppSetting;
+        // Debug.Log("OnFinishParse_AppSetting strDBName : " + sAppSetting.strDBName + " strPHPPrefix : " + sAppSetting.strPHPPrefix);
+
+        _pSetting_App = sAppSetting;
 		if (bResult == false)
 		{
 			Debug.Log("Error, AppSetting Is Null");
@@ -695,7 +605,6 @@ public class CManagerFrameWorkBase<CLASS_Framework, ENUM_Scene_Name, ENUM_DataFi
 			return;
 		}
 
-		CManagerNetworkDB_Common.instance.DoSetNetworkAddress( sAppSetting.strPHPPrefix, sAppSetting.strDBName );
 		CManagerNetworkDB_Project.instance.DoSetNetworkAddress( sAppSetting.strPHPPrefix, sAppSetting.strDBName );
 
 		//_sSetting_App = sAppSetting;

@@ -14,11 +14,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System;
 
-#if UNITY_EDITOR
-using NUnit.Framework;
-using UnityEngine.TestTools;
-#endif
-
 public class CUICompoLocalize_Sprite : CUICompoLocalizeBase
 {
     /* const & readonly declaration             */
@@ -50,7 +45,7 @@ public class CUICompoLocalize_Sprite : CUICompoLocalizeBase
 
         UnityEngine.UI.Image pImage_UGUI = GetComponent<UnityEngine.UI.Image>();
         if (pImage_UGUI)
-            pImage_UGUI.sprite = g_pResourceGetter.GetResource_Origin(strLocalizeValue);
+            pImage_UGUI.sprite = g_pResourceGetter.GetResource(strLocalizeValue);
 
     #if NGUI
         _pSprite_NGUI = GetComponent<UISprite>();
@@ -69,11 +64,5 @@ public class CUICompoLocalize_Sprite : CUICompoLocalizeBase
     #endregion Private
 
     // ========================================================================== //
-
-    #region Test
-#if UNITY_EDITOR
-
-#endif
-    #endregion Test
-
+    
 }

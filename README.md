@@ -274,55 +274,10 @@ https://postfiles.pstatic.net/MjAxODA1MDdfNjAg/MDAxNTI1NjgzNDYwNTkx.7LVx1ndhvjxd
 
 - Template에 작성자와 Library 링크를 적은 이유는 코드에 책임감을 부여하기 위해서입니다.
 
----
-- 기본적인 명명 규칙
-  - 클래스 및 변수, 함수의 명명 규칙은 접두어와 접미어로 이루어져 있습니다.
-  - 이는 인텔리 센스를 통한 빠른 찾기 및 코드 타이핑을 위해서 입니다.
-
-- 클래스 명명 규칙
-  - 클래스의 경우 계층에 따라 나뉩니다. C 혹은 SC는 Library 계층에서 Class, Static Class의 약어이며,
-    프로젝트 계층의 경우 프로젝트의 개발명 접두어 2글자를 따서 짓습니다.
-    - 예시 ) 슈팅게임 프로젝트(Shooting Game) = SG~~
-
-  - Singleton 클래스를 상속받는 경우 접두어로 Manager를 붙입니다.
-
-  - 상속용 클래스의 경우 ( abstract )  접미어로 Base를 붙이며, 상속받은 클래스는 그 기능을 Base의 위치에 붙입니다.
-    - 예시 ) CharacterBase - CharacterHuman, CharacterMonster 등
-
-- 함수 명명 규칙
-  - 함수의 경우 Public은 접두어 Do를 붙입니다. 그 외에 Get / Set 등을 붙이기도 하는데,
-  Get의 경우 Monobehaviour의 Get 함수 목록이 걸리기 때문에 보통 DoGet을 쓰기도 합니다.
-  - 예전에는 Private의 경우 Process(처리하다)의 약어인 Proc을 붙이기도 했으나,
-  최근에는 Private의 경우 접두어를 붙이지 않고, 역할만 잘 설명하면 되는 쪽으로 작업하고 있습니다.
-  - 그 외에 접두어로 Event를 붙이기도 했는데, 이는 C++의 Friend 클래스 함수로 쓰였으나,
-  마찬가지로 잘 쓰지 않아, 최근에는 Do로 통일했습니다.
-
-- 그 외
-  - 변수 네이밍은 헝가리안과 C++ 스타일을 따르고 있습니다.
-
-  - 클래스의 경우 Pointer의 약어인 p를 붙입니다.
-
-  - 프로퍼티의 경우 접두어 p_를 붙입니다.
-
-  - Struct의 경우 접두어 S를 붙입니다.
-
-  - Enum의 경우 접두어 E를 붙입니다.
-    - 최근에 Struct와 Enum의 경우 성격에 맞는 NameSpace로 빼는 중입니다.
-    - Enum 예시 - Enum.EGameState, Enum.EGameEvent
-    - Struct 예시 - Game.SGameState, Network.StatePacket 등
-    - 이렇게 빼면서 정의를 할 때에는 E와 S를 제거하려고 하고 있습니다.
-      ( 애초에 접두어를 두는 이유가 이름을 보고 성격을 파악하기 위함인데, NameSpace가 해주므로)
-
-
 ![](https://postfiles.pstatic.net/MjAxODA1MDdfMjM4/MDAxNTI1NjgyMzE3Nzgw.yGbOqrWKQ8zXPQuGo4GGgAF3CFvL0wNJdtdMWfKFQEcg.1zO8gO6AaNemOFtekPgnoqSigNlRyWJ0jOE4tuYiqaYg.JPEG.strix13/bandicam_2018-05-07_17-38-28-987.jpg?type=w773)
 
 - 최근에 작성한 코드부터는 Test 코드를 작성하기 시작했습니다.
-  - 기존의 있는 코드는 리펙토링과 함께 Test 코드를 작성합니다.
-  - 새로 작성하는 코드는 TestCase를 통과해야 작업 완료라 생각하고 작성하고 있습니다.
-    - 프로젝트 레벨의 경우 다른 클래스와 참조할 일이 잦으며, 다른 클래스가 작업이 안될 때가 있는데,
-    이경우엔 비어있는 함수부터 생성 후 테스트 케이스 작성합니다.
 
----
 ### 읽은 책 목록
 - C# 및 유니티 관련
   - 절대강좌 유니티5, 뇌를 자극하는 C# 5.0 프로그래밍, Effective C#, C# 코딩의 기술 실전편
@@ -344,4 +299,5 @@ https://postfiles.pstatic.net/MjAxODA1MDdfNjAg/MDAxNTI1NjgzNDYwNTkx.7LVx1ndhvjxd
 
 ### 개발자 연락처
 
-카카오톡 (유니티 개발자 모임 ) : https://open.kakao.com/o/gOi17az
+카카오톡 ( 유니티 개발자 모임 ) : https://open.kakao.com/o/gOi17az
+디스코드 ( 유니티 개발자 모임 ) : https://discord.gg/9EGrJap

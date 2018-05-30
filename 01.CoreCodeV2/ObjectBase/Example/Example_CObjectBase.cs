@@ -14,11 +14,6 @@ using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
 
-#if UNITY_EDITOR
-using UnityEngine.TestTools;
-using UnityEngine.Assertions;
-#endif
-
 public class Example_CObjectBase : CObjectBase
 {
     public enum EObjectName
@@ -88,13 +83,12 @@ public class Example_CObjectBase : CObjectBase
         // gameObject.SetActive(false);
     }
 
-    public override bool OnUpdate()
+    public override void OnUpdate(ref bool bCheckUpdateCount)
     {
-        base.OnUpdate();
+        base.OnUpdate(ref bCheckUpdateCount);
+        bCheckUpdateCount = true;
 
         PrintLog();
-
-        return true;
     }
 
     protected override void OnDisableObject()

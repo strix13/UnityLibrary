@@ -31,9 +31,6 @@ public class CCompoRandomSprite : CCompoEventTrigger
 
 	/* private - Field declaration           */
 
-	private UnityEngine.UI.Image _pImage;
-	private SpriteRenderer _pSprite;
-
 	// ========================================================================== //
 
 	/* public - [Do] Function

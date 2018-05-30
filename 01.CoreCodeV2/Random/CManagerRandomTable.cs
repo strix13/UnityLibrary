@@ -5,6 +5,7 @@ using System.Linq;
 
 #if UNITY_EDITOR
 using NUnit.Framework;
+using UnityEngine.TestTools;
 #endif
 
 /* ============================================ 
@@ -302,7 +303,8 @@ public class CManagerRandomTable<CLASS_Resource>
 #region Test
 #if UNITY_EDITOR
 
-public class 랜덤테이블_테스트
+[Category("StrixLibrary")]
+public class RandomTable_Test
 {
     public enum EItemGrade
     {

@@ -17,15 +17,12 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
 
-#if UNITY_EDITOR
 using NUnit.Framework;
 using UnityEngine.TestTools;
-#endif
 
 public class CObjectBase : MonoBehaviour, IUpdateAble
 {
 	protected bool _bIsExcuteAwake = false;
-    private Coroutine _pCoroutineOnAwake;
     private Coroutine _pCoroutineOnEnable;
 
 	public Vector3 p_vecPos
@@ -82,13 +79,6 @@ public class CObjectBase : MonoBehaviour, IUpdateAble
         {
             SCManagerGetComponent.DoUpdateGetComponentAttribute(this);
             _bIsExcuteAwake = true;
-
-            if (isActiveAndEnabled)
-            {
-                if (_pCoroutineOnAwake != null)
-                    StopCoroutine(OnAwakeCoroutine());
-                _pCoroutineOnAwake = StartCoroutine(OnAwakeCoroutine());
-            }
         }
 
 	}
@@ -99,11 +89,11 @@ public class CObjectBase : MonoBehaviour, IUpdateAble
     virtual protected IEnumerator OnEnableObjectCoroutine() { yield break; }
     virtual protected void OnDisableObject() { }
 
+    public void OnUpdate() { bool bCheckUpdate = true; OnUpdate(ref bCheckUpdate); }
     /// <summary>
     /// Unity Update와 동일한 로직입니다.
     /// </summary>
-    /// <returns>베이스의 경우 false, Update를 구현했는지 여부를 리턴형으로 체크.</returns>
-    virtual public bool OnUpdate() { return false; }
+    virtual public void OnUpdate(ref bool bCheckUpdateCount) { }
 
     // ========================== [ Division ] ========================== //
 
@@ -131,8 +121,7 @@ public class CObjectBase : MonoBehaviour, IUpdateAble
 }
 
 #region Test
-#if UNITY_EDITOR
-
+[Category("StrixLibrary")]
 public class CObjectBase_테스트 : CObjectBase
 {
     [GetComponent]
@@ -144,7 +133,6 @@ public class CObjectBase_테스트 : CObjectBase
     public CObjectBase pGetComponentParents;
 
     [UnityTest]
-    [Category("StrixLibrary")]
     public IEnumerator Test_ObjectBase_GetComponent_Attribute()
     {
         GameObject pObjectNew = new GameObject();
@@ -157,7 +145,6 @@ public class CObjectBase_테스트 : CObjectBase
     }
 
     [UnityTest]
-    [Category("StrixLibrary")]
     public IEnumerator Test_ObjectBase_GetComponentInChildren_Attribute()
     {
         GameObject pObjectNew = new GameObject();
@@ -172,6 +159,4 @@ public class CObjectBase_테스트 : CObjectBase
         Assert.IsNotNull(pTarget.pGetComponentParents);
     }
 }
-
-#endif
-#endregion Test
+#endregion

@@ -289,7 +289,7 @@ public class CManagerSound : CSingletonDynamicMonoBase<CManagerSound>
 
     public AudioClip GetAudioClip(string strSound)
     {
-        return _pAudioGetter.GetResource_Origin(strSound);
+        return _pAudioGetter.GetResource(strSound);
     }
 
     // ===================================== //
@@ -385,9 +385,10 @@ public class CManagerSound : CSingletonDynamicMonoBase<CManagerSound>
     }
 
 #if UNITY_EDITOR
-    public override bool OnUpdate()
+    public override void OnUpdate(ref bool bCheckUpdateCount)
     {
-        base.OnUpdate();
+        base.OnUpdate(ref bCheckUpdateCount);
+        bCheckUpdateCount = true;
 
         int iPlaySoundSlotCount = 0;
         for(int i = 0; i < transform.childCount; i++)
@@ -397,8 +398,6 @@ public class CManagerSound : CSingletonDynamicMonoBase<CManagerSound>
         }
 
         name = string.Format("사운드 매니져/{0}개 재생중/Effect{1}/BGM{2}", iPlaySoundSlotCount, _fVolumeEffect, _fVolumeBGM);
-
-        return true;
     }
 #endif
 

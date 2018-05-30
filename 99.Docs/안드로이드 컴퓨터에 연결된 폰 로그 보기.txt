@@ -1,0 +1,4 @@
+안드로이드 SDK 경로 // platform-tools 에서 cmd를 연 후
+
+adb logcat -s Unity
+입력

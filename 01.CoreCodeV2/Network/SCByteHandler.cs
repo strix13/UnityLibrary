@@ -18,9 +18,8 @@ using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System;
 
-#if UNITY_EDITOR
 using NUnit.Framework;
-#endif
+using UnityEngine.TestTools;
 
 public static class SCByteHelper
 {
@@ -71,8 +70,11 @@ public static class SCByteHelper
     static public bool ConvertPacket<Packet>(byte[] arrData, out Packet pObjectType)
     {
         pObjectType = default(Packet);
+        if (arrData == null)
+            return false;
+
         int iPacketSize = Marshal.SizeOf(typeof(Packet));
-        if (iPacketSize > arrData.Length)
+        if (iPacketSize != arrData.Length)
             return false;
 
         IntPtr pBuffer = Marshal.AllocHGlobal(iPacketSize);
@@ -82,9 +84,16 @@ public static class SCByteHelper
 
         return true;
     }
+
+    static public int SizeOf<Struct>()
+    {
+        return Marshal.SizeOf(typeof(Struct));
+    }
 }
 
-#if UNITY_EDITOR
+
+#region Test
+[Category("StrixLibrary")]
 public class 바이트핸들러_테스트
 {
     public enum ETest
@@ -93,7 +102,6 @@ public class 바이트핸들러_테스트
     }
 
     [Test]
-    [Category("StrixLibrary")]
     static public void 바이트_To_BitArray()
     {
         Assert.IsTrue(SCByteHelper.ConvertByte_To_Int(1) == 1);
@@ -102,4 +110,4 @@ public class 바이트핸들러_테스트
         Assert.IsTrue(SCByteHelper.ConvertByte_To_Int(127, 8, 2) == (127 - 3));
     }
 }
-#endif
+#endregion

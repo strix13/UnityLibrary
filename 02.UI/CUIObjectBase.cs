@@ -17,55 +17,81 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.EventSystems;
 
-public class CUIObjectBase : CObjectBase, IPointerClickHandler, IPointerDownHandler, IPointerUpHandler, /*IDragHandler,*/ IEndDragHandler, IDropHandler
+public class CUIObjectBase : CObjectBase, IPointerClickHandler, IPointerDownHandler, IPointerUpHandler, /*IDragHandler,*/ IEndDragHandler, IDropHandler, IPointerEnterHandler, IPointerExitHandler
 {
-	/* const & readonly declaration             */
+    /* const & readonly declaration             */
 
-	/* enum & struct declaration                */
+    /* enum & struct declaration                */
 
-	#region Field
+    #region Field
 
-	/* public - Field declaration            */
+    /* public - Field declaration            */
 
-	/* protected - Field declaration         */
+    public bool bPrintDebug = false;
 
-	/* private - Field declaration           */
+    /* protected - Field declaration         */
 
-	#endregion Field
+    /* private - Field declaration           */
 
-	#region Public
+    #endregion Field
 
-	// ========================================================================== //
+    #region Public
 
-	/* public - [Do] Function
+    // ========================================================================== //
+
+    /* public - [Do] Function
      * 외부 객체가 호출(For External class call)*/
 
-	/* public - [Event] Function             
+    /* public - [Event] Function             
        프랜드 객체가 호출(For Friend class call)*/
 
-	#endregion Public
+    #endregion Public
 
-	// ========================================================================== //
+    // ========================================================================== //
 
-	#region Protected
+    #region Protected
 
-	/* protected - [abstract & virtual]         */
+    /* protected - [abstract & virtual]         */
 
-	// ========================== [ Division ] ========================== //
+    // ========================== [ Division ] ========================== //
 
-	virtual protected void OnUIClick() { }
-	virtual protected void OnUIPress( bool bPress ) { }
-	virtual protected void OnUIHover( bool bHover ) { }
-	virtual protected void OnUIDrag( bool bIsDrag ) { }
-	virtual protected void OnUIDrop( GameObject pObjectOnDrop ) { }
+    virtual protected void OnUIClick()
+    {
+        if (bPrintDebug)
+            Debug.Log("OnUIClick");
+    }
 
-	/* protected - [Event] Function           
+    virtual protected void OnUIPress( bool bPress )
+    {
+        if (bPrintDebug)
+            Debug.Log("OnUIPress bPress : " + bPress);
+    }
+
+    virtual protected void OnUIHover( bool bHover )
+    {
+        if (bPrintDebug)
+            Debug.Log("OnUIHover bHover : " + bHover);
+    }
+
+    virtual protected void OnUIDrag( bool bIsDrag )
+    {
+        if (bPrintDebug)
+            Debug.Log("OnUIDrag bIsDrag : " + bIsDrag);
+    }
+
+    virtual protected void OnUIDrop( GameObject pObjectOnDrop )
+    {
+        if (bPrintDebug)
+            Debug.Log("OnUIDrop pObjectOnDrop : " + pObjectOnDrop.name);
+    }
+
+    /* protected - [Event] Function           
        자식 객체가 호출(For Child class call)		*/
 
-	/* protected - Override & Unity API         */
+    /* protected - Override & Unity API         */
 
-	// For NGUI
-	public void OnClick() { OnUIClick(); }
+    // For NGUI
+    public void OnClick() { OnUIClick(); }
 	public void OnPress( bool bPress ) { OnUIPress( bPress ); }
 	public void OnDragStart() { OnUIDrag( true ); }
 	public void OnDragEnd() { OnUIDrag( false ); }
@@ -110,8 +136,18 @@ public class CUIObjectBase : CObjectBase, IPointerClickHandler, IPointerDownHand
 		OnUIDrop( eventData.pointerDrag );
 	}
 
-	/* private - Other[Find, Calculate] Func 
+    public void OnPointerEnter(PointerEventData eventData)
+    {
+        OnUIHover(true);
+    }
+
+    public void OnPointerExit(PointerEventData eventData)
+    {
+        OnUIHover(false);
+    }
+
+    /* private - Other[Find, Calculate] Func 
        찾기, 계산등 단순 로직(Simpe logic)         */
 
-	#endregion Private
+    #endregion Private
 }

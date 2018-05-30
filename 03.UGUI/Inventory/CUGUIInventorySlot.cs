@@ -72,21 +72,6 @@ public class CUGUIInventorySlot<Class_Slot, Class_Data> : CUGUIObjectBase, IInve
 			_pData = pData;
 	}
 
-	public void OnPointerClick(PointerEventData pEventData)
-	{
-		_pInventory.IInventory_OnClickSlot( _pSlot );
-	}
-
-    public void OnPointerDown(PointerEventData eventData)
-    {
-        _pInventory.IInventory_OnPressSlot(_pSlot, true);
-    }
-
-    public void OnPointerUp(PointerEventData eventData)
-    {
-        _pInventory.IInventory_OnPressSlot(_pSlot, false);
-    }
-
     #endregion Public
 
     // ========================================================================== //
@@ -106,6 +91,20 @@ public class CUGUIInventorySlot<Class_Slot, Class_Data> : CUGUIObjectBase, IInve
 
 		_pSlot = this as Class_Slot;
 	}
+
+    protected override void OnUIClick()
+    {
+        base.OnUIClick();
+
+        _pInventory.IInventory_OnClickSlot(_pSlot);
+    }
+
+    protected override void OnUIPress(bool bPress)
+    {
+        base.OnUIPress(bPress);
+
+        _pInventory.IInventory_OnPressSlot(_pSlot, bPress);
+    }
 
     /* protected - [Event] Function           
        자식 객체가 호출(For Child class call)		*/

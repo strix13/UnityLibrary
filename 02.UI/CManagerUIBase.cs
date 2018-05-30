@@ -20,6 +20,7 @@
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 
 public interface IManagerUI
 {
@@ -32,6 +33,7 @@ abstract public partial class CManagerUIBase<CLASS_Instance, ENUM_Panel_Name, CL
     where CLASS_Panel : CObjectBase, IUIPanel
 {
     protected CDictionary_ForEnumKey<ENUM_Panel_Name, CUIPanelData> _mapPanelData = new CDictionary_ForEnumKey<ENUM_Panel_Name, CUIPanelData>();
+    protected Stack<CLASS_Panel> _Stack_OpendPanel = new Stack<CLASS_Panel>(10);
 
     public Camera p_pUICamera { get; private set; }
     public int p_iSortOrderTop { get; private set; }
@@ -50,6 +52,10 @@ abstract public partial class CManagerUIBase<CLASS_Instance, ENUM_Panel_Name, CL
         OnDefaultPanelShow();
     }
 
+    /// <summary>
+    /// 주의) Panel의 Hide Animation 이벤트가 호출되지 않습니다.
+    /// </summary>
+    /// <param name="bAlwaysShowHide"></param>
     public void DoHideAllPanel(bool bAlwaysShowHide = false)
     {
         List<CUIPanelData> listPanelDataAll = _mapPanelData.Values.ToList();
@@ -85,6 +91,7 @@ abstract public partial class CManagerUIBase<CLASS_Instance, ENUM_Panel_Name, CL
             if (pPanel.p_pPanel.p_bIsFixedSortOrder == false)
                 iSortOrder = CaculateSortOrder_Top();
 
+            _Stack_OpendPanel.Push(pPanel.p_pPanel);
             pPanel.DoShow(iSortOrder);
         }
         else
@@ -96,7 +103,7 @@ abstract public partial class CManagerUIBase<CLASS_Instance, ENUM_Panel_Name, CL
         return pPanel.p_pPanel;
     }
 
-    public CLASS_Panel DoShowHide_Panel_Force(ENUM_Panel_Name ePanel, bool bShow)
+    public CLASS_Panel DoShowHide_Panel_IgnoreSortOrder(ENUM_Panel_Name ePanel, bool bShow)
     {
         CUIPanelData pPanel = _mapPanelData[ePanel];
         if (pPanel == null)
@@ -104,6 +111,10 @@ abstract public partial class CManagerUIBase<CLASS_Instance, ENUM_Panel_Name, CL
             Debug.LogWarning(ePanel + "이 없습니다.. 하이어라키를 확인해주세요");
             return null;
         }
+
+        if (bShow)
+            _Stack_OpendPanel.Push(pPanel.p_pPanel);
+
         pPanel.SetActive(bShow);
 
         return pPanel.p_pPanel;
@@ -177,6 +188,16 @@ abstract public partial class CManagerUIBase<CLASS_Instance, ENUM_Panel_Name, CL
             Debug.LogWarning(string.Format("{0}을 찾을 수 없습니다.", strKey));
 
         return pFindPanel.p_pPanel as CUIPanel;
+    }
+
+    /// <summary>
+    /// 직전에 보였던 UI Panel을 얻어옵니다.
+    /// </summary>
+    /// <typeparam name="CUIPanel">얻고자 하는 Panel 타입</typeparam>
+    /// <returns></returns>
+    public CLASS_Panel GetUIPanel_BeforeShowed_OrNull()
+    {
+        return _Stack_OpendPanel.Skip(1).First();
     }
 
     /// <summary>

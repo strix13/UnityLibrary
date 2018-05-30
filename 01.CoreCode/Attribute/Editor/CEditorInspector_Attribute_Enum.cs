@@ -68,21 +68,6 @@ public class CEditorEnumToStringHelper
     }
 }
 
-[CustomPropertyDrawer( typeof( Rename_InspectorAttribute) )]
-public class CEditorInspector_Attribute_Rename : PropertyDrawer
-{
-	public override void OnGUI( Rect position,
-				   SerializedProperty property, GUIContent label )
-	{
-		Rename_InspectorAttribute pAttributeTarget = (Rename_InspectorAttribute)attribute;
-		label.text = pAttributeTarget.strInspectorName;
-
-		GUI.enabled = pAttributeTarget.bIsEditPossibleInspector;
-		EditorGUI.PropertyField( position, property, label, true );
-		GUI.enabled = true;
-	}
-}
-
 [CustomPropertyDrawer(typeof(EnumToStringAttribute))]
 public class CEditorInspector_Attribute_EnumToString : PropertyDrawer
 {

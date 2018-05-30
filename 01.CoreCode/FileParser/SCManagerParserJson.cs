@@ -132,6 +132,29 @@ public class SCManagerParserJson : SCManagerResourceBase<SCManagerParserJson, st
         return bSuccess;
     }
 
+    public bool DoReadJson_FromResource<ENUM_FILE_NAME, T>(string strFolderPath, ENUM_FILE_NAME eFileName, out T sData)
+    where ENUM_FILE_NAME : System.IConvertible, System.IComparable
+    where T : class
+    {
+        bool bSuccess = true;
+        try
+        {
+            string strText = "";
+
+            string strFilePath = ExtractLocalFilePath(eFileName, strFolderPath);
+            if (System.IO.File.Exists(strFilePath))
+                strText = System.IO.File.ReadAllText(strFilePath);
+
+            sData = JsonUtility.FromJson<T>(strText);
+        }
+        catch { sData = null; bSuccess = false; }
+
+        if (sData == null)
+            bSuccess = false;
+
+        return bSuccess;
+    }
+
     public bool DoReadJson_FromResource<ENUM_FILE_NAME, T>(ENUM_FILE_NAME eFileName, out T sData)
         where ENUM_FILE_NAME : System.IConvertible, System.IComparable
 		where T : class
@@ -204,7 +227,7 @@ public class SCManagerParserJson : SCManagerResourceBase<SCManagerParserJson, st
 		return arrReturn;
 	}
 
-	public void DoWriteJson<ENUM_FILE_NAME>(ENUM_FILE_NAME eFileName, System.Object pWriteObj)
+    public void DoWriteJson<ENUM_FILE_NAME>(ENUM_FILE_NAME eFileName, System.Object pWriteObj)
         where ENUM_FILE_NAME : System.IConvertible, System.IComparable
     {
         string strFilePath = ExtractLocalFilePath(eFileName, _strFolderPath );
@@ -231,7 +254,6 @@ public class SCManagerParserJson : SCManagerResourceBase<SCManagerParserJson, st
 	static public void DoWriteJson<ENUM_FILE_NAME>( string strFolderPath, ENUM_FILE_NAME eFileName, System.Object pWriteObj )
 		where ENUM_FILE_NAME : System.IConvertible, System.IComparable
 	{
-		strFolderPath = Application.dataPath + "/" + strFolderPath;
 		string strFilePath = ExtractLocalFilePath( eFileName, strFolderPath );
 		_pStrBuilder.Length = 0;
 		string strJson = JsonUtility.ToJson( pWriteObj, true );

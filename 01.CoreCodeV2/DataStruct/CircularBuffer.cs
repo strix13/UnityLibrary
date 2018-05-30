@@ -17,10 +17,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System;
 
-#if UNITY_EDITOR
 using NUnit.Framework;
 using UnityEngine.TestTools;
-#endif
 
 public interface ICircularBuffer<T>
 {
@@ -40,13 +38,21 @@ public class CircularBuffer<T> : ICircularBuffer<T>, IEnumerable<T>
     private T[] _buffer;
     private int _head;
     private int _tail;
+    private int _iCapacity;
 
     public CircularBuffer(int capacity)
     {
         if (capacity < 0)
             throw new ArgumentOutOfRangeException("capacity", "must be positive");
         _buffer = new T[capacity];
-        _head = capacity - 1;
+        _iCapacity = capacity;
+        Reset();
+    }
+
+    public void Reset()
+    {
+        _head = _iCapacity - 1;
+        _tail = 0;
     }
 
     public int Count { get; private set; }
@@ -105,11 +111,7 @@ public class CircularBuffer<T> : ICircularBuffer<T>, IEnumerable<T>
             return false;
         }
 
-        dequeued = _buffer[_tail];
-        _buffer[_tail] = default(T);
-        _tail = (_tail + 1) % Capacity;
-        --Count;
-
+        dequeued = Dequeue();
         return true;
     }
 
@@ -124,6 +126,30 @@ public class CircularBuffer<T> : ICircularBuffer<T>, IEnumerable<T>
         --Count;
 
         return dequeued;
+    }
+
+    public T Peek(int iPeekDepth = 0)
+    {
+        if (Count == 0 || Count < iPeekDepth)
+            return default(T);
+
+        int iPeekTail = _tail;
+        if (_tail + iPeekDepth >= Capacity)
+            iPeekTail = 0;
+
+        return _buffer[iPeekTail + iPeekDepth];
+    }
+
+    public bool Peek(out T peeked, int iPeekDepth = 0)
+    {
+        if (Count == 0 || Count < iPeekDepth + 1)
+        {
+            peeked = default(T);
+            return false;
+        }
+        
+        peeked = Peek(iPeekDepth);
+        return true;
     }
 
     private LinkedList<T> _listTemp = new LinkedList<T>();
@@ -144,6 +170,25 @@ public class CircularBuffer<T> : ICircularBuffer<T>, IEnumerable<T>
 
         return _listTemp.ToArray(); ;
     }
+
+    public T[] Peek_OrNull(int iPeekCount)
+    {
+        if (Count == 0)
+            return null;
+
+        _listTemp.Clear();
+        for(int i = 0; i < iPeekCount; i++)
+        {
+            T pDequeued;
+            if (Peek(out pDequeued, i))
+                _listTemp.AddLast(pDequeued);
+            else
+                break;
+        }
+
+        return _listTemp.ToArray();
+    }
+
 
     public void Clear()
     {
@@ -221,7 +266,6 @@ public class CircularBuffer<T> : ICircularBuffer<T>, IEnumerable<T>
 }
 
 #region Test
-#if UNITY_EDITOR
 
 public class 환형큐_테스트
 {
@@ -348,6 +392,23 @@ public class 환형큐_테스트
         Assert.AreEqual(0, buffer.Count);
 
     }
+
+    [Test]
+    public void TestPeek()
+    {
+        var buffer = new CircularBuffer<long>(5);
+        Assert.AreEqual(default(long), buffer.Enqueue(1));
+        Assert.AreEqual(default(long), buffer.Enqueue(2));
+        Assert.AreEqual(default(long), buffer.Enqueue(3));
+
+        Assert.AreEqual(1, buffer.Peek());
+
+        long[] arrPeek = buffer.Peek_OrNull(4);
+        Assert.AreEqual(1, arrPeek[0]);
+        Assert.AreEqual(2, arrPeek[1]);
+        Assert.AreEqual(3, arrPeek[2]);
+        Assert.AreEqual(3, arrPeek.Length);
+    }
 }
-#endif
-#endregion Test
+
+#endregion

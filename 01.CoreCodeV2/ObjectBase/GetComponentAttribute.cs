@@ -23,10 +23,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
 
-#if UNITY_EDITOR
-using UnityEngine.TestTools;
 using NUnit.Framework;
-#endif
+using UnityEngine.TestTools;
 
 [AttributeUsage(AttributeTargets.Field, Inherited = true, AllowMultiple = false)]
 public abstract class GetComponentAttributeBase : UnityEngine.PropertyAttribute
@@ -272,71 +270,69 @@ static public class SCManagerGetComponent
         pField.SetValue(pTargetMono, pInstanceDictionary);
         return pComponent;
     }
+}
 
-    #region Test
-#if UNITY_EDITOR
+#region Test
 
-    public class Test_ComponentChild : MonoBehaviour { }
-    public class Test_ComponentChild_DerivedDictionaryItem : MonoBehaviour, IDictionaryItem<Test_ComponentParents.ETestChildObject>
+public class Test_ComponentChild : MonoBehaviour { }
+public class Test_ComponentChild_DerivedDictionaryItem : MonoBehaviour, IDictionaryItem<GetComponentAttribute_Test.ETestChildObject>
+{
+    public GetComponentAttribute_Test.ETestChildObject IDictionaryItem_GetKey()
     {
-        public Test_ComponentParents.ETestChildObject IDictionaryItem_GetKey()
-        {
-            return name.ConvertEnum<Test_ComponentParents.ETestChildObject>();
-        }
+        return name.ConvertEnum<GetComponentAttribute_Test.ETestChildObject>();
+    }
+}
+
+[Category("StrixLibrary")]
+public class GetComponentAttribute_Test : MonoBehaviour
+{
+    public enum ETestChildObject
+    {
+        TestObject_1,
+        TestObject_2,
+        TestObject_3,
+
+        TestObject_Other_FindString,
+        TestObject_Other_FindEnum,
+
+        MAX,
     }
 
-    public class Test_ComponentParents : MonoBehaviour
+
+    [GetComponentInChildren]
+    public List<Test_ComponentChild> p_listTest = new List<Test_ComponentChild>();
+
+    [GetComponentInChildren]
+    public Dictionary<string, Test_ComponentChild> p_mapTest_KeyIsString = new Dictionary<string, Test_ComponentChild>();
+    [GetComponentInChildren]
+    public Dictionary<ETestChildObject, Test_ComponentChild> p_mapTest_KeyIsEnum = new Dictionary<ETestChildObject, Test_ComponentChild>();
+
+    [GetComponentInChildren("TestObject_Other_FindString")]
+    public Test_ComponentChild p_pChildComponent_FindString;
+    [GetComponentInChildren(ETestChildObject.TestObject_Other_FindEnum)]
+    public Test_ComponentChild p_pChildComponent_FindEnum;
+
+    public void Awake()
     {
-        public enum ETestChildObject
-        {
-            TestObject_1,
-            TestObject_2,
-            TestObject_3,
-
-            TestObject_Other_FindString,
-            TestObject_Other_FindEnum,
-
-            MAX,
-        }
-
-
-        [GetComponentInChildren]
-        public List<Test_ComponentChild> p_listTest = new List<Test_ComponentChild>();
-
-        [GetComponentInChildren]
-        public Dictionary<string, Test_ComponentChild> p_mapTest_KeyIsString = new Dictionary<string, Test_ComponentChild>();
-        [GetComponentInChildren]
-        public Dictionary<ETestChildObject, Test_ComponentChild> p_mapTest_KeyIsEnum = new Dictionary<ETestChildObject, Test_ComponentChild>();
-
-        [GetComponentInChildren("TestObject_Other_FindString")]
-        public Test_ComponentChild p_pChildComponent_FindString;
-        [GetComponentInChildren(ETestChildObject.TestObject_Other_FindEnum)]
-        public Test_ComponentChild p_pChildComponent_FindEnum;
-
-        public void Awake()
-        {
-            SCManagerGetComponent.DoUpdateGetComponentAttribute(this);
-        }
+        SCManagerGetComponent.DoUpdateGetComponentAttribute(this);
     }
 
     [UnityTest]
-    [Category("StrixLibrary")]
-
     static public IEnumerator Test_GetComponentAttribute()
     {
         GameObject pObjectParents = new GameObject("Test");
 
         // GetComponent 대상인 자식 추가
-        for (int i = 0; i < (int)Test_ComponentParents.ETestChildObject.MAX; i++)
+        for (int i = 0; i < (int)GetComponentAttribute_Test.ETestChildObject.MAX; i++)
         {
-            GameObject pObjectChild = new GameObject(((Test_ComponentParents.ETestChildObject)i).ToString());
+            GameObject pObjectChild = new GameObject(((GetComponentAttribute_Test.ETestChildObject)i).ToString());
             pObjectChild.transform.SetParent(pObjectParents.transform);
             pObjectChild.AddComponent<Test_ComponentChild>();
         }
 
         // 자식을 전부 추가한 뒤에 페런츠에 추가한다.
         // 추가하자마자 Awake로 자식을 찾기 때문
-        Test_ComponentParents pParents = pObjectParents.AddComponent<Test_ComponentParents>();
+        GetComponentAttribute_Test pParents = pObjectParents.AddComponent<GetComponentAttribute_Test>();
         pParents.Awake();
 
         yield return null;
@@ -345,10 +341,10 @@ static public class SCManagerGetComponent
         Assert.NotNull(pParents.p_pChildComponent_FindEnum);
         Assert.NotNull(pParents.p_pChildComponent_FindString);
 
-        Assert.IsTrue(pParents.p_pChildComponent_FindString.name == Test_ComponentParents.ETestChildObject.TestObject_Other_FindString.ToString());
-        Assert.IsTrue(pParents.p_pChildComponent_FindEnum.name == Test_ComponentParents.ETestChildObject.TestObject_Other_FindEnum.ToString());
+        Assert.IsTrue(pParents.p_pChildComponent_FindString.name == GetComponentAttribute_Test.ETestChildObject.TestObject_Other_FindString.ToString());
+        Assert.IsTrue(pParents.p_pChildComponent_FindEnum.name == GetComponentAttribute_Test.ETestChildObject.TestObject_Other_FindEnum.ToString());
 
-        Assert.IsTrue(pParents.p_listTest.Count == (int)Test_ComponentParents.ETestChildObject.MAX);
+        Assert.IsTrue(pParents.p_listTest.Count == (int)GetComponentAttribute_Test.ETestChildObject.MAX);
 
         Assert.IsTrue(pParents.p_mapTest_KeyIsEnum.Count == 5);
         Assert.IsTrue(pParents.p_mapTest_KeyIsString.Count == 5);
@@ -367,23 +363,21 @@ static public class SCManagerGetComponent
     }
 
     [UnityTest]
-    [Category("StrixLibrary")]
-
     static public IEnumerator Test_GetComponentInChildren_DeriveEnum()
     {
         GameObject pObjectParents = new GameObject("Test");
 
         // GetComponent 대상인 자식 추가
-        for (int i = 0; i < (int)Test_ComponentParents.ETestChildObject.MAX; i++)
+        for (int i = 0; i < (int)GetComponentAttribute_Test.ETestChildObject.MAX; i++)
         {
-            GameObject pObjectChild = new GameObject(((Test_ComponentParents.ETestChildObject)i).ToString());
+            GameObject pObjectChild = new GameObject(((GetComponentAttribute_Test.ETestChildObject)i).ToString());
             pObjectChild.transform.SetParent(pObjectParents.transform);
             pObjectChild.AddComponent<Test_ComponentChild_DerivedDictionaryItem>();
         }
 
         // 자식을 전부 추가한 뒤에 페런츠에 추가한다.
         // 추가하자마자 Awake로 자식을 찾기 때문
-        Test_ComponentParents pParents = pObjectParents.AddComponent<Test_ComponentParents>();
+        GetComponentAttribute_Test pParents = pObjectParents.AddComponent<GetComponentAttribute_Test>();
         pParents.Awake();
 
         yield return null;
@@ -394,7 +388,6 @@ static public class SCManagerGetComponent
             Assert.IsTrue(pIterEnum.Current.Key.ToString() == pIterEnum.Current.Value.name.ToString());
         }
     }
-
-#endif
-    #endregion
 }
+
+#endregion

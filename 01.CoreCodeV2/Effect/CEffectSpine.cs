@@ -12,10 +12,7 @@ using Spine;
    Edit Log    : 
    ============================================ */
 
-abstract public class CEffectSpineBase<CLASS_EFFECT, ENUM_EFFECT_NAME, ENUM_SOUND_NAME> : CEffectBase<CLASS_EFFECT, ENUM_EFFECT_NAME>
-	where CLASS_EFFECT : CEffectSpineBase<CLASS_EFFECT, ENUM_EFFECT_NAME, ENUM_SOUND_NAME>
-	where ENUM_EFFECT_NAME : System.IConvertible, System.IComparable
-	where ENUM_SOUND_NAME : System.IConvertible, System.IComparable
+public class CEffectSpine : CEffect
 {
 	/* const & readonly declaration             */
 
@@ -57,17 +54,17 @@ abstract public class CEffectSpineBase<CLASS_EFFECT, ENUM_EFFECT_NAME, ENUM_SOUN
 			_pSpineAnimation = GetComponentInChildren<SkeletonAnimation>();
 			if (_pSpineAnimation != null)
 			{
-				Spine.Animation[] arrAnimation = _pSpineAnimation.Skeleton.data.Animations.Items;
-				Spine.Animation pAnimationFirst = arrAnimation[0];
-				_strAnimationName = pAnimationFirst.name;
+				//Spine.Animation[] arrAnimation = _pSpineAnimation.Skeleton.data.Animations.Items;
+				//Spine.Animation pAnimationFirst = arrAnimation[0];
+				//_strAnimationName = pAnimationFirst.name;
 				_pSpineAnimation.loop = false;
 				_pSpineAnimation.AnimationName = _strAnimationName;
 
 				_eEffectType = EEffectType.Spine;
-				_pAutoDisable = gameObject.AddComponent<CCompoAutoDisable>();
-				_pAutoDisable.fAutoDisableTime = pAnimationFirst.duration;
-				_pAutoDisable.p_eInputType_Main = CCompoEventTrigger.EInputType.OnEnable;
-				_pAutoDisable.DoPlayEvent_Main();
+				//_pAutoDisable = gameObject.AddComponent<CCompoAutoDisable>();
+				//_pAutoDisable.fAutoDisableTime = pAnimationFirst.duration;
+				//_pAutoDisable.p_eInputType_Main = CCompoEventTrigger.EInputType.OnEnable;
+				//_pAutoDisable.DoPlayEvent_Main();
 			}
 		}
 	}

@@ -23,6 +23,8 @@ public class CSoundPlayer : CCompoEventTrigger
 	[Header("사운드 끝날때 이벤트 - 루프시에도 적용")]
 	public UnityEngine.Events.UnityEvent p_listEvent_FinishSound = new UnityEngine.Events.UnityEvent();
 
+    [Rename_Inspector("Disable 시 사운드 Off 유무")]
+    public bool _bPlayOff_OnDisable = false;
     [Header("플레이할 사운드 목록")]
     public AudioClip[] _arrPlayAudioClip;
 
@@ -91,15 +93,19 @@ public class CSoundPlayer : CCompoEventTrigger
         base.OnDisableObject();
 
         name = _strOriginName;
+
+        if (_pSlotCurrentPlaying != null && _bPlayOff_OnDisable)
+            _pSlotCurrentPlaying.DoStopSound();
     }
 #endif
 
 #if UNITY_EDITOR
-    public override bool OnUpdate()
+    public override void OnUpdate(ref bool bCheckUpdateCount)
     {
-        base.OnUpdate();
+        base.OnUpdate(ref bCheckUpdateCount);
+        bCheckUpdateCount = true;
 
-		if (_bIsPlaying)
+        if (_bIsPlaying)
 		{
 			if(_iLoopCount != 0)
 				name = string.Format("{0} 재생중.. Repeat : {1}", _strOriginName, _iLoopCountCurrent);
@@ -108,8 +114,6 @@ public class CSoundPlayer : CCompoEventTrigger
 		}
 		else
 			name = _strOriginName;
-
-        return true;
 	}
 #endif
 

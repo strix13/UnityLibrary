@@ -18,10 +18,8 @@ using System.Collections.Generic;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 
-#if UNITY_EDITOR
 using NUnit.Framework;
 using UnityEngine.TestTools;
-#endif
 
 [RequireComponent( typeof( CCompoEventSystemChecker ) )]
 [RequireComponent( typeof( Canvas ) )]
@@ -84,8 +82,9 @@ abstract public class CManagerUGUIBase<Class_Instance, Enum_Panel_Name> : CManag
 }
 
 #region Test
-#if UNITY_EDITOR
-public class UGUI_매니져_테스트 : CManagerUGUIBase<UGUI_매니져_테스트, UGUI_매니져_테스트.EUIPanel>
+
+[Category("StrixLibrary")]
+public class CManagerUGUIBase_Test : CManagerUGUIBase<CManagerUGUIBase_Test, CManagerUGUIBase_Test.EUIPanel>
 {
     const float const_fShowAnimation_DurationSec = 0.1f;
 
@@ -103,7 +102,7 @@ public class UGUI_매니져_테스트 : CManagerUGUIBase<UGUI_매니져_테스�
     }
     public class 패널테스트_2 : CUGUIPanelBase { }
 
-    [UnityTest] [Category("StrixLibrary")]
+    [UnityTest]
     public IEnumerator 패널관리테스트()
     {
         GameObject pObjectManager = new GameObject();
@@ -113,7 +112,7 @@ public class UGUI_매니져_테스트 : CManagerUGUIBase<UGUI_매니져_테스�
         pPanelTest.transform.SetParent(pObjectManager.transform);
         pPanelTest2.transform.SetParent(pObjectManager.transform);
 
-        UGUI_매니져_테스트 pManager = pObjectManager.AddComponent<UGUI_매니져_테스트>();
+        CManagerUGUIBase_Test pManager = pObjectManager.AddComponent<CManagerUGUIBase_Test>();
         yield return null;
 
         Assert.AreEqual(pPanelTest.gameObject.activeSelf, true);
@@ -134,5 +133,5 @@ public class UGUI_매니져_테스트 : CManagerUGUIBase<UGUI_매니져_테스�
 
     protected override void OnDefaultPanelShow() { DoShowHide_Panel(EUIPanel.패널테스트_1, true); }
 }
-#endif
-#endregion Test
+
+#endregion

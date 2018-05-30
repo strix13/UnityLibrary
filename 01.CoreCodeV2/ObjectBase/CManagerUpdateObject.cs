@@ -17,7 +17,7 @@ using System.Reflection;
 
 public interface IUpdateAble
 {
-    bool OnUpdate();
+    void OnUpdate(ref bool bCheckUpdateCount);
 }
 
 public class CManagerUpdateObject : CSingletonDynamicMonoBase<CManagerUpdateObject>
@@ -58,7 +58,9 @@ public class CManagerUpdateObject : CSingletonDynamicMonoBase<CManagerUpdateObje
             int iUpdateObjectCount = 0;
             for (int i = 0; i < _listObject.Count; i++)
             {
-                if (_listObject[i].OnUpdate())
+                bool bCheckUpdate = false;
+                _listObject[i].OnUpdate(ref bCheckUpdate);
+                if(bCheckUpdate)
                     iUpdateObjectCount++;
             }
 

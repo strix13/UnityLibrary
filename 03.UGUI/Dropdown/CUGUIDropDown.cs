@@ -56,7 +56,6 @@ public class CUGUIDropDown : Dropdown
 	/* private - Field declaration           */
 
 	private Dictionary<string, SDropDownData> _mapData = new Dictionary<string, SDropDownData>();
-	private List<SDropDownData> _listData = new List<SDropDownData>();
 
 	#endregion Field
 	#region Public
@@ -69,7 +68,6 @@ public class CUGUIDropDown : Dropdown
 	{
 		value = 0;
 		_mapData.Clear();
-		_listData.Clear();
 		ClearOptions();
 	}
 
@@ -77,7 +75,6 @@ public class CUGUIDropDown : Dropdown
 	{
 		if (listData == null) return;
 
-		_listData.AddRange(listData);
 		_mapData.DoAddItem(listData, false);
 
 		List<string> listText = new List<string>();
@@ -92,7 +89,10 @@ public class CUGUIDropDown : Dropdown
 
 	public SDropDownData GetData(string strItemText)
 	{
-		return _mapData[strItemText];
+        if (_mapData.ContainsKey_PrintOnError(strItemText))
+            return _mapData[strItemText];
+        else
+            return null;
 	}
 
 	/* public - [Event] Function             

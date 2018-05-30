@@ -53,12 +53,17 @@ public class CUIPopupShared_DebugConsole_UGUI : CUGUIPanelHasInputBase<CUIPopupS
     /* public - [Event] Function             
        프랜드 객체가 호출                       */
 
-    public void OnPointerDown(UnityEngine.EventSystems.PointerEventData eventData)
+    public override void OnButtons_Press_And_Hold(EUIInput eButtonName, bool bPress)
     {
+        base.OnButtons_Press_And_Hold(eButtonName, bPress);
+
         _vecPos_DragStart = GetInputPos();
     }
-    public void OnDrag(PointerEventData eventData)
+
+    protected override void OnUIDrag(bool bIsDrag)
     {
+        base.OnUIDrag(bIsDrag);
+
         if (_bIsMove)
         {
             Vector3 vecCurrentInputPos = GetInputPos();
@@ -91,11 +96,21 @@ public class CUIPopupShared_DebugConsole_UGUI : CUGUIPanelHasInputBase<CUIPopupS
 				strLogType = "<color=red>[심각한 에러] "; break;
 		}
 
-		string strDebugLog = string.Format("\n[시간]{0} -> {1}\n{2}\n[스택 트레이스]\n{3}", Time.time, strLogType, strLog, strStackTrace);
-        strDebugLog += "</color>";
+        if(eLogType == LogType.Log)
+        {
+            if (_pUIText)
+                _pUIText.text += strLog;
+        }
+        else
+        {
 
-		if(_pUIText)
-	        _pUIText.text += strDebugLog;
+            string strDebugLog = string.Format("\n[시간]{0} -> {1}\n{2}\n[스택 트레이스]\n{3}", Time.time, strLogType, strLog, strStackTrace);
+            strDebugLog += "</color>";
+
+            if (_pUIText)
+                _pUIText.text += strDebugLog;
+        }
+
 
         if (_pScrollView)
             _pScrollView.verticalNormalizedPosition = 0f;

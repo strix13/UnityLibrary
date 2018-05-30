@@ -111,7 +111,7 @@ public class CManagerUILocalize : CSingletonDynamicMonoBase<CManagerUILocalize>
 		}
 
 		if (p_eCurrentLocalize == SystemLanguage.Unknown)
-            Debug.LogWarning("현재 지정된 언어를 알수없습니다.");
+            Debug.LogWarning("DoSetLocalize_CurrentScene - p_eCurrentLocalize == SystemLanguage.Unknown");
 		else
             DoSet_Localize(p_eCurrentLocalize);
     }
@@ -120,7 +120,7 @@ public class CManagerUILocalize : CSingletonDynamicMonoBase<CManagerUILocalize>
 	{
         if (_mapLocaleData.ContainsKey(eLocalize) == false)
 		{
-			Debug.LogWarning("_mapLocaleData 에 " + eLocalize + " 키가 없습니다.");
+            Debug.LogWarning("_mapLocaleData ContainsKey (" + eLocalize + ") == false");
             return;
 		}
 
@@ -187,7 +187,7 @@ public class CManagerUILocalize : CSingletonDynamicMonoBase<CManagerUILocalize>
 			p_EVENT_OnFinishParse_LocFile += OnFinishParse;
 	}
 
-    public void EventSet_LocalizeParsing(SystemLanguage eLocale, string strText, byte[] arrTextByte, bool bIsFInish)
+    public void EventSet_LocalizeParsing(SystemLanguage eLocale, string strText, byte[] arrTextByte, bool bIsFinish)
     {
         if (CheckIsUTF8(arrTextByte))
             strText = Encoding.UTF8.GetString(arrTextByte, 3, arrTextByte.Length - 3);
@@ -203,12 +203,8 @@ public class CManagerUILocalize : CSingletonDynamicMonoBase<CManagerUILocalize>
                 Regist_LocalizeData(eLocale, pStringPair.strKey, pStringPair.strValue);
         }
 
-        if (bIsFInish && p_EVENT_OnFinishParse_LocFile != null)
-        {
-            p_EVENT_OnFinishParse_LocFile();
-            p_EVENT_OnFinishParse_LocFile = null;
-        }
-
+        if (bIsFinish)
+            ExcuteFinishEvent();
     }
 
     // ========================================================================== //
@@ -266,7 +262,13 @@ public class CManagerUILocalize : CSingletonDynamicMonoBase<CManagerUILocalize>
 			p_bIsFinishParse = true;
 
         if (pReader == null || pReader.error != null || pReader.bytes.Length == 0)
-			yield break;
+        {
+            if (p_bIsFinishParse)
+                ExcuteFinishEvent();
+
+            yield break;
+        }
+
 
         EventSet_LocalizeParsing(eLocale, pReader.text, pReader.bytes, p_bIsFinishParse);
     }
@@ -280,6 +282,15 @@ public class CManagerUILocalize : CSingletonDynamicMonoBase<CManagerUILocalize>
 
 	/* private - Other[Find, Calculate] Func 
        찾기, 계산 등의 비교적 단순 로직         */
+
+    private void ExcuteFinishEvent()
+    {
+        if (p_EVENT_OnFinishParse_LocFile != null)
+        {
+            p_EVENT_OnFinishParse_LocFile();
+            p_EVENT_OnFinishParse_LocFile = null;
+        }
+    }
 
     private bool CheckIsUTF8(byte[] arrByte)
     {

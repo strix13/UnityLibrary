@@ -46,11 +46,17 @@ public class CEffect : CObjectBase
 	private CUI2DSpriteAnimation _p2DSpriteAnimation;
 #endif
 	private System.Action _OnFinishEffect_OneShot;
+    private bool _bIsStop = false;
 
 	// ========================================================================== //
 
 	/* public - [Do] Function
      * 외부 객체가 호출                         */
+
+    public void DoReturnEffect()
+    {
+        gameObject.SetActive(false);
+    }
 
 	public void DoPlayEffect( Transform pTransParents )
 	{
@@ -86,6 +92,12 @@ public class CEffect : CObjectBase
 
 		OnPlayEffectAfter( _strEffectName );
 	}
+
+    public void DoStopEffect()
+    {
+        _bIsStop = true;
+        gameObject.SetActive(false);
+    }
 
 	/* public - [Event] Function             
        프랜드 객체가 호출                       */
@@ -151,14 +163,24 @@ public class CEffect : CObjectBase
 		OnDefineEffect();
 	}
 
-	protected override void OnDisableObject()
+    protected override void OnEnableObject()
+    {
+        base.OnEnableObject();
+
+        _bIsStop = false;
+    }
+
+    protected override void OnDisableObject()
 	{
 		base.OnDisableObject();
 
-        if(p_Event_Effect_OnDisable != null)
-            p_Event_Effect_OnDisable(this);
+        if (_bIsStop == false)
+        {
+            if (p_Event_Effect_OnDisable != null)
+                p_Event_Effect_OnDisable(this);
 
-        DoResetEvent();
+            DoResetEvent();
+        }
     }
 
     // ========================================================================== //

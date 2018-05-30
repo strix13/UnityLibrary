@@ -37,6 +37,11 @@ public class CSingletonDynamicMonoBase<CLASS_SingletoneTarget> : CObjectBase
                 }
                 else
                 {
+#if UNITY_EDITOR
+                    if(Application.isPlaying == false)
+                        return new CLASS_SingletoneTarget();
+#endif
+
                     _instance = FindObjectOfType<CLASS_SingletoneTarget>();
                     if (_instance == null)
                     {
@@ -104,12 +109,16 @@ public class CSingletonDynamicMonoBase<CLASS_SingletoneTarget> : CObjectBase
 
     // ========================== [ Division ] ========================== //
 
-    static public CLASS_SingletoneTarget EventMakeSingleton()
+    static public CLASS_SingletoneTarget EventMakeSingleton(bool bIsCreateNew_Force = false)
     {
-        if (_bIsQuitApplication) return null;
-        if (_instance != null) return instance;
+        if (_bIsQuitApplication)
+            return null;
+
+        if (bIsCreateNew_Force == false && _instance != null)
+            return instance;
 
         GameObject pObjectNewManager = new GameObject(typeof(CLASS_SingletoneTarget).ToString());
-        return pObjectNewManager.AddComponent<CLASS_SingletoneTarget>();
+        _instance = pObjectNewManager.AddComponent<CLASS_SingletoneTarget>();
+        return _instance;
     }
 }

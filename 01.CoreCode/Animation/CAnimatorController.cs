@@ -33,7 +33,7 @@ public enum EAnimationEvent
 
 public interface IAnimationController
 {
-	event System.Action<EAnimationEvent> p_Event_OnAnimationEvent;
+	event System.Action<string> p_Event_OnAnimationEvent;
 
 	void DoPlayAnimation<ENUM_ANIMATION_NAME>( ENUM_ANIMATION_NAME eAnimName, System.Action OnFinishAnimation = null )
 		where ENUM_ANIMATION_NAME : System.IConvertible, System.IComparable;
@@ -55,7 +55,7 @@ public class CAnimatorController : CObjectBase, IAnimationController
 	public string strDefaultAnimation;
 	public bool bDefaultIsLoop = true;
 
-	public event Action<EAnimationEvent> p_Event_OnAnimationEvent;
+	public event Action<string> p_Event_OnAnimationEvent;
 
 	private System.Action _OnFinishAnimation;
 	private Animator _pAnimator;	public Animator p_pAnimator {  get { return _pAnimator; } }
@@ -213,10 +213,10 @@ public class CAnimatorController : CObjectBase, IAnimationController
 	}
 
 
-	public void EventAnimationListen( EAnimationEvent eAnimationEvent )
+	public void EventAnimationListen( string strAnimationEvent )
 	{
 		if (p_Event_OnAnimationEvent != null)
-			p_Event_OnAnimationEvent( eAnimationEvent );
+			p_Event_OnAnimationEvent(strAnimationEvent);
 	}
 
 	// ========================== [ Division ] ========================== //
@@ -299,8 +299,9 @@ public class CAnimatorController : CObjectBase, IAnimationController
 			// 에러인 경우
 			if (bFindAnimation == false)
 			{
-				Debug.LogWarning( "Error!!" );
-			}
+                Debug.LogWarning("Error! bFindAnimation == false");
+                ExcuteOnFinishAnimation();
+            }
 
 			_fCurrentAnimation_NomalizeTime = sCurrentState.normalizedTime;
 			// 플레이가 끝났을 때
@@ -308,17 +309,8 @@ public class CAnimatorController : CObjectBase, IAnimationController
 			{
 				if (_bIsLoop)
 					DoPlayAnimation_Loop( _strCurrentAnimName );
-				else if (_OnFinishAnimation != null)
-				{
-					// OnFinishAnimation에 DoPlayAnimation(ENUM_ANIM_NAME eAnimName, System.Action OnFinishAnimation)을 실행하면, 
-					// _OnFinishAnimation을 세팅한다. 근데 그 함수가 끝나고 바로 null처리를 하기 때문에,
-					// 결과적으로 세팅을 해도 _OnFinishAnimation을은 null이 된다. 따라서, 임시 객체에 일단 저장 후 미리 null처리 후 호출한다.
-					System.Action OnFinishAnimation = _OnFinishAnimation;
-					_OnFinishAnimation = null;
-					yield return null;
-
-					OnFinishAnimation();
-				}
+				else
+                    ExcuteOnFinishAnimation();
 
 				break;
 			}
@@ -327,4 +319,18 @@ public class CAnimatorController : CObjectBase, IAnimationController
 
 		yield break;
 	}
+
+    private void ExcuteOnFinishAnimation()
+    {
+        if(_OnFinishAnimation == null)
+            return;
+
+        // OnFinishAnimation에 DoPlayAnimation(ENUM_ANIM_NAME eAnimName, System.Action OnFinishAnimation)을 실행하면, 
+        // _OnFinishAnimation을 세팅한다. 근데 그 함수가 끝나고 바로 null처리를 하기 때문에,
+        // 결과적으로 세팅을 해도 _OnFinishAnimation을은 null이 된다. 따라서, 임시 객체에 일단 저장 후 미리 null처리 후 호출한다.
+        System.Action OnFinishAnimation = _OnFinishAnimation;
+        _OnFinishAnimation = null;
+
+        OnFinishAnimation();
+    }
 }

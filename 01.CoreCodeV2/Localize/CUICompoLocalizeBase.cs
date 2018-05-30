@@ -13,11 +13,6 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 
-#if UNITY_EDITOR
-using NUnit.Framework;
-using UnityEngine.TestTools;
-#endif
-
 abstract public class CUICompoLocalizeBase : CObjectBase, CManagerUILocalize.ILocalizeListener
 {
     /* const & readonly declaration             */
@@ -75,12 +70,5 @@ abstract public class CUICompoLocalizeBase : CObjectBase, CManagerUILocalize.ILo
     #region Private
 
     #endregion Private
-
-    // ========================================================================== //
-
-    #region Test
-#if UNITY_EDITOR
-
-#endif
-    #endregion Test
+    
 }

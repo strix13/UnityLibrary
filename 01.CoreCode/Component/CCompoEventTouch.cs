@@ -87,11 +87,12 @@ public class CCompoEventTouch : CObjectBase
 
     /* protected - Override & Unity API         */
 
-    public override bool OnUpdate()
+    public override void OnUpdate(ref bool bCheckUpdateCount)
 	{
 		base.OnUpdate();
+        bCheckUpdateCount = true;
 
-		int iTouchCount = 0;
+        int iTouchCount = 0;
 
 #if (UNITY_EDITOR || UNITY_STANDALONE)
 
@@ -182,8 +183,6 @@ public class CCompoEventTouch : CObjectBase
 			if (_eStateTouch != EStateTouch.None)
 				_eStateTouch = EStateTouch.None;
 		}
-
-        return true;
 	}
 
 #endregion Protected

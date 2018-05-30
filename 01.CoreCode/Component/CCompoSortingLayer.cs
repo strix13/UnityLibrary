@@ -84,15 +84,14 @@ public class CCompoSortingLayer : CObjectBase
        로직을 처리(Process Local logic)           */
 
 #if UNITY_EDITOR
-    public override bool OnUpdate()
+    public override void OnUpdate(ref bool bCheckUpdateCount)
 	{
 		base.OnUpdate();
-		
-		Renderer pRenderer = GetComponent<Renderer>();
+        bCheckUpdateCount = true;
+
+        Renderer pRenderer = GetComponent<Renderer>();
 		if (pRenderer != null)
 			pRenderer.sortingLayerName = this.strSortingLayer;
-
-        return true;
 	}
 
 #endif

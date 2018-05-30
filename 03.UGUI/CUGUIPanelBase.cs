@@ -21,24 +21,24 @@ using System;
 [RequireComponent( typeof( Canvas ))]
 public class CUGUIPanelBase : CUGUIObjectBase, IUIPanel
 {
-	/* const & readonly declaration             */
+    /* const & readonly declaration             */
 
-	/* enum & struct declaration                */
+    /* enum & struct declaration                */
 
-	#region Field
+    #region Field
 
-	/* public - Field declaration            */
+    /* public - Field declaration            */
 
-	[SerializeField]
-	private bool _bIsAlwaysShow = false;
-	[SerializeField]
-	private bool _bIsFixedSortOrder = false;
+    [Rename_Inspector("항상 보여줄 건지 유무")]
+    public bool p_bIsAlwaysShow = false;
+	[Rename_Inspector("SortOrder를 고정 시킬 건지 유무")]
+	public bool p_bIsFixedSortOrder = false;
 	
 	bool IUIPanel.p_bIsAlwaysShow
 	{
 		get
 		{
-			return _bIsAlwaysShow;
+			return p_bIsAlwaysShow;
 		}
 	}
 
@@ -46,7 +46,7 @@ public class CUGUIPanelBase : CUGUIObjectBase, IUIPanel
 	{
 		get
 		{
-			return _bIsFixedSortOrder;
+			return p_bIsFixedSortOrder;
 		}
 	}
 

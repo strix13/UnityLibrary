@@ -26,11 +26,11 @@ public class CFollowObject : CObjectBase
     private EFollowPos _eFollowPos = EFollowPos.All;
     [SerializeField]
     private Transform _pTransTarget = null;
-    [SerializeField]
-    private EFollowMode _bUseFixedUpdate = EFollowMode.Update;
-	[SerializeField]
-	private bool _bIsSmoothFollow = false;
-	[SerializeField] [Range(0, 1f)]
+
+    public EFollowMode p_eFollowMode = EFollowMode.Update;
+	public bool p_bIsSmoothFollow = false;
+
+    [SerializeField] [Range(0, 1f)]
 	private float _fSmoothFollowDelta = 0.1f;
 
 	[Header("흔들기 옵션")]
@@ -97,7 +97,7 @@ public class CFollowObject : CObjectBase
         Vector3 vecFollowPos = transform.position;
         Vector3 vecTargetPos = _pTransTarget.position;
 
-		if(_bIsSmoothFollow)
+		if(p_bIsSmoothFollow)
 			ProcFollow_Smooth( ref vecFollowPos, vecTargetPos );
 		else
 			ProcFollow_Normal( ref vecFollowPos, vecTargetPos );
@@ -120,19 +120,18 @@ public class CFollowObject : CObjectBase
 		}
 	}
 
-    public override bool OnUpdate()
+    public override void OnUpdate(ref bool bCheckUpdateCount)
     {
-        base.OnUpdate();
+        base.OnUpdate(ref bCheckUpdateCount);
+        bCheckUpdateCount = true;
 
-        if (_bUseFixedUpdate == EFollowMode.Update)
+        if (p_eFollowMode == EFollowMode.Update)
             DoUpdateFollow();
-
-        return true;
     }
 
     private void FixedUpdate()
     {
-        if (_bUseFixedUpdate == EFollowMode.FixedUpdate)
+        if (p_eFollowMode == EFollowMode.FixedUpdate)
             DoUpdateFollow();
     }
 

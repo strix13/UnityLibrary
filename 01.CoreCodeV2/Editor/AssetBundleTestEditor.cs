@@ -10,8 +10,8 @@ public class AssetBundleTestEditor : CEditorWindowBase<AssetBundleTestEditor>
 
 #if UNITY_STANDALONE
     static readonly BuildTarget const_BuildTarget = BuildTarget.StandaloneWindows64;
-#elif UNITY_ANDROID
-    static readonly BuildTarget const_BuildTarget = BuildTarget.Android;
+//#elif UNITY_ANDROID
+//    static readonly BuildTarget const_BuildTarget = BuildTarget.Android;
 #endif
 
     string _strBundleName;

@@ -110,6 +110,17 @@ public class CCompoEventTrigger : CObjectBase, IPointerDownHandler, IPointerUpHa
 			ProcPlayEvent();
 	}
 
+    public void DoSetActiveObject_True()
+    {
+        gameObject.SetActive(true);
+    }
+
+    public void DoSetActiveObject_False()
+    {
+        gameObject.SetActive(false);
+    }
+
+
     /* public - [Event] Function             
        프랜드 객체가 호출                       */
 

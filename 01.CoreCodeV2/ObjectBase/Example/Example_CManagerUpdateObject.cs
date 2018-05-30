@@ -26,11 +26,10 @@ public class Test_UpdateAbleObject : MonoBehaviour, IUpdateAble
         CManagerUpdateObject.instance.DoRemoveObject(this);
     }
 
-    public bool OnUpdate()
+    public void OnUpdate(ref bool bCheckUpdateCount)
     {
+        bCheckUpdateCount = true;
         pManagerObject.TestCase(this);
-
-        return true;
     }
 }
 

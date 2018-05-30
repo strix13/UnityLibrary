@@ -2,11 +2,6 @@
 using System.Collections;
 using System.Collections.Generic;
 
-#if UNITY_EDITOR
-using UnityEngine.TestTools;
-
-#endif
-
 /* ============================================ 
    Editor      : Strix                               
    Date        : 2017-03-24 오후 8:59:21
@@ -95,13 +90,12 @@ public class CManagerEffect : CSingletonDynamicMonoBase<CManagerEffect>
     }
 
 #if UNITY_EDITOR
-    public override bool OnUpdate()
+    public override void OnUpdate(ref bool bCheckUpdateCount)
     {
-        base.OnUpdate();
+        base.OnUpdate(ref bCheckUpdateCount);
+        bCheckUpdateCount = true;
 
         name = string.Format("이펙트 매니져/{0}개 재생중", _pManagerPooling.p_iPopCount);
-
-        return true;
     }
 #endif
 
@@ -125,19 +119,3 @@ public class CManagerEffect : CSingletonDynamicMonoBase<CManagerEffect>
         _pManagerPooling.DoPush(obj);
     }
 }
-
-#region Test
-#if UNITY_EDITOR
-
-public class 이펙트_매니져_테스트
-{
-    [UnityTest]
-    public IEnumerator 이펙트_풀링_테스트()
-    {
-
-        yield break;
-    }
-}
-
-#endif
-#endregion Test

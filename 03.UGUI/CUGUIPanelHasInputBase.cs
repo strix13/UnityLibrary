@@ -257,6 +257,8 @@ abstract public class CUGUIPanelHasInputBase<Enum_InputName> : CUGUIPanelBase, I
 
 #region Test
 #if UNITY_EDITOR
+
+[Category("StrixLibrary")]
 public class UGUI_인풋패널_테스트 : CUGUIPanelHasInputBase<UGUI_인풋패널_테스트.EInput>
 {
     public enum EInput
@@ -265,7 +267,7 @@ public class UGUI_인풋패널_테스트 : CUGUIPanelHasInputBase<UGUI_인풋패
     }
     static EInput eLastInput;
 
-    [UnityTest] [Category("StrixLibrary")]
+    [UnityTest]
     public IEnumerator 인풋입력테스트()
     {
         EventSystem.current = new GameObject().AddComponent<EventSystem>();
@@ -292,4 +294,4 @@ public class UGUI_인풋패널_테스트 : CUGUIPanelHasInputBase<UGUI_인풋패
     public override void OnButtons_Click(EInput eButtonName) { eLastInput = eButtonName; }
 }
 #endif
-#endregion Test
+#endregion

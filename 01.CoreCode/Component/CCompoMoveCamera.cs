@@ -34,11 +34,12 @@ public class CCompoMoveCamera : CObjectBase
         _pCam = GetComponent<Camera>();
     }
 
-    public override bool OnUpdate()
+    public override void OnUpdate(ref bool bCheckUpdateCount)
     {
         base.OnUpdate();
+        bCheckUpdateCount = true;
 
-		int iTouchCount = 0;// UICamera.CountInputSources();
+        int iTouchCount = 0;// UICamera.CountInputSources();
         if (iTouchCount == 0)
         {
 			oldTouchPositions[0] = null;
@@ -117,7 +118,5 @@ public class CCompoMoveCamera : CObjectBase
         if (fFOV < fZoomLimitMin) fFOV = fZoomLimitMin;
         if (fFOV > fZoomLimitMax) fFOV = fZoomLimitMax;
         _pCam.fieldOfView = fFOV;
-
-        return true;
     }
 }

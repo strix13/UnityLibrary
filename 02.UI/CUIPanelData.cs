@@ -121,7 +121,7 @@ abstract public partial class CManagerUIBase<CLASS_Instance, ENUM_Panel_Name, CL
 
 		protected IEnumerator CoProcShowPanel( int iSortOrder )
 		{
-			if (_bIsShowCurrent) yield break;
+			// if (_bIsShowCurrent) yield break;
 
 			_bIsShowCurrent = true;
 			_bIsPlayUIAnimation = true;

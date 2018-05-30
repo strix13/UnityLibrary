@@ -74,9 +74,14 @@ public class SCManagerResourceBase<CLASS, ENUM_RESOURCE_NAME, RESOURCE>
 		return pInstance;
     }
 
+    public void DoStartCo_GetStreammingAssetResource<TResource>(string strFolderPath, ENUM_RESOURCE_NAME eResourceName, System.Action<bool, TResource> OnGetResource)
+    {
+        _pBase.StartCoroutine(CoGetResource_StreammingAsset(strFolderPath, eResourceName.ToString(), OnGetResource));
+    }
+
     public void DoStartCo_GetStreammingAssetResource<TResource>(ENUM_RESOURCE_NAME eResourceName, System.Action<bool, TResource> OnGetResource)
     {
-        _pBase.StartCoroutine(CoGetResource_StreammingAsset(eResourceName.ToString(), OnGetResource));
+        _pBase.StartCoroutine(CoGetResource_StreammingAsset(_strFolderPath, eResourceName.ToString(), OnGetResource));
     }
 
     public void DoStartCo_GetStreammingAssetResource_Array<TResource>(ENUM_RESOURCE_NAME eResourceName, System.Action<bool, TResource[]> OnGetResource)
@@ -148,16 +153,15 @@ public class SCManagerResourceBase<CLASS, ENUM_RESOURCE_NAME, RESOURCE>
 		}
 	}
 
-    private IEnumerator CoGetResource_StreammingAsset<TResource>(string strResourceName, System.Action<bool, TResource> OnGetResource)
+    private IEnumerator CoGetResource_StreammingAsset<TResource>(string strFolderPath, string strResourceName, System.Action<bool, TResource> OnGetResource)
     {
         _pStrBuilder.Length = 0;
 #if UNITY_EDITOR
 		_pStrBuilder.Append("file://");
 #endif
-		_pStrBuilder.Append(_strFolderPath);
-        _pStrBuilder.Append("/");
-        _pStrBuilder.Append(strResourceName + OnGetFileExtension());
+        _pStrBuilder.Append(strFolderPath).Append("/").Append(strResourceName).Append(OnGetFileExtension());
 
+        // Debug.Log(" _pStrBuilder : " + _pStrBuilder.ToString());
         WWW www = new WWW(_pStrBuilder.ToString());
         yield return www;
 		
@@ -181,20 +185,28 @@ public class SCManagerResourceBase<CLASS, ENUM_RESOURCE_NAME, RESOURCE>
     private IEnumerator CoGetResource_StreammingAsset_Array<TResource>(string strResourceName, System.Action<bool, TResource[]> OnGetResource)
     {
         _pStrBuilder.Length = 0;
-#if UNITY_EDITOR
-		_pStrBuilder.Append("file://");
-#endif
+//#if UNITY_EDITOR
+//		_pStrBuilder.Append("file://");
+//#endif
 		_pStrBuilder.Append(_strFolderPath);
         _pStrBuilder.Append("/");
         _pStrBuilder.Append(strResourceName + OnGetFileExtension());
-		
-		WWW www = new WWW(_pStrBuilder.ToString());
+
+        if(System.IO.File.Exists(_pStrBuilder.ToString()) == false)
+        {
+            Debug.LogWarning(_pStrBuilder.ToString() + " 파일이 존재하지 않습니다");
+            OnGetResource(false, null);
+            yield break;
+        }
+
+        WWW www = new WWW(_pStrBuilder.ToString());
         yield return www;
 
         if (www.error != null && www.error.Length != 0)
         {
             Debug.LogWarning(www.error);
             OnGetResource(false, null);
+            yield break;
         }
 
         TResource[] arrResource = null;
