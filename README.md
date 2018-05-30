@@ -299,5 +299,6 @@ https://postfiles.pstatic.net/MjAxODA1MDdfNjAg/MDAxNTI1NjgzNDYwNTkx.7LVx1ndhvjxd
 
 ### 개발자 연락처
 
-카카오톡 ( 유니티 개발자 모임 ) : https://open.kakao.com/o/gOi17az
-디스코드 ( 유니티 개발자 모임 ) : https://discord.gg/9EGrJap
+- 카카오톡 ( 유니티 개발자 모임 ) : https://open.kakao.com/o/gOi17az
+
+- 디스코드 ( 유니티 개발자 모임 ) : https://discord.gg/9EGrJap
