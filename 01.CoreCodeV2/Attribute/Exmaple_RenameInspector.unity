@@ -140,7 +140,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eb7fdd987bee1db4b8fa9f6cdaf80e2e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  fValue: 6.04
+  iValue: 1
+  fValue: 0
+  strValue: It's a Readonly
+  strValue_Long: It's Looooooooooooooooooooooooooooooooooooooooooong
 --- !u!4 &1405985119
 Transform:
   m_ObjectHideFlags: 0

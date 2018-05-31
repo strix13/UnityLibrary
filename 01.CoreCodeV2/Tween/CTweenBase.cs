@@ -57,6 +57,9 @@ abstract public class CTweenBase : CObjectBase
 
     public delegate void OnCreateYield(out CustomYieldInstruction pYield);
 
+
+    public bool bIsDebug = false;
+
     public AnimationCurve p_pAnimationCurve = new AnimationCurve(new Keyframe(0f, 0f, 0f, 1f), new Keyframe(1f, 1f, 1f, 0f));
     public bool p_bIgnoreTimeScale = false;
     public float p_fDuration = 1f;

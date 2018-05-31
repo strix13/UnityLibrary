@@ -17,4 +17,8 @@ public class RenameInspectorAttribute_Test : MonoBehaviour {
     [Rename_Inspector("private reaonlyString", false)]
     private string strValue = "It's a Readonly";
 
+    [SerializeField]
+    [Rename_Inspector("It's Looooooooooooooooooooooooooooooooooooooooooong", false)]
+    private string strValue_Long = "It's Looooooooooooooooooooooooooooooooooooooooooong";
+
 }

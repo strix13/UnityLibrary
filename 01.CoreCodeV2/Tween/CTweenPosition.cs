@@ -86,9 +86,9 @@ public class CTweenPosition : CTweenBase
     protected override void OnTween(float fProgress_0_1)
     {
         if (p_bIsLocal)
-            transform.localPosition = Vector3.Lerp(p_vecPosStart, p_vecPosDest, fProgress_0_1);
+            transform.localPosition = p_vecPosStart * (1f - fProgress_0_1) + p_vecPosDest * fProgress_0_1;
         else
-            transform.position = Vector3.Lerp(p_vecPosStart, p_vecPosDest, fProgress_0_1);
+            transform.position = p_vecPosStart * (1f - fProgress_0_1) + p_vecPosDest * fProgress_0_1;
     }
 
     public override void OnEditorButtonClick_SetStartValue_IsCurrentValue()
