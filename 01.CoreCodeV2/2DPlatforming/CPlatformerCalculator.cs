@@ -24,7 +24,7 @@ public class CPlatformerCalculator : CRaycastCalculator
     }
 
     [System.Serializable]
-    public struct CollisionInfo
+    public class CollisionInfo
     {
         public bool above;
         public bool below { get; private set; }
@@ -41,7 +41,10 @@ public class CPlatformerCalculator : CRaycastCalculator
         public bool fallingThroughPlatform;
 
         [HideInInspector]
-        public List<Transform> _listHitTransform;
+        public List<Transform> _listHitTransform = new List<Transform>();
+
+        [HideInInspector]
+        public List<RaycastHit2D> _listHit_Vertical = new List<RaycastHit2D>();
 
         public void Reset()
         {
@@ -49,7 +52,7 @@ public class CPlatformerCalculator : CRaycastCalculator
             left = right = false;
             climbingSlope = false;
             descendingSlope = false;
-            DoSetSlopeSliding(false);
+            DoSet_MaxSlope(false);
             slopeNormal = Vector2.zero;
 
             slopeAngleOld = slopeAngle;
@@ -86,7 +89,7 @@ public class CPlatformerCalculator : CRaycastCalculator
             this._OnChangeFaceDir = OnChangeFaceDir;
         }
 
-        public void DoSetSlopeSliding(bool bSliding)
+        public void DoSet_MaxSlope(bool bSliding)
         {
             if (slidingDownMaxSlope != bSliding)
             {
@@ -117,8 +120,6 @@ public class CPlatformerCalculator : CRaycastCalculator
 
     public LayerMask collisionMask;
 
-    [Rename_Inspector("밑에서 몇번째 좌우 레이까지 닿았을 때 언덕으로 인식할 것인가")]
-    public int _iRayIndex_HitIsSlope = 0;
     //[Rename_Inspector("레이 원점 X 오프셋")]
     //public float _fRayOriginOffset_X = 0f;
     //[Rename_Inspector("레이 원점 Y 오프셋")]
@@ -130,8 +131,9 @@ public class CPlatformerCalculator : CRaycastCalculator
     public CollisionInfo p_pCollisionInfo;
     [HideInInspector]
     public Vector2 _vecPlayerInput;
-    Vector3 _vecMoveAmountOrigin;
-    Vector3 _vecMoveAmountResult;
+
+    public Vector3 p_vecMoveAmountOrigin { get; private set; }
+    public Vector3 p_vecMoveAmountResult { get; private set; }
 
     public int _iHorizontalHitCount { get; private set; }
     public int _iVerticalHitCount { get; private set; }
@@ -139,7 +141,6 @@ public class CPlatformerCalculator : CRaycastCalculator
     /* protected & private - Field declaration         */
 
     OnHit_VerticalCollider _OnHit_VerticalCollider;
-    float _fSlopeAngle_Last;
 
     // ========================================================================== //
 
@@ -166,37 +167,39 @@ public class CPlatformerCalculator : CRaycastCalculator
         p_pCollisionInfo.DoSet_Below(OnChangeBelow);
     }
 
-    public void DoMove(Vector2 moveAmount, bool standingOnPlatform)
+    public void DoMove(Vector2 moveAmount, bool bPlatform)
     {
-        DoMove(moveAmount, Vector2.zero, standingOnPlatform);
+        DoMove(moveAmount, Vector3.zero, bPlatform);
     }
 
-    public void DoMove(Vector2 moveAmount, Vector2 input, bool standingOnPlatform = false)
+    public void DoMove(Vector2 moveAmount, Vector2 vecInput, bool standingOnPlatform = false)
     {
         DoUpdateRaycastOrigins();
 
         p_pCollisionInfo.Reset();
         p_pCollisionInfo.moveAmountOld = moveAmount;
-        _vecPlayerInput = input;
+        p_vecMoveAmountOrigin = moveAmount;
+        _vecPlayerInput = vecInput;
 
-        _vecMoveAmountOrigin = moveAmount;
         if (moveAmount.y < 0)
-        {
             DescendSlope(ref moveAmount);
-        }
 
         if (moveAmount.x != 0)
-        {
-            p_pCollisionInfo.DoSetFaceDir_OneIsLeft((int)Mathf.Sign(moveAmount.x));
-        }
+            p_pCollisionInfo.DoSetFaceDir_OneIsLeft(System.Math.Sign(moveAmount.x));
 
         HorizontalCollision(ref moveAmount);
         //if (moveAmount.y != 0)
         {
-            VerticalCollision(ref moveAmount, input.x != 0f);
+            VerticalCollision(ref moveAmount);
         }
-        _vecMoveAmountResult = moveAmount;
+
+        p_vecMoveAmountResult = moveAmount;
         transform.Translate(moveAmount);
+
+        if (standingOnPlatform)
+        {
+            p_pCollisionInfo.DoSet_Below(true);
+        }
     }
 
     public void DoIgnoreCollider(float fRestoreSeconds)
@@ -205,6 +208,57 @@ public class CPlatformerCalculator : CRaycastCalculator
         Invoke("ResetFallingThroughPlatform", fRestoreSeconds);
     }
     
+    public bool DoCheckBelow(out RaycastHit2D pHitBelow)
+    {
+        pHitBelow = default(RaycastHit2D);
+        float directionY = -1f;
+        float rayLength = Mathf.Abs(p_vecMoveAmountOrigin.y) + _fSkinWidth_Vertical;
+
+        for (int i = 0; i < _iVerticalRayCount; i++)
+        {
+            Vector2 rayOrigin = (directionY == -1) ? _pRaycastOrigins.vecBound_BottomLeft : _pRaycastOrigins.vecBound_TopLeft;
+            rayOrigin += Vector2.right * (_fDstBetweenRays_Vertical * i);
+            if (i == _iVerticalRayCount - 1)
+                rayOrigin.x = ((directionY == -1) ? _pRaycastOrigins.vecBound_BottomRight.x : _pRaycastOrigins.vecBound_TopRight.x);
+
+            RaycastHit2D hit = Physics2D.Raycast(rayOrigin, Vector2.up * directionY, rayLength, collisionMask);
+
+            if (bDebugMode)
+            {
+                if (hit)
+                    Debug.DrawRay(rayOrigin, Vector2.up * directionY * hit.distance, Color.magenta);
+                else
+                    Debug.DrawRay(rayOrigin, Vector2.up * directionY * rayLength, Color.cyan);
+            }
+
+            if (hit)
+            {
+                if (hit.collider.tag == "Through")
+                {
+                    if (directionY == 1/* || hit.distance == 0*/)
+                    {
+                        continue;
+                    }
+                    if (p_pCollisionInfo.fallingThroughPlatform)
+                    {
+                        continue;
+                    }
+                    if (_vecPlayerInput.y == -1)
+                    {
+                        p_pCollisionInfo.fallingThroughPlatform = true;
+                        Invoke("ResetFallingThroughPlatform", .5f);
+                        continue;
+                    }
+                }
+
+                pHitBelow = hit;
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     // ========================================================================== //
 
     /* protected - Override & Unity API         */
@@ -213,7 +267,6 @@ public class CPlatformerCalculator : CRaycastCalculator
     {
         base.OnAwake();
 
-        p_pCollisionInfo._listHitTransform = new List<Transform>();
         p_pCollisionInfo.DoSetFaceDir_OneIsLeft(p_iFaceDir_OnAwake);
     }
 
@@ -225,28 +278,32 @@ public class CPlatformerCalculator : CRaycastCalculator
         if (bDebugMode == false) return;
 
         Vector3 vecPos = transform.position + vecDebugOffset;
-        UnityEditor.Handles.Label(vecPos, "SlopeAngle_Last : " + _fSlopeAngle_Last);
-
-        vecPos.y -= 0.5f;
         UnityEditor.Handles.Label(vecPos, "collisions.climbingSlope : " + p_pCollisionInfo.climbingSlope);
 
-        vecPos.y -= 0.5f;
+        vecPos.y -= 1;
         UnityEditor.Handles.Label(vecPos, "_pCollisionInfo.slidingDownMaxSlope : " + p_pCollisionInfo.slidingDownMaxSlope);
 
-        vecPos.y -= 0.5f;
+        vecPos.y -= 1;
         UnityEditor.Handles.Label(vecPos, "_iHorizontalHitCount : " + _iHorizontalHitCount);
 
-        vecPos.y -= 0.5f;
+        vecPos.y -= 1;
         UnityEditor.Handles.Label(vecPos, "_iVerticalHitCount : " + _iVerticalHitCount);
 
-        vecPos.y -= 0.5f;
+        vecPos.y -= 1;
         UnityEditor.Handles.Label(vecPos, "_vecPlayerInput : " + _vecPlayerInput.ToString("F4"));
 
-        vecPos.y -= 0.5f;
-        UnityEditor.Handles.Label(vecPos, "_vecMoveAmountOrigin : " + _vecMoveAmountOrigin.ToString("F4"));
+        vecPos.y -= 1;
+        UnityEditor.Handles.Label(vecPos, "_vecMoveAmountOrigin : " + p_vecMoveAmountOrigin.ToString("F4"));
 
-        vecPos.y -= 0.5f;
-        UnityEditor.Handles.Label(vecPos, "_vecMoveAmountResult : " + _vecMoveAmountResult.ToString("F4"));
+        vecPos.y -= 1;
+        UnityEditor.Handles.Label(vecPos, "_vecMoveAmountResult : " + p_vecMoveAmountResult.ToString("F4"));
+
+        vecPos.y -= 1;
+        UnityEditor.Handles.Label(vecPos, "p_pCollisionInfo.right : " + p_pCollisionInfo.right + " p_pCollisionInfo.left : " + p_pCollisionInfo.left);
+
+        vecPos.y -= 1;
+        UnityEditor.Handles.Label(vecPos, "p_pCollisionInfo.below : " + p_pCollisionInfo.below + " p_pCollisionInfo.above : " + p_pCollisionInfo.above);
+
     }
 #endif
 
@@ -264,60 +321,35 @@ public class CPlatformerCalculator : CRaycastCalculator
 
         if (Mathf.Abs(moveAmount.x) < _fSkinWidth_Horizontal)
         {
-            rayLength = _fSkinWidth_Horizontal * 2f;
+            rayLength = 2 * _fSkinWidth_Horizontal;
         }
 
         _iHorizontalHitCount = 0;
-        moveAmount = HorizontalCollision(moveAmount, directionX, rayLength);
-    }
-
-    private Vector2 HorizontalCollision(Vector2 moveAmount, float directionX, float rayLength)
-    {
         for (int i = 0; i < _iHorizontalRayCount; i++)
         {
-            if (i < _iIgnoreRayCount_Horizontal)
-                continue;
-
             Vector2 rayOrigin = (directionX == -1) ? _pRaycastOrigins.vecBound_BottomLeft : _pRaycastOrigins.vecBound_BottomRight;
-            // rayOrigin.x += (directionX == -1) ? _fRayOriginOffset_X * -1 : _fRayOriginOffset_X;
+            rayOrigin += Vector2.up * (_fDstBetweenRays_Horizontal * i);
+            RaycastHit2D hit = Physics2D.Raycast(rayOrigin, Vector2.right * directionX, rayLength, collisionMask);
 
-            rayOrigin += Vector2.up * (_fHorizontalRaySpacing * i);
-            CRaycastHitWrapper pHit;
-            if (p_eDimensionType == EDimensionType.TwoD)
-                pHit = CRaycastHitWrapper.Raycast2D(rayOrigin, Vector2.right * directionX, rayLength, collisionMask);
-            else
-                pHit = CRaycastHitWrapper.Raycast3D(rayOrigin, Vector2.right * directionX, rayLength, collisionMask);
-
-            if (pHit)
+            if (bDebugMode)
             {
-                if (i <= _iRayIndex_HitIsSlope)
-                    Debug.DrawRay(rayOrigin, Vector2.right * directionX * rayLength, new Color(0f, 0.5f, 0f, 1f));
+                if (hit)
+                    Debug.DrawRay(rayOrigin, Vector2.right * directionX * hit.distance, Color.red);
                 else
                     Debug.DrawRay(rayOrigin, Vector2.right * directionX * rayLength, Color.green);
-                Debug.DrawRay(rayOrigin, pHit.normal, Color.yellow);
-            }
-            else
-            {
-                if ( i <= _iRayIndex_HitIsSlope )
-                    Debug.DrawRay(rayOrigin, Vector2.right * directionX * rayLength, Color.magenta);
-                else
-                    Debug.DrawRay(rayOrigin, Vector2.right * directionX * rayLength, Color.red);
             }
 
-            if (pHit && pHit.transform == transform)
-                continue;
-
-            if (pHit)
+            if (hit)
             {
-                p_pCollisionInfo._listHitTransform.Add(pHit.transform);
-                _iHorizontalHitCount++;
-                if (pHit.distance == 0)
-                {
+                if (hit.distance == 0)
                     continue;
-                }
-                _fSlopeAngle_Last = Vector2.Angle(pHit.normal, Vector2.up);
 
-                if (i <= _iRayIndex_HitIsSlope && _fSlopeAngle_Last <= maxSlopeAngle)
+                p_pCollisionInfo._listHitTransform.Add(hit.transform);
+                _iHorizontalHitCount++;
+
+                float slopeAngle = Vector2.Angle(hit.normal, Vector2.up);
+
+                if (i == 0 && slopeAngle <= maxSlopeAngle)
                 {
                     if (p_pCollisionInfo.descendingSlope)
                     {
@@ -325,21 +357,19 @@ public class CPlatformerCalculator : CRaycastCalculator
                         moveAmount = p_pCollisionInfo.moveAmountOld;
                     }
                     float distanceToSlopeStart = 0;
-                    if (_fSlopeAngle_Last != p_pCollisionInfo.slopeAngleOld)
+                    if (slopeAngle != p_pCollisionInfo.slopeAngleOld)
                     {
-                        distanceToSlopeStart = pHit.distance - _fSkinWidth_Horizontal;
+                        distanceToSlopeStart = hit.distance - _fSkinWidth_Horizontal;
                         moveAmount.x -= distanceToSlopeStart * directionX;
                     }
-                    ClimbSlope(ref moveAmount, _fSlopeAngle_Last, pHit.normal);
-
-                    //Debug.Log(" distanceToSlopeStart : " + distanceToSlopeStart);
-                    //moveAmount.x += distanceToSlopeStart * directionX;
+                    ClimbSlope(ref moveAmount, slopeAngle, hit.normal);
+                    moveAmount.x += distanceToSlopeStart * directionX;
                 }
 
-                if (!p_pCollisionInfo.climbingSlope || _fSlopeAngle_Last > maxSlopeAngle)
+                if (!p_pCollisionInfo.climbingSlope || slopeAngle > maxSlopeAngle)
                 {
-                    moveAmount.x = (pHit.distance - _fSkinWidth_Horizontal) * directionX;
-                    rayLength = pHit.distance;
+                    moveAmount.x = (hit.distance - _fSkinWidth_Horizontal) * directionX;
+                    rayLength = hit.distance;
 
                     if (p_pCollisionInfo.climbingSlope)
                     {
@@ -351,105 +381,59 @@ public class CPlatformerCalculator : CRaycastCalculator
                 }
             }
         }
-
-        return moveAmount;
     }
 
 
-    void VerticalCollision(ref Vector2 moveAmount, bool bIsMoveX)
+    void VerticalCollision(ref Vector2 moveAmount)
     {
-        float directionY = -1f;
-        if (moveAmount.normalized.y != 0f)
-            directionY = Mathf.Sign(moveAmount.normalized.y);
+        float directionY = Mathf.Sign(moveAmount.y);
+        float rayLength = Mathf.Abs(moveAmount.y) + _fSkinWidth_Vertical;
 
         _iVerticalHitCount = 0;
-        moveAmount = VerticalCollision(moveAmount, directionY, bIsMoveX);
-
-        float rayLength = Mathf.Abs(moveAmount.y) + _fSkinWidth_Vertical;
-        if (p_pCollisionInfo.climbingSlope)
-        {
-            float directionX = Mathf.Sign(moveAmount.x);
-            rayLength = Mathf.Abs(moveAmount.x) + _fSkinWidth_Vertical;
-            Vector2 rayOrigin = ((directionX == -1) ? _pRaycastOrigins.vecBound_BottomLeft : _pRaycastOrigins.vecBound_BottomRight) + Vector2.up * moveAmount.y;
-
-            CalculateClimbSlope(rayOrigin, directionX, rayLength, ref moveAmount);
-        }
-
-        bool bIsStandOnPlatform = _iVerticalHitCount != 0 && directionY == -1f;
-        if (bIsStandOnPlatform == false)
-            p_pCollisionInfo.DoSetSlopeSliding(false);
-
-    }
-
-    private Vector2 VerticalCollision(Vector2 moveAmount, float directionY, bool bIsMoveX)
-    {
-        bool bDirectionIsLeft = p_pCollisionInfo.iFaceDir_OneIsLeft == 1;
         for (int i = 0; i < _iVerticalRayCount; i++)
         {
-            if (bDirectionIsLeft && i < _iIgnoreRayCount_Vertical)
-                continue;
+            Vector2 rayOrigin = (directionY == -1) ? _pRaycastOrigins.vecBound_BottomLeft : _pRaycastOrigins.vecBound_TopLeft;
+            rayOrigin += Vector2.right * (_fDstBetweenRays_Vertical * i + moveAmount.x);
+            if (i == _iVerticalRayCount - 1)
+                rayOrigin.x = ((directionY == -1) ? _pRaycastOrigins.vecBound_BottomRight.x : _pRaycastOrigins.vecBound_TopRight.x) + moveAmount.x;
 
-            if (bDirectionIsLeft == false && i > _iVerticalRayCount - _iIgnoreRayCount_Vertical)
-                continue;
+            RaycastHit2D hit = Physics2D.Raycast(rayOrigin, Vector2.up * directionY, rayLength, collisionMask);
 
-            float rayLength = Mathf.Abs(moveAmount.y) + _pRaycastOrigins.fRayLength_Vertical;
-            Vector2 rayOrigin = (directionY == -1) ? _pRaycastOrigins.vecRayOrigin_VerticalDown : _pRaycastOrigins.vecRayOrigin_VerticalUp;
-            rayOrigin.x = _pRaycastOrigins.vecBound_BottomLeft.x;
-            // rayOrigin.y += (directionY == -1) ? _fRayOriginOffset_Y : _fRayOriginOffset_Y * -1;
-            rayOrigin += Vector2.right * (_fVerticalRaySpacing * i + moveAmount.x);
-
-            CRaycastHitWrapper pHit;
-            if (p_eDimensionType == EDimensionType.TwoD)
-                pHit = CRaycastHitWrapper.Raycast2D(rayOrigin, Vector2.up * directionY, rayLength, collisionMask);
-            else
-                pHit = CRaycastHitWrapper.Raycast3D(rayOrigin, Vector2.up * directionY, rayLength, collisionMask);
-
-            if (pHit && pHit.transform == transform)
-                continue;
-
-            if (pHit)
+            if(bDebugMode)
             {
-                Debug.DrawRay(rayOrigin, Vector2.up * pHit.distance * directionY, Color.green);
-                Debug.DrawRay(rayOrigin, pHit.normal, Color.yellow);
-            }
-            else
-                Debug.DrawRay(rayOrigin, Vector2.up * directionY * rayLength, Color.red);
-
-            if (pHit)
-            {
-                ECollisionIgnoreType eIgnoreType = ECollisionIgnoreType.None;
-                if (p_pCollisionInfo.fallingThroughPlatform)
-                    continue;
-
-                if (_OnHit_VerticalCollider != null)
-                {
-                    _OnHit_VerticalCollider(pHit.transform, out eIgnoreType);
-                }
+                if(hit)
+                    Debug.DrawRay(rayOrigin, Vector2.up * directionY * hit.distance, Color.red);
                 else
-                {
-                    if (pHit.transform.CompareTag("Through"))
-                    {
-                        if (directionY == 1 || pHit.distance == 0)
-                            eIgnoreType = ECollisionIgnoreType.Though_Up;
-                        if (_vecPlayerInput.y == -1)
-                            eIgnoreType = ECollisionIgnoreType.Though_Down;
-                    }
-                }
+                    Debug.DrawRay(rayOrigin, Vector2.up * directionY * rayLength, Color.green);
+            }
 
-                if (eIgnoreType != ECollisionIgnoreType.None)
-                {
-                    if (eIgnoreType == ECollisionIgnoreType.Though_Down)
-                            DoIgnoreCollider(0.5f);
+            if (hit)
+            {
+                //if (hit.collider.tag == "Through")
+                //{
+                //    if (directionY == 1/* || hit.distance == 0*/)
+                //    {
+                //        continue;
+                //    }
+                //    if (p_pCollisionInfo.fallingThroughPlatform)
+                //    {
+                //        continue;
+                //    }
+                //    if (_vecPlayerInput.y == -1)
+                //    {
+                //        p_pCollisionInfo.fallingThroughPlatform = true;
+                //        Invoke("ResetFallingThroughPlatform", .5f);
+                //        continue;
+                //    }
+                //}
 
-                    continue;
-                }
-
-                p_pCollisionInfo._listHitTransform.Add(pHit.transform);
+                p_pCollisionInfo._listHit_Vertical.Add(hit);
+                p_pCollisionInfo._listHitTransform.Add(hit.transform);
                 _iVerticalHitCount++;
-                moveAmount.y = (pHit.distance - _pRaycastOrigins.fRayLength_Vertical) * directionY;
-                //rayLength = hit.distance;
+                moveAmount.y = (hit.distance - _fSkinWidth_Vertical) * directionY;
+                rayLength = hit.distance;
 
-                if (bIsMoveX && p_pCollisionInfo.climbingSlope)
+                if (p_pCollisionInfo.climbingSlope)
                 {
                     moveAmount.x = moveAmount.y / Mathf.Tan(p_pCollisionInfo.slopeAngle * Mathf.Deg2Rad) * Mathf.Sign(moveAmount.x);
                 }
@@ -459,25 +443,22 @@ public class CPlatformerCalculator : CRaycastCalculator
             }
         }
 
-        return moveAmount;
-    }
-
-    void CalculateClimbSlope(Vector2 rayOrigin, float directionX, float rayLength, ref Vector2 moveAmount)
-    {
-        CRaycastHitWrapper pHit;
-        if (p_eDimensionType == EDimensionType.TwoD)
-            pHit = CRaycastHitWrapper.Raycast2D(rayOrigin, Vector2.right * directionX, rayLength, collisionMask);
-        else
-            pHit = CRaycastHitWrapper.Raycast3D(rayOrigin, Vector2.right * directionX, rayLength, collisionMask);
-
-        if (pHit)
+        if (p_pCollisionInfo.climbingSlope)
         {
-            float slopeAngle = Vector2.Angle(pHit.normal, Vector2.up);
-            if (slopeAngle != p_pCollisionInfo.slopeAngle)
+            float directionX = Mathf.Sign(moveAmount.x);
+            rayLength = Mathf.Abs(moveAmount.x) + _fSkinWidth_Vertical;
+            Vector2 rayOrigin = ((directionX == -1) ? _pRaycastOrigins.vecBound_BottomLeft : _pRaycastOrigins.vecBound_BottomRight) + Vector2.up * moveAmount.y;
+            RaycastHit2D hit = Physics2D.Raycast(rayOrigin, Vector2.right * directionX, rayLength, collisionMask);
+
+            if (hit)
             {
-                moveAmount.x = (pHit.distance - _fSkinWidth_Horizontal) * directionX;
-                p_pCollisionInfo.slopeAngle = slopeAngle;
-                p_pCollisionInfo.slopeNormal = pHit.normal;
+                float slopeAngle = Vector2.Angle(hit.normal, Vector2.up);
+                if (slopeAngle != p_pCollisionInfo.slopeAngle)
+                {
+                    moveAmount.x = (hit.distance - _fSkinWidth_Vertical) * directionX;
+                    p_pCollisionInfo.slopeAngle = slopeAngle;
+                    p_pCollisionInfo.slopeNormal = hit.normal;
+                }
             }
         }
     }
@@ -486,6 +467,7 @@ public class CPlatformerCalculator : CRaycastCalculator
     {
         float moveDistance = Mathf.Abs(moveAmount.x);
         float climbmoveAmountY = Mathf.Sin(slopeAngle * Mathf.Deg2Rad) * moveDistance;
+
         if (moveAmount.y <= climbmoveAmountY)
         {
             moveAmount.y = climbmoveAmountY;
@@ -499,53 +481,28 @@ public class CPlatformerCalculator : CRaycastCalculator
 
     void DescendSlope(ref Vector2 moveAmount)
     {
-        CRaycastHitWrapper pHitLeft, pHitRight;
-
-        Vector2 vecRayOriginYOffset = new Vector2(0f, _pRaycastOrigins.vecRayOrigin_VerticalDown.y);
-
-        if (p_eDimensionType == EDimensionType.TwoD)
+        RaycastHit2D maxSlopeHitLeft = Physics2D.Raycast(_pRaycastOrigins.vecBound_BottomLeft, Vector2.down, Mathf.Abs(moveAmount.y) + _fSkinWidth_Vertical, collisionMask);
+        RaycastHit2D maxSlopeHitRight = Physics2D.Raycast(_pRaycastOrigins.vecBound_BottomRight, Vector2.down, Mathf.Abs(moveAmount.y) + _fSkinWidth_Vertical, collisionMask);
+        if (maxSlopeHitLeft ^ maxSlopeHitRight)
         {
-
-            pHitLeft = Physics2D.Raycast(_pRaycastOrigins.vecBound_BottomLeft + vecRayOriginYOffset, Vector2.down, Mathf.Abs(moveAmount.y) + _fSkinWidth_Vertical, collisionMask);
-            pHitRight = Physics2D.Raycast(_pRaycastOrigins.vecBound_BottomRight + vecRayOriginYOffset, Vector2.down, Mathf.Abs(moveAmount.y) + _fSkinWidth_Vertical, collisionMask);
-        }
-        else
-        {
-            RaycastHit maxSlopeHitLeft;
-            RaycastHit maxSlopeHitRight;
-            Physics.Raycast(new Ray(_pRaycastOrigins.vecBound_BottomLeft + vecRayOriginYOffset, Vector2.down), out maxSlopeHitLeft, Mathf.Abs(moveAmount.y) + _pRaycastOrigins.fRayLength_Vertical, collisionMask);
-            Physics.Raycast(new Ray(_pRaycastOrigins.vecBound_BottomRight + vecRayOriginYOffset, Vector2.down), out maxSlopeHitRight, Mathf.Abs(moveAmount.y) + _pRaycastOrigins.fRayLength_Vertical, collisionMask);
-
-            pHitLeft = maxSlopeHitLeft;
-            pHitRight = maxSlopeHitRight;
-        }
-
-        if (pHitLeft ^ pHitRight)
-        {
-            SlideDownMaxSlope(pHitLeft, ref moveAmount);
-            SlideDownMaxSlope(pHitRight, ref moveAmount);
+            SlideDownMaxSlope(maxSlopeHitLeft, ref moveAmount);
+            SlideDownMaxSlope(maxSlopeHitRight, ref moveAmount);
         }
 
         if (!p_pCollisionInfo.slidingDownMaxSlope)
         {
             float directionX = Mathf.Sign(moveAmount.x);
             Vector2 rayOrigin = (directionX == -1) ? _pRaycastOrigins.vecBound_BottomRight : _pRaycastOrigins.vecBound_BottomLeft;
-            rayOrigin += vecRayOriginYOffset;
+            RaycastHit2D hit = Physics2D.Raycast(rayOrigin, -Vector2.up, Mathf.Infinity, collisionMask);
 
-            CRaycastHitWrapper pHit;
-            if (p_eDimensionType == EDimensionType.TwoD)
-                pHit = CRaycastHitWrapper.Raycast2D(rayOrigin, -Vector2.up, Mathf.Infinity, collisionMask);
-            else
-                pHit = CRaycastHitWrapper.Raycast3D(rayOrigin, -Vector2.up, Mathf.Infinity, collisionMask);
-
-            if (pHit)
+            if (hit)
             {
-                float slopeAngle = Vector2.Angle(pHit.normal, Vector2.up);
+                float slopeAngle = Vector2.Angle(hit.normal, Vector2.up);
                 if (slopeAngle != 0 && slopeAngle <= maxSlopeAngle)
                 {
-                    if (Mathf.Sign(pHit.normal.x) == directionX)
+                    if (Mathf.Sign(hit.normal.x) == directionX)
                     {
-                        if (pHit.distance - _pRaycastOrigins.fRayLength_Vertical <= Mathf.Tan(slopeAngle * Mathf.Deg2Rad) * Mathf.Abs(moveAmount.x))
+                        if (hit.distance - _fSkinWidth_Vertical <= Mathf.Tan(slopeAngle * Mathf.Deg2Rad) * Mathf.Abs(moveAmount.x))
                         {
                             float moveDistance = Mathf.Abs(moveAmount.x);
                             float descendmoveAmountY = Mathf.Sin(slopeAngle * Mathf.Deg2Rad) * moveDistance;
@@ -555,7 +512,7 @@ public class CPlatformerCalculator : CRaycastCalculator
                             p_pCollisionInfo.slopeAngle = slopeAngle;
                             p_pCollisionInfo.descendingSlope = true;
                             p_pCollisionInfo.DoSet_Below(true);
-                            p_pCollisionInfo.slopeNormal = pHit.normal;
+                            p_pCollisionInfo.slopeNormal = hit.normal;
                         }
                     }
                 }
@@ -563,22 +520,44 @@ public class CPlatformerCalculator : CRaycastCalculator
         }
     }
 
-    void SlideDownMaxSlope(CRaycastHitWrapper pHit, ref Vector2 moveAmount)
+    void SlideDownMaxSlope(RaycastHit2D hit, ref Vector2 moveAmount)
     {
-        if (!pHit) return;
-
-        float slopeAngle = Vector2.Angle(pHit.normal, Vector2.up);
-        bool bIsSlopeSliding = slopeAngle > maxSlopeAngle;
-        if (bIsSlopeSliding)
+        if (hit)
         {
-            moveAmount.x = Mathf.Sign(pHit.normal.x) * (Mathf.Abs(moveAmount.y) - pHit.distance) / Mathf.Tan(slopeAngle * Mathf.Deg2Rad);
-            p_pCollisionInfo.slopeAngle = slopeAngle;
-            p_pCollisionInfo.DoSetSlopeSliding(true);
-            p_pCollisionInfo.slopeNormal = pHit.normal;
+            float slopeAngle = Vector2.Angle(hit.normal, Vector2.up);
+            if (slopeAngle > maxSlopeAngle)
+            {
+                moveAmount.x = Mathf.Sign(hit.normal.x) * (Mathf.Abs(moveAmount.y) - hit.distance) / Mathf.Tan(slopeAngle * Mathf.Deg2Rad);
+
+                p_pCollisionInfo.slopeAngle = slopeAngle;
+                p_pCollisionInfo.DoSet_MaxSlope(true);
+                p_pCollisionInfo.slopeNormal = hit.normal;
+            }
         }
 
-        p_pCollisionInfo.DoSetSlopeSliding(bIsSlopeSliding);
     }
+
+    //void SlideDownMaxSlope(CRaycastHitWrapper pHit, ref Vector2 vecMoveAmount)
+    //{
+    //    if (!pHit) return;
+
+    //    float fSlopeAngle = Vector2.Angle(pHit.normal, Vector2.up);
+    //    bool bIsSlopeSliding = fSlopeAngle > maxSlopeAngle;
+    //    if (bIsSlopeSliding)
+    //    {
+    //        vecMoveAmount.x = Mathf.Abs(vecMoveAmount.y) - (pHit.distance - _pRaycastOrigins.fRayLength_Vertical) / Mathf.Tan(fSlopeAngle * Mathf.Deg2Rad);
+    //        if (Mathf.Sign(vecMoveAmount.x) != Mathf.Sign(pHit.normal.x))
+    //            vecMoveAmount.x *= -1f;
+
+    //        if(vecMoveAmount.y > 0f)
+    //            vecMoveAmount.y = Mathf.Tan(p_pCollisionInfo.slopeAngle * Mathf.Deg2Rad) * Mathf.Abs(vecMoveAmount.x);
+
+    //        p_pCollisionInfo.slopeAngle = fSlopeAngle;
+    //        p_pCollisionInfo.slopeNormal = pHit.normal;
+    //    }
+
+    //    p_pCollisionInfo.DoSet_MaxSlope(bIsSlopeSliding);
+    //}
 
     void ResetFallingThroughPlatform()
     {

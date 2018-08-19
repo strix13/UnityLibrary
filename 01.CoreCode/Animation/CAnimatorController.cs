@@ -33,12 +33,14 @@ public enum EAnimationEvent
 
 public interface IAnimationController
 {
-	event System.Action<string> p_Event_OnAnimationEvent;
+    event System.Action<string> p_Event_OnAnimationEvent;
 
 	void DoPlayAnimation<ENUM_ANIMATION_NAME>( ENUM_ANIMATION_NAME eAnimName, System.Action OnFinishAnimation = null )
 		where ENUM_ANIMATION_NAME : System.IConvertible, System.IComparable;
 
-	void DoPlayAnimation_Loop<ENUM_ANIMATION_NAME>( ENUM_ANIMATION_NAME eAnimName )
+    void DoPlayAnimation_Continuedly<ENUM_ANIMATION_NAME>(System.Action OnFinishAnimationAll, params ENUM_ANIMATION_NAME[] arrAnimName);
+
+    bool DoPlayAnimation_Loop<ENUM_ANIMATION_NAME>( ENUM_ANIMATION_NAME eAnimName )
 		where ENUM_ANIMATION_NAME : System.IConvertible, System.IComparable;
 
 	void DoStopAnimation();
@@ -47,6 +49,8 @@ public interface IAnimationController
 
 	bool DoCheckIsPlaying<ENUM_ANIMATION_NAME>( ENUM_ANIMATION_NAME eAnimName )
 		where ENUM_ANIMATION_NAME : System.IConvertible, System.IComparable;
+
+    void DoSetAnimationSpeed(float fSpeed);
 }
 
 public class CAnimatorController : CObjectBase, IAnimationController
@@ -55,27 +59,32 @@ public class CAnimatorController : CObjectBase, IAnimationController
 	public string strDefaultAnimation;
 	public bool bDefaultIsLoop = true;
 
+    public bool p_bIsDebuging = false;
+
 	public event Action<string> p_Event_OnAnimationEvent;
 
 	private System.Action _OnFinishAnimation;
 	private Animator _pAnimator;	public Animator p_pAnimator {  get { return _pAnimator; } }
 
 	private float _fCurrentAnimation_NomalizeTime; public float p_fCurrentAnimation_NomalizeTime { get { return _fCurrentAnimation_NomalizeTime; } }
-	private string _strCurrentAnimName;
+	private string _strCurrentAnimName;            public string p_strCurrentAnimation { get { return _strCurrentAnimName; } }
 	private bool _bIsLoop;
+
+    Coroutine _pCoroutine;
 
 	// ========================== [ Division ] ========================== //
 
 	public void DoStopAnimation()
 	{
-		if (_pAnimator.isActiveAndEnabled == false) return;
+        if (_pAnimator.isActiveAndEnabled == false) return;
 
 		for (int i = 0; i < _pAnimator.layerCount; i++)
 			_pAnimator.Play( 0, i, 0f );
 
 		_pAnimator.gameObject.SetActive( false );
 		_pAnimator.gameObject.SetActive( true );
-		StopAllCoroutines();
+
+        StopCoroutine(_pCoroutine);
 	}
 
 	public void DoSetLayerWeight(int iLayerIndex, float fWeight)
@@ -139,11 +148,11 @@ public class CAnimatorController : CObjectBase, IAnimationController
 	public void DoPlayAnimation<ENUM_ANIMATION_NAME>( ENUM_ANIMATION_NAME eAnimName, System.Action OnFinishAnimation = null )
 		where ENUM_ANIMATION_NAME : System.IConvertible, System.IComparable
 	{
-		_OnFinishAnimation = OnFinishAnimation;
+        _OnFinishAnimation = OnFinishAnimation;
 		ProcPlayAnim( eAnimName, false );
 	}
-
-	public void DoPlayAnimation_Default()
+    
+    public void DoPlayAnimation_Default()
 	{
 		if (bDefaultIsLoop)
 			DoPlayAnimation_Loop( strDefaultAnimation );
@@ -155,10 +164,12 @@ public class CAnimatorController : CObjectBase, IAnimationController
 	/// 애니메이션을 반복으로 실행합니다.
 	/// </summary>
 	/// <param name="eAnimName">반복 실행할 애니메이션 이름의 Enum</param>
-	public void DoPlayAnimation_Loop<ENUM_ANIMATION_NAME>( ENUM_ANIMATION_NAME eAnimName )
+	public bool DoPlayAnimation_Loop<ENUM_ANIMATION_NAME>( ENUM_ANIMATION_NAME eAnimName )
 		where ENUM_ANIMATION_NAME : System.IConvertible, System.IComparable
 	{
 		ProcPlayAnim( eAnimName, true );
+
+        return true;
 	}
 
 	/// <summary>
@@ -242,7 +253,7 @@ public class CAnimatorController : CObjectBase, IAnimationController
 		}
 		if (_pAnimator.isInitialized == false) // Animator does not have an AnimatorController 관련 에러 잡기 위함
 		{
-			Debug.LogWarning( "Before : " + name + _pAnimator.isInitialized );
+			// Debug.LogWarning( "Before : " + name + _pAnimator.isInitialized );
 			StartCoroutine( CoDelayPlayAnimation( eAnimName.ToString(), bIsLoop, iAnimationLayer ) );
 			return;
 		}
@@ -257,14 +268,20 @@ public class CAnimatorController : CObjectBase, IAnimationController
 		//}
 		
 		_strCurrentAnimName = eAnimName.ToString();
-		_pAnimator.Play( _strCurrentAnimName, iAnimationLayer, 0f );
+        if (p_bIsDebuging)
+            Debug.Log(name + " Play Animation : " + _strCurrentAnimName, this);
 
-		_pAnimator.Update(0);
+        if (_pAnimator.enabled == false)
+            _pAnimator.enabled = true;
+        _pAnimator.Play( _strCurrentAnimName, iAnimationLayer, 0f );
+        _pAnimator.Update(0);
+
 		_bIsLoop = bIsLoop;
 		_fCurrentAnimation_NomalizeTime = 0f;
 
-		StopCoroutine( "CoUpdateAnimation");
-		StartCoroutine( "CoUpdateAnimation" );
+        if (_pCoroutine != null)
+            StopCoroutine(_pCoroutine);
+        _pCoroutine = StartCoroutine(CoUpdateAnimation());
 	}
 
 	private IEnumerator CoDelayPlayAnimation( string strAnimationName, bool bIsLoop, int iAnimationLayer )
@@ -277,20 +294,21 @@ public class CAnimatorController : CObjectBase, IAnimationController
 
 	private IEnumerator CoUpdateAnimation()
 	{
-		//// 바로 시작하면 Animator가 갱신이 안되서 플레이중인 애니메이션을 못찾는다..
-		//yield return new WaitForSeconds(0.1f);
+        //// 바로 시작하면 Animator가 갱신이 안되서 플레이중인 애니메이션을 못찾는다..
+        yield return null;
+
 		while (true)
 		{
-			yield return null;
+            yield return null;
 
-			bool bFindAnimation = false;
-			AnimatorStateInfo sCurrentState = _pAnimator.GetCurrentAnimatorStateInfo( 0 );
+            bool bFindAnimation = false;
+			AnimatorStateInfo sCurrentState = default(AnimatorStateInfo);
 			for (int i = 0; i < _pAnimator.layerCount; i++)
 			{
-				AnimatorStateInfo sState = _pAnimator.GetCurrentAnimatorStateInfo( i );
-				if (sState.IsName( _strCurrentAnimName ))
+                AnimatorStateInfo sState = _pAnimator.GetCurrentAnimatorStateInfo( i );
+                if (sState.IsName( _strCurrentAnimName ))
 				{
-					sCurrentState = sState;
+                    sCurrentState = sState;
 					bFindAnimation = true;
 					break;
 				}
@@ -299,26 +317,32 @@ public class CAnimatorController : CObjectBase, IAnimationController
 			// 에러인 경우
 			if (bFindAnimation == false)
 			{
-                Debug.LogWarning("Error! bFindAnimation == false");
-                ExcuteOnFinishAnimation();
+                if (p_bIsDebuging)
+                    Debug.LogError("Error! bFindAnimation == false _strCurrentAnimName : " + _strCurrentAnimName);
+
+                //OnFinishAnimation();
+                //break;
             }
 
-			_fCurrentAnimation_NomalizeTime = sCurrentState.normalizedTime;
+            _fCurrentAnimation_NomalizeTime = sCurrentState.normalizedTime;
 			// 플레이가 끝났을 때
 			if (_fCurrentAnimation_NomalizeTime >= 0.99f || sCurrentState.IsName( _strCurrentAnimName ) == false)
-			{
-				if (_bIsLoop)
-					DoPlayAnimation_Loop( _strCurrentAnimName );
-				else
-                    ExcuteOnFinishAnimation();
+            {
+                OnFinishAnimation();
+                break;
+            }
+        }
 
-				break;
-			}
-		}
-
-
-		yield break;
+        yield break;
 	}
+
+    private void OnFinishAnimation()
+    {
+        if (_bIsLoop)
+            DoPlayAnimation_Loop(_strCurrentAnimName);
+        else
+            ExcuteOnFinishAnimation();
+    }
 
     private void ExcuteOnFinishAnimation()
     {
@@ -332,5 +356,10 @@ public class CAnimatorController : CObjectBase, IAnimationController
         _OnFinishAnimation = null;
 
         OnFinishAnimation();
+    }
+
+    public void DoPlayAnimation_Continuedly<ENUM_ANIMATION_NAME>(Action OnFinishAnimationAll, params ENUM_ANIMATION_NAME[] arrAnimName)
+    {
+        throw new NotImplementedException();
     }
 }

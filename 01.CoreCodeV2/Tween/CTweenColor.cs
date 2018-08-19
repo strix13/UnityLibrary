@@ -11,6 +11,10 @@ using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
 
+#if Spine
+using Spine.Unity;
+#endif
+
 public class CTweenColor : CTweenBase
 {
     /* const & readonly declaration             */
@@ -24,8 +28,16 @@ public class CTweenColor : CTweenBase
 
     /* protected & private - Field declaration         */
 
-    Renderer _pRenderer;
-    Graphic _pUIElement;
+    SpriteRenderer _pSpriteRenderer = null;
+    Renderer _pRenderer = null;
+    Graphic _pUIElement = null;
+    Light _pLight = null;
+#if Spine
+    SkeletonAnimation _pSpineAnimation = null;
+
+    CCompo_SpineColorControl _pSpineColor;
+
+#endif
 
     Color _pColor_Backup;
     Material _pMaterial_Backup;
@@ -34,17 +46,62 @@ public class CTweenColor : CTweenBase
     {
         get
         {
+#if Spine
+            if(_pSpineAnimation)
+            {
+                if (_pSpineColor == null)
+                {
+                    _pSpineColor = _pSpineAnimation.GetComponent<CCompo_SpineColorControl>();
+                    if(_pSpineColor == null)
+                        _pSpineColor = _pSpineAnimation.gameObject.AddComponent<CCompo_SpineColorControl>();
+                }
+
+                if (_pSpineColor)
+                    return _pSpineColor.GetColor();
+            }
+#endif
+
+
+            if (_pSpriteRenderer)
+                return _pSpriteRenderer.color;
+
             if (_pRenderer)
                 return _pRenderer.material.color;
 
             if (_pUIElement)
                 return _pUIElement.color;
 
+            if (_pLight)
+                return _pLight.color;
+
             return Color.white;
         }
 
         private set
         {
+#if Spine
+            if (_pSpineAnimation)
+            {
+                if (_pSpineColor == null)
+                {
+                    _pSpineColor = _pSpineAnimation.GetComponent<CCompo_SpineColorControl>();
+                    if (_pSpineColor == null)
+                        _pSpineColor = _pSpineAnimation.gameObject.AddComponent<CCompo_SpineColorControl>();
+                }
+
+                if (_pSpineColor)
+                {
+                    _pSpineColor.DoSetColor(value);
+                    return;
+                }
+            }
+#endif
+            if (_pSpriteRenderer)
+            {
+                _pSpriteRenderer.color = value;
+                return;
+            }
+
             if (_pRenderer)
             {
                 _pRenderer.material.color = value;
@@ -54,6 +111,12 @@ public class CTweenColor : CTweenBase
             if (_pUIElement)
             {
                 _pUIElement.color = value;
+                return;
+            }
+
+            if (_pLight)
+            {
+                _pLight.color = value;
                 return;
             }
         }
@@ -69,22 +132,40 @@ public class CTweenColor : CTweenBase
 
     /* protected - Override & Unity API         */
 
-    protected override void OnAwake()
-    {
-        base.OnAwake();
-
-        _pRenderer = GetComponent<Renderer>();
-        _pUIElement = GetComponent<Graphic>();
-    }
-
     public override void OnEditorButtonClick_SetStartValue_IsCurrentValue()
     {
+        EventOnAwake();
         pColor_Start = p_pColor;
     }
 
     public override void OnEditorButtonClick_SetDestValue_IsCurrentValue()
     {
+        EventOnAwake();
         pColor_Dest = p_pColor;
+    }
+
+    public override void OnEditorButtonClick_SetCurrentValue_IsStartValue()
+    {
+        EventOnAwake();
+        p_pColor = pColor_Start;
+    }
+
+    public override void OnEditorButtonClick_SetCurrentValue_IsDestValue()
+    {
+        EventOnAwake();
+        p_pColor = pColor_Dest;
+    }
+
+    protected override void OnSetTarget(GameObject pObjectNewTarget)
+    {
+        _pSpriteRenderer = pObjectNewTarget.GetComponent<SpriteRenderer>();
+        _pRenderer = pObjectNewTarget.GetComponent<Renderer>();
+        _pUIElement = pObjectNewTarget.GetComponent<Graphic>();
+        _pLight = pObjectNewTarget.GetComponent<Light>();
+
+#if Spine
+        _pSpineAnimation = pObjectNewTarget.GetComponent<SkeletonAnimation>();
+#endif
     }
 
     protected override void OnTween(float fProgress_0_1)
@@ -99,7 +180,7 @@ public class CTweenColor : CTweenBase
         _pColor_Backup = p_pColor;
         if (_pRenderer)
         {
-            _pMaterial_Backup = _pRenderer.material;
+            _pMaterial_Backup = _pRenderer.sharedMaterial;
             _pRenderer.material = new Material(_pMaterial_Backup);
             _pRenderer.sharedMaterials = new Material[] { _pMaterial_Backup };
             return;
@@ -108,7 +189,9 @@ public class CTweenColor : CTweenBase
 
     public override void OnReleaseTween_EditorOnly()
     {
-        _pRenderer.material = _pMaterial_Backup;
+        if(_pRenderer)
+            _pRenderer.material = _pMaterial_Backup;
+
         p_pColor = _pColor_Backup;
     }
 

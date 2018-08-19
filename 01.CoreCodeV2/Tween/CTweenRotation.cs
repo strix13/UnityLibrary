@@ -23,7 +23,7 @@ public static class CTweenRotationHelper
         pTweenRot.p_fDuration = fDuration;
 
         pTweenRot.p_Event_OnFinishTween.AddListener(OnFinishTween);
-        pTweenRot.DoStartTween_Forward();
+        pTweenRot.DoPlayTween_Forward();
     }
 
     static public void DoStartTween_Rotation(this Transform pTransStart, Vector3 vecAngleEulerDest_Offset, float fDuration, UnityEngine.Events.UnityAction OnFinishTween)
@@ -37,7 +37,7 @@ public static class CTweenRotationHelper
         pTweenRot.p_fDuration = fDuration;
 
         pTweenRot.p_Event_OnFinishTween.AddListener(OnFinishTween);
-        pTweenRot.DoStartTween_Forward();
+        pTweenRot.DoPlayTween_Forward();
     }
 }
 
@@ -49,13 +49,20 @@ public class CTweenRotation : CTweenBase
 
     /* public - Field declaration            */
 
+    [Rename_Inspector("벡터 보간을 사용할 것인지 ? (false면 쿼터니언 보간)")]
+    public bool p_bUseSlerp = true;
+
+    [Rename_InspectorAttribute("시작")]
     public Vector3 p_vecRotStart;
+    [Rename_InspectorAttribute("도달")]
     public Vector3 p_vecRotDest;
 
     public bool p_bIsLocal;
 
     /* protected & private - Field declaration         */
 
+    Transform _pTransformTarget;
+    Vector3 _vecOriginPos;
 
     // ========================================================================== //
 
@@ -75,39 +82,84 @@ public class CTweenRotation : CTweenBase
         p_vecRotDest = transform.rotation.eulerAngles;
     }
 
+    protected override void OnSetTarget(GameObject pObjectNewTarget)
+    {
+        _pTransformTarget = pObjectNewTarget.transform;
+        _vecOriginPos = _pTransformTarget.position;
+    }
+
     protected override void OnTween(float fProgress_0_1)
     {
-        if (p_bIsLocal)
-            transform.localRotation = Quaternion.Euler(Vector3.Slerp(p_vecRotStart, p_vecRotDest, fProgress_0_1));
+        if(p_bUseSlerp)
+        {
+            if (p_bIsLocal)
+                _pTransformTarget.localRotation = Quaternion.Euler(Vector3.Slerp(p_vecRotStart, p_vecRotDest, fProgress_0_1));
+            else
+                _pTransformTarget.rotation = Quaternion.Euler(Vector3.Slerp(p_vecRotStart, p_vecRotDest, fProgress_0_1));
+        }
         else
-            transform.rotation = Quaternion.Euler(Vector3.Slerp(p_vecRotStart, p_vecRotDest, fProgress_0_1));
+        {
+            if (p_bIsLocal)
+                _pTransformTarget.localRotation = Quaternion.Lerp(Quaternion.Euler(p_vecRotStart), Quaternion.Euler(p_vecRotDest), fProgress_0_1);
+            else
+                _pTransformTarget.rotation = Quaternion.Lerp(Quaternion.Euler(p_vecRotStart), Quaternion.Euler(p_vecRotDest), fProgress_0_1);
+        }
     }
 
     public override void OnEditorButtonClick_SetStartValue_IsCurrentValue()
     {
         if (p_bIsLocal)
-            p_vecRotStart = transform.localRotation.eulerAngles;
+            p_vecRotStart = _pTransformTarget.localRotation.eulerAngles;
         else
-            p_vecRotStart = transform.rotation.eulerAngles;
+            p_vecRotStart = _pTransformTarget.rotation.eulerAngles;
     }
 
     public override void OnEditorButtonClick_SetDestValue_IsCurrentValue()
     {
         if (p_bIsLocal)
-            p_vecRotDest = transform.localRotation.eulerAngles;
+            p_vecRotDest = _pTransformTarget.localRotation.eulerAngles;
         else
-            p_vecRotDest = transform.rotation.eulerAngles;
+            p_vecRotDest = _pTransformTarget.rotation.eulerAngles;
     }
 
-    public override void OnInitTween_EditorOnly()
+    public override void OnEditorButtonClick_SetCurrentValue_IsStartValue()
     {
-        throw new System.NotImplementedException();
+        if (p_bIsLocal)
+            _pTransformTarget.localRotation = Quaternion.Euler(p_vecRotStart);
+        else
+            _pTransformTarget.rotation = Quaternion.Euler(p_vecRotStart);
     }
 
-    public override void OnReleaseTween_EditorOnly()
+    public override void OnEditorButtonClick_SetCurrentValue_IsDestValue()
     {
-        throw new System.NotImplementedException();
+        if (p_bIsLocal)
+            _pTransformTarget.localRotation = Quaternion.Euler(p_vecRotDest);
+        else
+            _pTransformTarget.rotation = Quaternion.Euler(p_vecRotDest);
     }
+
+#if UNITY_EDITOR
+    protected override void OnDrawGizmos()
+    {
+        base.OnDrawGizmos();
+
+        if (g_bIsDrawGizmo)
+        {
+            Vector3 vecPos = p_pObjectTarget.transform.position;
+
+            Gizmos.color = Color.cyan;
+            Gizmos.DrawLine(vecPos, vecPos + (Quaternion.Euler(p_vecRotStart) * p_pObjectTarget.transform.forward) * 10f);
+
+            Gizmos.DrawLine(vecPos, vecPos + (Quaternion.Euler(p_vecRotDest) * p_pObjectTarget.transform.forward) * 10f);
+
+            GUIStyle style = new GUIStyle();
+            style.normal.textColor = Color.cyan;
+
+            UnityEditor.Handles.Label(vecPos + (Quaternion.Euler(p_vecRotStart) * p_pObjectTarget.transform.forward) * 10f, "Tween Rotation Start", style);
+            UnityEditor.Handles.Label(vecPos + (Quaternion.Euler(p_vecRotDest) * p_pObjectTarget.transform.forward) * 10f, "Tween Rotation Dest", style);
+        }
+    }
+#endif
 
     /* protected - [abstract & virtual]         */
 

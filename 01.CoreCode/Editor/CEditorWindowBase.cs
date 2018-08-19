@@ -7,7 +7,7 @@ using System.Collections.Generic;
    Editor      : Strix
    Description :
    
-	//[MenuItem("Strix_Tools/Name")]
+	//[MenuItem("Tools/Strix_Tools/Name")]
 	//public static void ShowWindow()
 	//{
 	//	GetWindow(typeof(TClass));

@@ -22,8 +22,8 @@ public class CCompoAutoDisable : CCompoEventTrigger
 
 	/* private - Variable declaration           */
 
-	public System.Action<GameObject> _OnDisable;
-
+	System.Action<GameObject> _OnDisable;
+    Coroutine _pCoroutine;
 
 	// ========================================================================== //
 
@@ -51,15 +51,23 @@ public class CCompoAutoDisable : CCompoEventTrigger
 	{
 		base.OnPlayEventMain();
 
-		StartCoroutine("CoDelayDisable");
+        _pCoroutine = StartCoroutine(CoDelayDisable());
 	}
 
-	// ========================================================================== //
+    protected override void OnDisableObject()
+    {
+        base.OnDisableObject();
 
-	/* private - [Proc] Function             
+        if (_pCoroutine != null)
+            StopCoroutine(_pCoroutine);
+    }
+
+    // ========================================================================== //
+
+    /* private - [Proc] Function             
        로직을 처리(Process Local logic)           */
 
-	private IEnumerator CoDelayDisable()
+    private IEnumerator CoDelayDisable()
 	{
 		yield return SCManagerYield.GetWaitForSecond(fAutoDisableTime);
 

@@ -21,6 +21,7 @@ abstract public class CUICompoLocalizeBase : CObjectBase, CManagerUILocalize.ILo
 
     /* public - Field declaration            */
 
+    public bool p_bIsAutoChange_OnEnable = true;
     public string _strLocalizeKey;
 
     /* protected & private - Field declaration         */
@@ -34,7 +35,7 @@ abstract public class CUICompoLocalizeBase : CObjectBase, CManagerUILocalize.ILo
     // ========================================================================== //
 
     /* protected - Override & Unity API         */
-    
+
     public string ILocalizeListner_GetLocalizeKey()
     {
         return _strLocalizeKey;
@@ -51,6 +52,9 @@ abstract public class CUICompoLocalizeBase : CObjectBase, CManagerUILocalize.ILo
         base.OnEnableObject();
 
         CManagerUILocalize.instance.DoRegist_LocalizeListener(this, gameObject);
+
+        if (p_bIsAutoChange_OnEnable)
+            ILocalizeListner_ChangeLocalize(CManagerUILocalize.instance.p_eCurrentLocalize, CManagerUILocalize.instance.DoGetCurrentLocalizeValue_Random(_strLocalizeKey));
     }
 
     protected override void OnDisableObject()

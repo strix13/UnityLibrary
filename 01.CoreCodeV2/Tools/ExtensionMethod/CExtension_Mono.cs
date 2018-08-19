@@ -15,6 +15,15 @@ using System.Collections.Generic;
 
 public static class CExtension_Mono
 {
+    static public void SetLayer_Recursive(this Component pObj, int iLayer)
+    {
+        pObj.gameObject.layer = iLayer;
+        Transform pTransformTarget = pObj.transform;
+        int iChildCount = pTransformTarget.childCount;
+        for (int i = 0; i < iChildCount; i++)
+            pTransformTarget.GetChild(i).SetLayer_Recursive(iLayer);
+    }
+
     static public void SetActive(this Component pObj, bool bEnable)
     {
         if (pObj == null)

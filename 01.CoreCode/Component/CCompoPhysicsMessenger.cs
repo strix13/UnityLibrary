@@ -37,6 +37,17 @@ public class CCompoPhysicsMessenger : CObjectBase
 
     /* protected - Override & Unity API         */
 
+    protected override void OnAwake()
+    {
+        base.OnAwake();
+
+        if (transform.parent == null)
+        {
+            Debug.LogWarning(name + " 이 컴포넌트는 부모 오브젝트가 있어야 정상 동작합니다.", gameObject);
+            Destroy(this);
+        }
+    }
+
     private void OnTriggerEnter2D(Collider2D collision)
     {
         transform.parent.SendMessageUpwards("OnTriggerEnter2D", collision, SendMessageOptions.DontRequireReceiver);

@@ -87,7 +87,7 @@ public class CManagerSound : CSingletonDynamicMonoBase<CManagerSound>
     {
         bool bIsPlaying = false;
         if (_pSlotBGM.CheckIsPlaying())
-            bIsPlaying = _pSlotBGM.p_pAudioSource.clip.name == GetAudioClip(strSound).name;
+            bIsPlaying = _pSlotBGM.p_pAudioSource.clip.GetInstanceID() == GetAudioClip(strSound).GetInstanceID();
 
         return bIsPlaying;
     }
@@ -144,7 +144,7 @@ public class CManagerSound : CSingletonDynamicMonoBase<CManagerSound>
     {
         if (_bIsMute) return null;
 
-        string strSoundName = strSound.ToString();
+        string strSoundName = strSound;
         if (_mapCurrentPlayingSound.ContainsKey(strSoundName))
         {
             CSoundSlot pSlotCurrentPlaying = _mapCurrentPlayingSound[strSoundName];
@@ -385,6 +385,8 @@ public class CManagerSound : CSingletonDynamicMonoBase<CManagerSound>
     }
 
 #if UNITY_EDITOR
+    int _iPrevCount;
+
     public override void OnUpdate(ref bool bCheckUpdateCount)
     {
         base.OnUpdate(ref bCheckUpdateCount);
@@ -397,7 +399,11 @@ public class CManagerSound : CSingletonDynamicMonoBase<CManagerSound>
                 iPlaySoundSlotCount++;
         }
 
-        name = string.Format("사운드 매니져/{0}개 재생중/Effect{1}/BGM{2}", iPlaySoundSlotCount, _fVolumeEffect, _fVolumeBGM);
+        if(_iPrevCount != iPlaySoundSlotCount)
+        {
+            _iPrevCount = iPlaySoundSlotCount;
+            name = string.Format("사운드 매니져/{0}개 재생중/Effect{1}/BGM{2}", iPlaySoundSlotCount, _fVolumeEffect, _fVolumeBGM);
+        }
     }
 #endif
 

@@ -63,6 +63,9 @@ public class CSoundSlot : CObjectBase
 
 	private System.Action _OnFinishClip;
 
+    Coroutine _pCoroutine_FadeInOut;
+    Coroutine _pCoroutine_AudioPlay;
+
 	// private bool _bIsFadeIn;
 
 	// ========================================================================== //
@@ -98,7 +101,11 @@ public class CSoundSlot : CObjectBase
 		for (int i = 0; i < p_Event_OnFinishedClip.Count; i++)
 			p_Event_OnFinishedClip[i](this);
 
-        StopAllCoroutines();
+        if (_pCoroutine_FadeInOut != null)
+            StopCoroutine(_pCoroutine_FadeInOut);
+        if (_pCoroutine_AudioPlay != null)
+            StopCoroutine(_pCoroutine_AudioPlay);
+
         gameObject.SetActive(false);
 
 #if UNITY_EDITOR
@@ -150,14 +157,18 @@ public class CSoundSlot : CObjectBase
 
     public void DoSetFadeIn()
     {
-        StartCoroutine(CoPlayFadeInOut(false));
+        if (_pCoroutine_FadeInOut != null)
+            StopCoroutine(_pCoroutine_FadeInOut);
+        _pCoroutine_FadeInOut = StartCoroutine(CoPlayFadeInOut(false));
     }
 
     public void DoSetFadeOut(AudioClip pAudioClipNext, float fNextVolume)
     {
         _pAudioClipNext = pAudioClipNext;
         _fVolumeNext = fNextVolume;
-        StartCoroutine(CoPlayFadeInOut(true));
+        if (_pCoroutine_FadeInOut != null)
+            StopCoroutine(_pCoroutine_FadeInOut);
+        _pCoroutine_FadeInOut = StartCoroutine(CoPlayFadeInOut(true));
     }
 
 	public void EventInitSoundSlot(MonoBehaviour pManager, OnEventSoundClip OnMethodOnStart, OnEventSoundClip OnMethodOnFinish )
@@ -210,8 +221,10 @@ public class CSoundSlot : CObjectBase
 
 		if (gameObject != null)
 			gameObject.SetActive(true);
-        StopAllCoroutines();
-        StartCoroutine(CoPlaySoundEffect());
+
+        if (_pCoroutine_AudioPlay != null)
+            StopCoroutine(_pCoroutine_AudioPlay);
+        _pCoroutine_AudioPlay = StartCoroutine(CoPlaySoundEffect());
     }
 
     // ===================================== //

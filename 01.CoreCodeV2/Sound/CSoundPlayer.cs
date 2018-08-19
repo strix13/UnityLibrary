@@ -26,7 +26,7 @@ public class CSoundPlayer : CCompoEventTrigger
     [Rename_Inspector("Disable 시 사운드 Off 유무")]
     public bool _bPlayOff_OnDisable = false;
     [Header("플레이할 사운드 목록")]
-    public AudioClip[] _arrPlayAudioClip;
+    public List<AudioClip> _listPlayAudioClip;
 
 	[Range( 0f, 1f )]
 	public float _fSoundVolume = 1f;
@@ -137,7 +137,7 @@ public class CSoundPlayer : CCompoEventTrigger
 		}
 		else
 		{
-			EventDelayExcuteCallBack(DoPlayEventTrigger, 0.1f);
+			EventExcuteDelay(DoPlayEventTrigger, 0.1f);
 		}
 	}
 
@@ -149,7 +149,7 @@ public class CSoundPlayer : CCompoEventTrigger
 	private void ProcFinishSound()
 	{
 		if (_iLoopCount != 0 && _iLoopCountCurrent-- > 0) // 반복 횟수가 0이 아니고 반복 횟수가 아직 0이 아니라면..
-            EventDelayExcuteCallBack( ProcPlaySound, _fLoopDelay );
+            EventExcuteDelay( ProcPlaySound, _fLoopDelay );
 		else
 		{
             // 반복 횟수가 0이거나 반복 횟수가 다 끝났다면..
@@ -160,7 +160,7 @@ public class CSoundPlayer : CCompoEventTrigger
 			if (_bIsLoop)
             {
                 if (_fLoopDelay != 0f)
-                    EventDelayExcuteCallBack(DoPlayEventTrigger, _fLoopDelay);
+                    EventExcuteDelay(DoPlayEventTrigger, _fLoopDelay);
                 else
                     DoPlayEventTrigger();
             }
@@ -196,9 +196,9 @@ public class CSoundPlayer : CCompoEventTrigger
             _pManagerSound.EventOnSlotFinishClip(_pSlotCurrentPlaying);
 
         CSoundSlot pSlot = null;
-        if (_arrPlayAudioClip != null)
+        if (_listPlayAudioClip != null)
         {
-            AudioClip pClipRandom = _arrPlayAudioClip.GetRandom();
+            AudioClip pClipRandom = _listPlayAudioClip.GetRandom();
             pSlot = _pManagerSound.DoPlaySoundEffect_OrNull(pClipRandom, _fSoundVolume);
         }
 

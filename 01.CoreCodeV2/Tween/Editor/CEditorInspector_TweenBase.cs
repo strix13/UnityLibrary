@@ -12,24 +12,28 @@ public class CEditorInspector_TweenBase : Editor
 
     public override void OnInspectorGUI()
     {
+        CTweenBase.g_bIsDrawGizmo = GUILayout.Toggle(CTweenBase.g_bIsDrawGizmo, "  기즈모를 그릴지");
+
         base.OnInspectorGUI();
+
         CTweenBase pTarget = target as CTweenBase;
 
         EditorGUILayout.BeginHorizontal();
-        if(GUILayout.Button("현재 값을 Start로 세팅"))
+        if(GUILayout.Button("현재 값 = Start로"))
         {
             EditorGUI.BeginChangeCheck();
+            pTarget.DoSetTarget(pTarget.p_pObjectTarget);
             pTarget.OnEditorButtonClick_SetStartValue_IsCurrentValue();
             if (EditorGUI.EndChangeCheck())
                 Undo.RecordObject(target, "OnEditorButtonClick_SetStartValue_IsCurrentValue");
         }
-        if (GUILayout.Button("현재 값을 Dest로 세팅"))
+        if (GUILayout.Button("현재 값 = Dest로"))
         {
             EditorGUI.BeginChangeCheck();
+            pTarget.DoSetTarget(pTarget.p_pObjectTarget);
             pTarget.OnEditorButtonClick_SetDestValue_IsCurrentValue();
             if (EditorGUI.EndChangeCheck())
                 Undo.RecordObject(target, "OnEditorButtonClick_SetDestValue_IsCurrentValue");
-
         }
         EditorGUILayout.EndHorizontal();
 
@@ -61,6 +65,26 @@ public class CEditorInspector_TweenBase : Editor
         }
         EditorGUILayout.EndHorizontal();
 
+        EditorGUILayout.BeginHorizontal();
+        if (GUILayout.Button("Start값 = 현재값으로"))
+        {
+            EditorGUI.BeginChangeCheck();
+            pTarget.DoSetTarget(pTarget.p_pObjectTarget);
+            pTarget.OnEditorButtonClick_SetCurrentValue_IsStartValue();
+            if (EditorGUI.EndChangeCheck())
+                Undo.RecordObject(target, "OnEditorButtonClick_SetStartValue_IsCurrentValue");
+        }
+        if (GUILayout.Button("Dest값 = 현재 값으로"))
+        {
+            EditorGUI.BeginChangeCheck();
+            pTarget.DoSetTarget(pTarget.p_pObjectTarget);
+            pTarget.OnEditorButtonClick_SetCurrentValue_IsDestValue();
+            if (EditorGUI.EndChangeCheck())
+                Undo.RecordObject(target, "OnEditorButtonClick_SetDestValue_IsCurrentValue");
+        }
+        EditorGUILayout.EndHorizontal();
+
+
     }
 
     private void OnEnable()
@@ -81,15 +105,25 @@ public class CEditorInspector_TweenBase : Editor
         {
             pTweenTestPlay.DoSetTweening();
 
-            if (pTweenTestPlay as CTweenPosition)
+            CTweenPosition pTweenPos = pTweenTestPlay as CTweenPosition;
+            if (pTweenPos)
             {
-                CTweenPosition pTweenPos = pTweenTestPlay as CTweenPosition;
                 Vector3 vecPos = (Vector3)pTweenTestPlay.OnTween_EditorOnly(pTweenTestPlay.p_fProgress_0_1);
                 if (pTweenPos.p_bIsLocal)
                     pTweenPos.transform.localPosition = vecPos;
                 else
                     pTweenPos.transform.position = vecPos;
             }
+
+            //CTweenRotation pTweenRot = pTweenTestPlay as CTweenRotation;
+            //if (pTweenRot)
+            //{
+            //    //Vector3 vecPos = (Vector3)pTweenTestPlay.OnTween_EditorOnly(pTweenTestPlay.p_fProgress_0_1);
+            //    //if (pTweenPos.p_bIsLocal)
+            //    //    pTweenPos.transform.localPosition = vecPos;
+            //    //else
+            //    //    pTweenPos.transform.position = vecPos;
+            //}
 
             EditorUtility.SetDirty(pTweenTestPlay);
         }
@@ -100,7 +134,8 @@ public class CEditorInspector_TweenBase : Editor
         if (g_listTweenTestPlay.Contains(pTween) == false)
         {
             g_listTweenTestPlay.Add(pTween);
-            pTween.DoInitTween(CTweenBase.ETweenDirection.Forward);
+            pTween.DoSetTarget(pTween.p_pObjectTarget);
+            pTween.DoInitTween(CTweenBase.ETweenDirection.Forward, true);
             pTween.OnInitTween_EditorOnly();
         }
     }

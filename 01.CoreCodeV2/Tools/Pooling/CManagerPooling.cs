@@ -12,7 +12,10 @@ using System.Collections.Generic;
 using NUnit.Framework;
 using UnityEngine.TestTools;
 
-public class CManagerPooling<ENUM_Resource_Name, Class_Resource> : CSingletonNotMonoBase<CManagerPooling<ENUM_Resource_Name, Class_Resource>>, IUpdateAble
+public class CManagerPooling<ENUM_Resource_Name, Class_Resource> : CSingletonNotMonoBase<CManagerPooling<ENUM_Resource_Name, Class_Resource>>
+#if UNITY_EDITOR // 디버그용 오브젝트 이름을 변경하기 위한 UpdateAble
+    , IUpdateAble
+#endif
     where ENUM_Resource_Name : System.IComparable, System.IConvertible
     where Class_Resource : Component
 {
@@ -148,8 +151,7 @@ public class CManagerPooling<ENUM_Resource_Name, Class_Resource> : CSingletonNot
     /// <param name="listRequestPooling">풀링할 Enum 형태의 리소스 리스트</param>
     public void DoStartPooling(int iPoolingCount)
     {
-        if (_bIsInit == false)
-            ProcPooling_From_ResourcesFolder();
+        ProcPooling_From_ResourcesFolder();
 
         List<ENUM_Resource_Name> listKey = _mapResourceOriginCopy.Keys.ToList();
         for (int i = 0; i < listKey.Count; i++)
@@ -219,6 +221,8 @@ public class CManagerPooling<ENUM_Resource_Name, Class_Resource> : CSingletonNot
 
     /* protected - Override & Unity API         */
 
+
+// 몇개의 오브젝트를 풀링했는지 체크하기 위한 Update 추가
 #if UNITY_EDITOR
     protected override void OnMakeSingleton()
     {
@@ -233,13 +237,13 @@ public class CManagerPooling<ENUM_Resource_Name, Class_Resource> : CSingletonNot
 
         CManagerUpdateObject.instance.DoRemoveObject(this);
     }
-#endif
 
     public void OnUpdate(ref bool bCheckUpdateCount)
     {
         bCheckUpdateCount = true;
         _pTransManager.name = p_strManagerName;
     }
+#endif
 
     // ========================================================================== //
 
@@ -248,6 +252,10 @@ public class CManagerPooling<ENUM_Resource_Name, Class_Resource> : CSingletonNot
 
     private void ProcPooling_From_ResourcesFolder()
     {
+        if (_bIsInit)
+            return;
+        _bIsInit = true;
+
         if (string.IsNullOrEmpty(p_strResourcesPath))
         {
             Debug.LogError("Error- Require Set ResourcesPath");
@@ -319,7 +327,7 @@ public class CManagerPooling<ENUM_Resource_Name, Class_Resource> : CSingletonNot
             pResource.name = string.Format("{0}(Origin)", eResourceName);
             Transform pTransMake = pResource.transform;
             pTransMake.SetParent(_pTransManager);
-            pTransMake.DoResetTransform();
+            //pTransMake.DoResetTransform();
         }
     }
 
@@ -327,7 +335,7 @@ public class CManagerPooling<ENUM_Resource_Name, Class_Resource> : CSingletonNot
     {
         Transform pTransMake = pObjectMake.transform;
         pTransMake.SetParent(_pTransManager);
-        pTransMake.DoResetTransform();
+        //pTransMake.DoResetTransform();
         pObjectMake.name = string.Format("{0}_{1}", eResourceName, ++_mapResourcePoolingCount[eResourceName]);
 
         int hInstanceID = pObjectMake.GetInstanceID();

@@ -16,7 +16,7 @@ public class AssetBundleTestEditor : CEditorWindowBase<AssetBundleTestEditor>
 
     string _strBundleName;
 
-    [MenuItem("Strix_Tools/AssetBundleTestEditor")]
+    [MenuItem("Tools/Strix_Tools/AssetBundleTestEditor")]
     public static void ShowWindow()
     {
         GetWindow(typeof(AssetBundleTestEditor));

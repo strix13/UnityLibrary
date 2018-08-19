@@ -34,7 +34,7 @@ public class CEditorWindow_SpriteEditor : CEditorWindowBase<CEditorWindow_Sprite
 	/* public - [Do] Function
      * 외부 객체가 호출                         */
 
-	[MenuItem( "Strix_Tools/Multiple Sprite Editor" )]
+	[MenuItem( "Tools/Strix_Tools/Multiple Sprite Editor" )]
 	public static void ShowWindow()
 	{
 		GetWindow( typeof( CEditorWindow_SpriteEditor ) );

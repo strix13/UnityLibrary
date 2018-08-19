@@ -26,7 +26,43 @@ using System.Reflection;
 using NUnit.Framework;
 using UnityEngine.TestTools;
 
-[AttributeUsage(AttributeTargets.Field, Inherited = true, AllowMultiple = false)]
+static public class Extension_MemberInfo
+{
+    static public System.Type MemberType(this MemberInfo pMemberInfo)
+    {
+        FieldInfo pFieldInfo = pMemberInfo as FieldInfo;
+        if (pFieldInfo != null)
+            return pFieldInfo.FieldType;
+
+        PropertyInfo pProperty = pMemberInfo as PropertyInfo;
+        if(pProperty != null)
+            return pProperty.PropertyType;
+
+        return null;
+    }
+
+    static public bool CheckValueIsNull(this MemberInfo pMemberInfo, object pTarget)
+    {
+        FieldInfo pFieldInfo = pMemberInfo as FieldInfo;
+        if (pFieldInfo == null)
+            return false;
+
+        return pFieldInfo.GetValue(pTarget) == null;
+    }
+
+    static public void SetValue_Extension(this MemberInfo pMemberInfo, object pTarget, object pValue)
+    {
+        FieldInfo pFieldInfo = pMemberInfo as FieldInfo;
+        if (pFieldInfo != null)
+            pFieldInfo.SetValue(pTarget, pValue);
+
+        PropertyInfo pProperty = pMemberInfo as PropertyInfo;
+        if (pProperty != null)
+            pProperty.SetValue(pTarget, pValue, null);
+    }
+}
+
+[AttributeUsage(AttributeTargets.Field | AttributeTargets.Property, Inherited = true, AllowMultiple = false)]
 public abstract class GetComponentAttributeBase : UnityEngine.PropertyAttribute
 {
     public bool bIsPrint_OnNotFound;
@@ -34,7 +70,6 @@ public abstract class GetComponentAttributeBase : UnityEngine.PropertyAttribute
     public abstract object GetComponent(MonoBehaviour pTargetMono, Type pElementType);
 }
 
-[AttributeUsage(AttributeTargets.Field, Inherited = true, AllowMultiple = false)]
 public class GetComponentAttribute : GetComponentAttributeBase
 {
     public override object GetComponent(MonoBehaviour pTargetMono, Type pElementType)
@@ -46,23 +81,45 @@ public class GetComponentAttribute : GetComponentAttributeBase
     }
 }
 
-[AttributeUsage(AttributeTargets.Field, Inherited = true, AllowMultiple = false)]
 public class GetComponentInChildrenAttribute : GetComponentAttributeBase
 {
     public bool bSearch_By_ComponentName = false;
+    public bool bInclude_DeActive = false;
     public string strComponentName;
 
-    public GetComponentInChildrenAttribute(System.Object pObject, bool bIsPrint_OnNotFound = true)
+    public GetComponentInChildrenAttribute(bool bInclude_DeActive = true)
+    {
+        bSearch_By_ComponentName = false;
+        this.bInclude_DeActive = bInclude_DeActive;
+    }
+
+    public GetComponentInChildrenAttribute(bool bInclude_DeActive, bool bIsPrint_OnNotFound = true)
+    {
+        this.bInclude_DeActive = bInclude_DeActive;
+        bSearch_By_ComponentName = false;
+        this.bIsPrint_OnNotFound = bIsPrint_OnNotFound;
+    }
+
+    public GetComponentInChildrenAttribute(System.Object pObject)
     {
         bSearch_By_ComponentName = true;
         this.strComponentName = pObject.ToString();
         this.bSearch_By_ComponentName = true;
-        this.bIsPrint_OnNotFound = bIsPrint_OnNotFound;
+    }
+    public GetComponentInChildrenAttribute(System.Object pObject, bool bInclude_DeActive)
+    {
+        bSearch_By_ComponentName = true;
+        this.strComponentName = pObject.ToString();
+        this.bSearch_By_ComponentName = true;
+        this.bInclude_DeActive = bInclude_DeActive;
     }
 
-    public GetComponentInChildrenAttribute(bool bIsPrint_OnNotFound = true)
+    public GetComponentInChildrenAttribute(System.Object pObject, bool bInclude_DeActive, bool bIsPrint_OnNotFound = true)
     {
-        bSearch_By_ComponentName = false;
+        bSearch_By_ComponentName = true;
+        this.bInclude_DeActive = bInclude_DeActive;
+        this.strComponentName = pObject.ToString();
+        this.bSearch_By_ComponentName = true;
         this.bIsPrint_OnNotFound = bIsPrint_OnNotFound;
     }
 
@@ -76,7 +133,6 @@ public class GetComponentInChildrenAttribute : GetComponentAttributeBase
     }
 }
 
-[AttributeUsage(AttributeTargets.Field, Inherited = true, AllowMultiple = false)]
 public class GetComponentInParentAttribute : GetComponentAttributeBase
 {
     public override object GetComponent(MonoBehaviour pTargetMono, Type pElementType)
@@ -92,9 +148,9 @@ public class GetComponentInParentAttribute : GetComponentAttributeBase
 
 static public class SCManagerGetComponent
 {
-    static public Component GetComponentInChildren(this Component pTarget, string strObjectName, System.Type pComponentType)
+    static public Component GetComponentInChildren(this Component pTarget, string strObjectName, System.Type pComponentType, bool bInclude_DeActive)
     {
-        Component[] arrComponentFind = pTarget.transform.GetComponentsInChildren(pComponentType);
+        Component[] arrComponentFind = pTarget.transform.GetComponentsInChildren(pComponentType, bInclude_DeActive);
         for (int i = 0; i < arrComponentFind.Length; i++)
         {
             if (arrComponentFind[i].name.Equals(strObjectName))
@@ -105,33 +161,48 @@ static public class SCManagerGetComponent
 
     static public void DoUpdateGetComponentAttribute(MonoBehaviour pTarget)
     {
+        // BindingFloags를 일일이 써야 잘 동작한다..
+
         System.Type pType = pTarget.GetType();
-        FieldInfo[] arrFields = pType.GetFields(BindingFlags.Public | BindingFlags.Instance);
-        ProcUpdateComponentAttribute(pTarget, arrFields);
+        MemberInfo[] arrMembers = pType.GetFields(BindingFlags.Public | BindingFlags.Instance);
+        ProcUpdateComponentAttribute(pTarget, arrMembers);
 
-        arrFields = pType.GetFields(BindingFlags.NonPublic | BindingFlags.Instance);
-        ProcUpdateComponentAttribute(pTarget, arrFields);
+        arrMembers = pType.GetFields(BindingFlags.NonPublic | BindingFlags.Instance);
+        ProcUpdateComponentAttribute(pTarget, arrMembers);
 
-        arrFields = pType.GetFields(BindingFlags.Public | BindingFlags.Static);
-        ProcUpdateComponentAttribute(pTarget, arrFields);
+        arrMembers = pType.GetFields(BindingFlags.Public | BindingFlags.Static);
+        ProcUpdateComponentAttribute(pTarget, arrMembers);
 
-        arrFields = pType.GetFields(BindingFlags.NonPublic | BindingFlags.Static);
-        ProcUpdateComponentAttribute(pTarget, arrFields);
+        arrMembers = pType.GetFields(BindingFlags.NonPublic | BindingFlags.Static);
+        ProcUpdateComponentAttribute(pTarget, arrMembers);
+
+        // Property 구간
+        arrMembers = pType.GetProperties(BindingFlags.Public | BindingFlags.Instance);
+        ProcUpdateComponentAttribute(pTarget, arrMembers);
+
+        arrMembers = pType.GetProperties(BindingFlags.NonPublic | BindingFlags.Instance);
+        ProcUpdateComponentAttribute(pTarget, arrMembers);
+
+        arrMembers = pType.GetProperties(BindingFlags.Public | BindingFlags.Static);
+        ProcUpdateComponentAttribute(pTarget, arrMembers);
+
+        arrMembers = pType.GetProperties(BindingFlags.NonPublic | BindingFlags.Static);
+        ProcUpdateComponentAttribute(pTarget, arrMembers);
     }
 
-    static private void ProcUpdateComponentAttribute(MonoBehaviour pTargetMono, FieldInfo[] arrFields)
+    static private void ProcUpdateComponentAttribute(MonoBehaviour pTargetMono, MemberInfo[] arrMember)
     {
-        for (int i = 0; i < arrFields.Length; i++)
+        for (int i = 0; i < arrMember.Length; i++)
         {
-            FieldInfo pField = arrFields[i];
-            object[] arrCustomAttributes = pField.GetCustomAttributes(true);
+            MemberInfo pMemberInfo = arrMember[i];
+            object[] arrCustomAttributes = pMemberInfo.GetCustomAttributes(true);
 
             for (int j = 0; j < arrCustomAttributes.Length; j++)
             {
                 GetComponentAttributeBase pGetcomponentAttribute = arrCustomAttributes[j] as GetComponentAttributeBase;
                 if (pGetcomponentAttribute == null) continue;
 
-                System.Type pTypeField = pField.FieldType;
+                System.Type pTypeField = pMemberInfo.MemberType();
                 object pComponent = null;
 
                 if (pTypeField.IsArray)
@@ -140,7 +211,7 @@ static public class SCManagerGetComponent
                 }
                 else if (pTypeField.IsGenericType)
                 {
-                    pComponent = ProcUpdateComponent_Generic(pTargetMono, pField, (GetComponentInChildrenAttribute)pGetcomponentAttribute, pTypeField);
+                    pComponent = ProcUpdateComponent_Generic(pTargetMono, pMemberInfo, (GetComponentInChildrenAttribute)pGetcomponentAttribute, pTypeField);
                 }
                 else
                 {
@@ -150,9 +221,9 @@ static public class SCManagerGetComponent
                     {
                         GetComponentInChildrenAttribute pAttributeInChildren = (GetComponentInChildrenAttribute)pGetcomponentAttribute;
                         if (pAttributeInChildren.bSearch_By_ComponentName)
-                            pComponent = pTargetMono.GetComponentInChildren(pAttributeInChildren.strComponentName, pTypeField);
+                            pComponent = pTargetMono.GetComponentInChildren(pAttributeInChildren.strComponentName, pTypeField, pAttributeInChildren.bInclude_DeActive);
                         else
-                            pComponent = pTargetMono.GetComponentInChildren(pTypeField, true);
+                            pComponent = pTargetMono.GetComponentInChildren(pTypeField, pAttributeInChildren.bInclude_DeActive);
                     }
                     else if (pGetcomponentAttribute is GetComponentInParentAttribute)
                         pComponent = pTargetMono.GetComponentInParent(pTypeField);
@@ -169,12 +240,12 @@ static public class SCManagerGetComponent
                 }
 
                 if (pTypeField.IsGenericType == false)
-                    pField.SetValue(pTargetMono, pComponent);
+                    pMemberInfo.SetValue_Extension(pTargetMono, pComponent);
             }
         }
     }
 
-    static private object ProcUpdateComponent_Generic(MonoBehaviour pTargetMono, FieldInfo pField, GetComponentInChildrenAttribute pGetComponentAttribute, System.Type pTypeField)
+    static private object ProcUpdateComponent_Generic(MonoBehaviour pTargetMono, MemberInfo pMember, GetComponentInChildrenAttribute pGetComponentAttribute, System.Type pTypeField)
     {
         object pComponent = null;
         System.Type pTypeField_Generic = pTypeField.GetGenericTypeDefinition();
@@ -185,17 +256,17 @@ static public class SCManagerGetComponent
             // List의 경우 GetComponentsInChildren 을 통해 Array를 얻은 뒤
             pComponent = pGetComponentAttribute.GetComponent(pTargetMono, arrArgumentsType[0]);
             // List 생성자에 Array를 집어넣는다.
-            pField.SetValue(pTargetMono, System.Activator.CreateInstance(pTypeField, pComponent));
+            pMember.SetValue_Extension(pTargetMono, System.Activator.CreateInstance(pTypeField, pComponent));
         }
         else if (pTypeField_Generic == typeof(Dictionary<,>))
         {
-            pComponent = ProcUpdateComponent_Dictionary(pTargetMono, pField, pTypeField, pGetComponentAttribute, arrArgumentsType[0], arrArgumentsType[1]);
+            pComponent = ProcUpdateComponent_Dictionary(pTargetMono, pMember, pTypeField, pGetComponentAttribute, arrArgumentsType[0], arrArgumentsType[1]);
         }
 
         return pComponent;
     }
 
-    static private object ProcUpdateComponent_Dictionary(MonoBehaviour pTargetMono, FieldInfo pField, System.Type pTypeField, GetComponentInChildrenAttribute pAttributeInChildren, Type pType_DictionaryKey, Type pType_DictionaryValue)
+    static private object ProcUpdateComponent_Dictionary(MonoBehaviour pTargetMono, MemberInfo pMember, System.Type pTypeField, GetComponentInChildrenAttribute pAttributeInChildren, Type pType_DictionaryKey, Type pType_DictionaryValue)
     {
         object pComponent = pAttributeInChildren.GetComponent(pTargetMono, pType_DictionaryValue);
         Array arrComponent = pComponent as Array;
@@ -210,6 +281,17 @@ static public class SCManagerGetComponent
 
         // Reflection의 메소드는 Instance에서만 호출할수 있다.
         var pInstanceDictionary = System.Activator.CreateInstance(pTypeField);
+        bool bIsDerived_DictionaryItem = false;
+        Type[] arrInterfaces = pType_DictionaryValue.GetInterfaces();
+        string strTypeName = typeof(IDictionaryItem<>).Name;
+        for (int i = 0; i < arrInterfaces.Length; i++)
+        {
+            if (arrInterfaces[i].Name.Equals(strTypeName))
+            {
+                bIsDerived_DictionaryItem = true;
+                break;
+            }
+        }
 
         if (pType_DictionaryKey == typeof(string))
         {
@@ -221,53 +303,43 @@ static public class SCManagerGetComponent
                                     pComponentChild });
             }
         }
-        else if (pType_DictionaryKey.IsEnum)
+        else
         {
-            bool bIsDerived_DictionaryItem = false;
-            Type[] arrInterfaces = pType_DictionaryValue.GetInterfaces();
-            string strTypeName = typeof(IDictionaryItem<>).Name;
-            for (int i = 0; i < arrInterfaces.Length; i++)
-            {
-                if (arrInterfaces[i].Name.Equals(strTypeName))
-                {
-                    bIsDerived_DictionaryItem = true;
-                    break;
-                }
-            }
             if (bIsDerived_DictionaryItem)
             {
-                var method = pType_DictionaryValue.GetMethod("IDictionaryItem_GetKey");
+                var pMethod_GetKey = pType_DictionaryValue.GetMethod("IDictionaryItem_GetKey");
                 for (int k = 0; k < arrComponent.Length; k++)
                 {
                     Component pComponentChild = arrComponent.GetValue(k) as Component;
                     Method_Add.Invoke(pInstanceDictionary, new object[] {
-                                    method.Invoke(pComponentChild, null),
+                                    pMethod_GetKey.Invoke(pComponentChild, null),
                                     pComponentChild });
                 }
             }
-            else
+            else 
             {
-                for (int k = 0; k < arrComponent.Length; k++)
+                if (pType_DictionaryKey.IsEnum)
                 {
-                    Component pComponentChild = arrComponent.GetValue(k) as Component;
-                    try
+                    for (int k = 0; k < arrComponent.Length; k++)
                     {
-                        var pEnum = System.Enum.Parse(pType_DictionaryKey, pComponentChild.name, true);
-                        Method_Add.Invoke(pInstanceDictionary, new object[] {
+                        Component pComponentChild = arrComponent.GetValue(k) as Component;
+                        try
+                        {
+                            var pEnum = System.Enum.Parse(pType_DictionaryKey, pComponentChild.name, true);
+                            Method_Add.Invoke(pInstanceDictionary, new object[] {
                                     pEnum,
                                     pComponentChild });
+                        }
+                        catch { }
                     }
-                    catch { }
                 }
             }
-        }
-        else
-        {
-            Debug.LogError("GetComponentAttribute Error Dictionary Key 타입은 string, enum입니다. Key Type : " + pType_DictionaryKey.Name);
-            return null;
+
+            // Debug.LogError("GetComponentAttribute Error Dictionary Key 타입은 string, enum만 됩니다. Key Type : " + pType_DictionaryKey.Name);
+            // return null;
         }
 
-        pField.SetValue(pTargetMono, pInstanceDictionary);
+        pMember.SetValue_Extension(pTargetMono, pInstanceDictionary);
         return pComponent;
     }
 }
@@ -275,6 +347,7 @@ static public class SCManagerGetComponent
 #region Test
 
 public class Test_ComponentChild : MonoBehaviour { }
+public class Test_ComponentOnly : MonoBehaviour { }
 public class Test_ComponentChild_DerivedDictionaryItem : MonoBehaviour, IDictionaryItem<GetComponentAttribute_Test.ETestChildObject>
 {
     public GetComponentAttribute_Test.ETestChildObject IDictionaryItem_GetKey()
@@ -305,12 +378,18 @@ public class GetComponentAttribute_Test : MonoBehaviour
     [GetComponentInChildren]
     public Dictionary<string, Test_ComponentChild> p_mapTest_KeyIsString = new Dictionary<string, Test_ComponentChild>();
     [GetComponentInChildren]
-    public Dictionary<ETestChildObject, Test_ComponentChild> p_mapTest_KeyIsEnum = new Dictionary<ETestChildObject, Test_ComponentChild>();
+    private Dictionary<ETestChildObject, Test_ComponentChild> p_mapTest_KeyIsEnum = new Dictionary<ETestChildObject, Test_ComponentChild>();
 
     [GetComponentInChildren("TestObject_Other_FindString")]
-    public Test_ComponentChild p_pChildComponent_FindString;
+    private Test_ComponentChild p_pChildComponent_FindString;
     [GetComponentInChildren(ETestChildObject.TestObject_Other_FindEnum)]
-    public Test_ComponentChild p_pChildComponent_FindEnum;
+    private Test_ComponentChild p_pChildComponent_FindEnum;
+
+    [GetComponentInChildren]
+    public Test_ComponentChild p_pChildComponent_FindEnumProperty { get; private set; }
+
+    [GetComponent]
+    Test_ComponentOnly[] arrComponent = null;
 
     public void Awake()
     {
@@ -318,9 +397,9 @@ public class GetComponentAttribute_Test : MonoBehaviour
     }
 
     [UnityTest]
-    static public IEnumerator Test_GetComponentAttribute()
+    static public IEnumerator GetComponent_자식_필드_테스트()
     {
-        GameObject pObjectParents = new GameObject("Test");
+        GameObject pObjectParents = new GameObject("GetComponent_Test_Field");
 
         // GetComponent 대상인 자식 추가
         for (int i = 0; i < (int)GetComponentAttribute_Test.ETestChildObject.MAX; i++)
@@ -363,9 +442,9 @@ public class GetComponentAttribute_Test : MonoBehaviour
     }
 
     [UnityTest]
-    static public IEnumerator Test_GetComponentInChildren_DeriveEnum()
+    static public IEnumerator GetComponent_자식_Enum_테스트()
     {
-        GameObject pObjectParents = new GameObject("Test");
+        GameObject pObjectParents = new GameObject("GetComponent_Test_Enum");
 
         // GetComponent 대상인 자식 추가
         for (int i = 0; i < (int)GetComponentAttribute_Test.ETestChildObject.MAX; i++)
@@ -387,6 +466,49 @@ public class GetComponentAttribute_Test : MonoBehaviour
         {
             Assert.IsTrue(pIterEnum.Current.Key.ToString() == pIterEnum.Current.Value.name.ToString());
         }
+    }
+
+    [UnityTest]
+    static public IEnumerator GetComponent_자식_Property_테스트()
+    {
+        GameObject pObjectParents = new GameObject("GetComponent_Test_Property");
+
+        // GetComponent 대상인 자식 추가
+        for (int i = 0; i < (int)GetComponentAttribute_Test.ETestChildObject.MAX; i++)
+        {
+            GameObject pObjectChild = new GameObject(((GetComponentAttribute_Test.ETestChildObject)i).ToString());
+            pObjectChild.transform.SetParent(pObjectParents.transform);
+            pObjectChild.AddComponent<Test_ComponentChild>();
+        }
+
+        // 자식을 전부 추가한 뒤에 페런츠에 추가한다.
+        // 추가하자마자 Awake로 자식을 찾기 때문
+        GetComponentAttribute_Test pParents = pObjectParents.AddComponent<GetComponentAttribute_Test>();
+        pParents.Awake();
+
+        yield return null;
+
+        Assert.IsNotNull(pParents.p_pChildComponent_FindEnumProperty);
+    }
+
+    [UnityTest]
+    static public IEnumerator GetComponent_Array_테스트()
+    {
+        GameObject pObjectParents = new GameObject("GetComponent_Test_GetComponentArray");
+
+        // GetComponent 대상인 자식 추가
+        int iAddComponentCount = 3;
+        for (int i = 0; i < iAddComponentCount; i++)
+            pObjectParents.AddComponent<Test_ComponentOnly>();
+
+        // 자식을 전부 추가한 뒤에 페런츠에 추가한다.
+        // 추가하자마자 Awake로 자식을 찾기 때문
+        GetComponentAttribute_Test pParents = pObjectParents.AddComponent<GetComponentAttribute_Test>();
+        pParents.Awake();
+
+        yield return null;
+
+        Assert.AreEqual(pParents.arrComponent.Length, iAddComponentCount);
     }
 }
 

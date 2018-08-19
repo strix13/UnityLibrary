@@ -35,7 +35,7 @@ public class CManagerNavMeshBuilder : CSingletonMonoBase<CManagerNavMeshBuilder>
     public void DoBakeNavmesh_Async(System.Action OnFinishBake)
     {
         _OnFinishBakeAsync = OnFinishBake;
-        StopAllCoroutines();
+        // StopAllCoroutines();
         StartCoroutine(CoBakeAsync());
     }
 

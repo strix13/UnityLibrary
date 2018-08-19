@@ -12,17 +12,15 @@ using System.Collections.Generic;
 using System;
 using System.Reflection;
 
-#if UNITY_EDITOR
 using NUnit.Framework;
 using UnityEngine.TestTools;
-#endif
 
 [AttributeUsage(AttributeTargets.Field, Inherited = true, AllowMultiple = false)]
-public class EnumToSubStringAttribute : UnityEngine.PropertyAttribute
+public class RegistSubStringAttribute : UnityEngine.PropertyAttribute
 {
     public string strSubString;
 
-    public EnumToSubStringAttribute(string strSubString)
+    public RegistSubStringAttribute(string strSubString)
     {
         this.strSubString = strSubString;
     }
@@ -35,9 +33,12 @@ public static class SCEnumToSubStringHelper
         string strString = eEnum.ToString();
         Type pType = eEnum.GetType();
         FieldInfo pFieldInfo = pType.GetField(strString);
-        EnumToSubStringAttribute[] arrAttribute = pFieldInfo.GetCustomAttributes(typeof(EnumToSubStringAttribute), false) as EnumToSubStringAttribute[];
-        if (arrAttribute.Length > 0)
-            strString = arrAttribute[0].strSubString;
+        if(pFieldInfo != null)
+        {
+            RegistSubStringAttribute[] arrAttribute = pFieldInfo.GetCustomAttributes(typeof(RegistSubStringAttribute), false) as RegistSubStringAttribute[];
+            if (arrAttribute.Length > 0)
+                strString = arrAttribute[0].strSubString;
+        }
 
         return strString;
     }
@@ -48,7 +49,7 @@ public class EnumToSubStringAttribute_Test
 {
     public enum ETest
     {
-        [EnumToSubString("Test11")]
+        [RegistSubStringAttribute("Test11")]
         Test1,
         Test2,
     }

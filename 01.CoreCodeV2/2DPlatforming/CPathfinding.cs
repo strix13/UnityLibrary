@@ -413,8 +413,8 @@ public class CPathfinding : MonoBehaviour
 
     private void PortalNeighbors(List<pathNode> fromNodes, List<pathNode> toNodes, bool onlyPortals)
     {
-        float distanceForGround = blockSize * 1.5f + 0.1f;
-        float maxXDistance = blockSize * 1f;
+        // float distanceForGround = blockSize * 1.5f + 0.1f;
+        // float maxXDistance = blockSize * 1f;
         for (int i = 0; i < fromNodes.Count; i++)
         {
             pathNode a = fromNodes[i];

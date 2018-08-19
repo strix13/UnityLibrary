@@ -448,6 +448,13 @@ public static class PrimitiveHelper
 		return _listDigitNote;
 	}
 
+    /// <summary>
+    /// Min과 Max값을 기준으로 Current값을 0 ~ 1사이값으로 변환합니다.
+    /// </summary>
+    /// <param name="fCurrent"></param>
+    /// <param name="fMax"></param>
+    /// <param name="fMin"></param>
+    /// <returns></returns>
     static public float ProgressDelta_0_1(this float fCurrent, float fMax, float fMin = 0f)
     {
         if (fCurrent > fMax)
@@ -461,6 +468,32 @@ public static class PrimitiveHelper
         return (fCurrent * (fMax - fMin)) + fMin;
     }
 
+
+    public static bool ContainEnumFlag<T>(this T eEnumFlag, T eEnum )
+        where T : struct, System.IConvertible, System.IComparable, System.IFormattable
+    {
+        int iEnumFlag = eEnumFlag.GetHashCode();
+        int iEnum = eEnum.GetHashCode();
+
+        return (iEnumFlag & iEnum) == iEnum;
+    }
+    
+    public static bool ContainEnumFlag<T>(this T eEnumFlag, params T[] arrEnum)
+        where T : struct, System.IConvertible, System.IComparable, System.IFormattable
+    {
+        bool bIsContain = false;
+
+        int iEnumFlag = eEnumFlag.GetHashCode();
+        for (int i = 0; i < arrEnum.Length; i++)
+        {
+            int iEnum = arrEnum[i].GetHashCode();
+            bIsContain = (iEnumFlag & iEnum) == iEnum;
+            if (bIsContain)
+                break;
+        }
+
+        return bIsContain;
+    }
 }
 
 #region Test
@@ -468,6 +501,33 @@ public static class PrimitiveHelper
 [Category("StrixLibrary")]
 public class PrimitiveHelper_Test
 {
+    [System.Flags]
+    public enum ETestEnumFlag
+    {
+        Test1 = 1 << 1,
+        Test2 = 1 << 2,
+        Test3 = 1 << 3,
+        Test4 = 1 << 4,
+        Test5 = 1 << 5,
+
+    }
+
+    [Test]
+    public void Test_EnumExtension_ContainEnumFlag()
+    {
+        ETestEnumFlag eTestEnum = ETestEnumFlag.Test1 | ETestEnumFlag.Test2 | ETestEnumFlag.Test3;
+        Assert.IsTrue(eTestEnum.ContainEnumFlag(ETestEnumFlag.Test1));
+        Assert.IsTrue(eTestEnum.ContainEnumFlag(ETestEnumFlag.Test2));
+        Assert.IsTrue(eTestEnum.ContainEnumFlag(ETestEnumFlag.Test3));
+
+        Assert.IsTrue(eTestEnum.ContainEnumFlag(ETestEnumFlag.Test1, ETestEnumFlag.Test2, ETestEnumFlag.Test4));
+
+
+        Assert.IsFalse(eTestEnum.ContainEnumFlag(ETestEnumFlag.Test4));
+        Assert.IsFalse(eTestEnum.ContainEnumFlag(ETestEnumFlag.Test4, ETestEnumFlag.Test5));
+
+    }
+
     [Test]
     static public void Test_IntExtension_CutDigitString_Number([Random(1000, 10000, 5)] int iTestNum)
     {

@@ -69,7 +69,7 @@ public class CEditorWindow_NameChanger : EditorWindow
 	/* public - [Do] Function
      * 외부 객체가 호출                         */
 
-	[MenuItem("Strix_Tools/NameChanger")]
+	[MenuItem("Tools/Strix_Tools/NameChanger")]
 	public static void ShowWindow()
 	{
 		GetWindow(typeof(CEditorWindow_NameChanger), true, "NameChanger");

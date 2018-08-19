@@ -27,8 +27,12 @@ public class CRaycastCalculator : CObjectBase
         public Vector2 vecBound_TopLeft, vecBound_TopRight;
         public Vector2 vecBound_BottomLeft, vecBound_BottomRight;
 
-        public Vector2 vecRayOrigin_VerticalUp;
-        public Vector2 vecRayOrigin_VerticalDown;
+        public Vector2 vecRayOrigin_Horizontal_Left;
+        public Vector2 vecRayOrigin_Horizontal_Right;
+
+        public Vector2 vecCenter;
+
+        public float fRayLength_Horizontal;
         public float fRayLength_Vertical;
     }
 
@@ -49,10 +53,10 @@ public class CRaycastCalculator : CObjectBase
     [Rename_Inspector("스킨 두께 - 세로")]
     public float _fSkinWidth_Vertical = .03f;
 
-    [Rename_Inspector("좌우 방향 무시할 레이 개수")]
-    public int _iIgnoreRayCount_Horizontal = 0;
-    [Rename_Inspector("아래 방향 무시할 레이 개수")]
-    public int _iIgnoreRayCount_Vertical = 0;
+    [Rename_Inspector("세팅할 컬라이더(없으면 GetComponent)")]
+    public Collider p_pCollider;
+    [Rename_Inspector("세팅할 컬라이더(없으면 GetComponent)")]
+    public Collider2D p_pCollider2D;
 
     [HideInInspector]
     public float _fHorizontalRaySpacing;
@@ -61,8 +65,6 @@ public class CRaycastCalculator : CObjectBase
 
     public RaycastOrigins _pRaycastOrigins;
 
-    public Collider p_pCollider { get; private set; }
-    public Collider2D p_pCollider2D { get; private set; }
     public EDimensionType p_eDimensionType { get; private set; }
 
     /* protected & private - Field declaration         */
@@ -91,12 +93,14 @@ public class CRaycastCalculator : CObjectBase
     {
         Bounds bounds = GetBounds();
 
-        _pRaycastOrigins.vecRayOrigin_VerticalUp = bounds.center;
-        _pRaycastOrigins.vecRayOrigin_VerticalUp.y += _fSkinWidth_Vertical;
-        _pRaycastOrigins.vecRayOrigin_VerticalDown = bounds.center;
-        _pRaycastOrigins.vecRayOrigin_VerticalDown.y -= _fSkinWidth_Vertical;
+        _pRaycastOrigins.vecRayOrigin_Horizontal_Left = new Vector2(bounds.center.x, bounds.min.y);
+        _pRaycastOrigins.vecRayOrigin_Horizontal_Left.x -= _fSkinWidth_Horizontal;
 
-        _pRaycastOrigins.fRayLength_Vertical = Mathf.Abs(bounds.max.y - bounds.center.y) - _fSkinWidth_Vertical;
+        _pRaycastOrigins.vecRayOrigin_Horizontal_Right = new Vector2(bounds.center.x, bounds.min.y);
+        _pRaycastOrigins.vecRayOrigin_Horizontal_Right.x += _fSkinWidth_Horizontal;
+
+        _pRaycastOrigins.vecCenter = bounds.center;
+
         _pRaycastOrigins.vecBound_BottomLeft = new Vector2(bounds.min.x, bounds.min.y);
         _pRaycastOrigins.vecBound_BottomRight = new Vector2(bounds.max.x , bounds.min.y);
         _pRaycastOrigins.vecBound_TopLeft = new Vector2(bounds.min.x, bounds.max.y);
@@ -115,11 +119,14 @@ public class CRaycastCalculator : CObjectBase
         float boundsWidth = bounds.size.x;
         float boundsHeight = bounds.size.y;
 
-        _iHorizontalRayCount = Mathf.RoundToInt(boundsHeight / _fDstBetweenRays_Horizontal);
-        _iVerticalRayCount = Mathf.RoundToInt(boundsWidth / _fDstBetweenRays_Vertical);
+        _iHorizontalRayCount = Mathf.CeilToInt(boundsHeight / _fDstBetweenRays_Horizontal);
+        _iVerticalRayCount = Mathf.CeilToInt(boundsWidth / _fDstBetweenRays_Vertical);
 
         _fHorizontalRaySpacing = bounds.size.y / (_iHorizontalRayCount - 1);
         _fVerticalRaySpacing = bounds.size.x / (_iVerticalRayCount - 1);
+
+        _pRaycastOrigins.fRayLength_Horizontal = Mathf.Abs(bounds.max.x - bounds.center.x) - _fSkinWidth_Horizontal;
+        _pRaycastOrigins.fRayLength_Vertical = Mathf.Abs(bounds.max.y - bounds.center.y) + _fSkinWidth_Vertical;
     }
 
 
@@ -144,10 +151,17 @@ public class CRaycastCalculator : CObjectBase
     {
         base.OnAwake();
 
-        if (GetComponent<Collider2D>())
-            DoSetCollider(GetComponent<Collider2D>());
-        else if(GetComponent<Collider>())
-            DoSetCollider(GetComponent<Collider>());
+        if (p_pCollider)
+            DoSetCollider(p_pCollider);
+        else if (p_pCollider2D)
+            DoSetCollider(p_pCollider2D);
+        else
+        {
+            if (GetComponent<Collider2D>())
+                DoSetCollider(GetComponent<Collider2D>());
+            else if (GetComponent<Collider>())
+                DoSetCollider(GetComponent<Collider>());
+        }
     }
 
 

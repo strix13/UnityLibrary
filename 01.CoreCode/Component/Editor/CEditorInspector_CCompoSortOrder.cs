@@ -20,10 +20,12 @@ public class CEditorInspector_CCompoSortingLayer : Editor
 
 	public override void OnInspectorGUI()
 	{
+        //base.OnInspectorGUI();
+
 		System.Type internalEditorUtilityType = typeof( InternalEditorUtility );
 		PropertyInfo sortingLayersProperty = internalEditorUtilityType.GetProperty( "sortingLayerNames", BindingFlags.Static | BindingFlags.NonPublic );
 
-		int iIndex = -1;
+		int iIndex = 0;
 		this._arrSortingLayerNames = (string[])sortingLayersProperty.GetValue( null, new object[0] );
 		for (int i = 0; i < _arrSortingLayerNames.Length; i++)
 		{
@@ -31,12 +33,9 @@ public class CEditorInspector_CCompoSortingLayer : Editor
 				iIndex = i;
 		}
 
-		if(iIndex != -1)
-		{
-			iIndex = EditorGUILayout.Popup( "SortLayer", iIndex, _arrSortingLayerNames );
-			_pTarget.strSortingLayer = _arrSortingLayerNames[iIndex];
-		}
-		_pTarget.iSortOrder = EditorGUILayout.IntField( "SortOrder", _pTarget.iSortOrder );
-		EditorUtility.SetDirty( _pTarget );
-	}
+		iIndex = EditorGUILayout.Popup( "SortLayer", iIndex, _arrSortingLayerNames );
+		_pTarget.strSortingLayer = _arrSortingLayerNames[iIndex];
+        _pTarget.iSortOrder = EditorGUILayout.IntField("SortOrder", _pTarget.iSortOrder);
+        EditorUtility.SetDirty(_pTarget);
+    }
 }

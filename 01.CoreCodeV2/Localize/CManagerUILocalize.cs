@@ -166,7 +166,15 @@ public class CManagerUILocalize : CSingletonDynamicMonoBase<CManagerUILocalize>
 		return _mapLocaleData[p_eCurrentLocalize][strKey][iIndex];
 	}
 
-	public string DoGetLocalizeRandomText_OrNull(string strKey)
+    public string DoGetCurrentLocalizeValue_Random(string strKey)
+    {
+        if (ProcCheckValidLocalizeValue(strKey) == false) return null;
+
+        return _mapLocaleData[p_eCurrentLocalize][strKey].GetRandom();
+    }
+
+
+    public string DoGetLocalizeRandomText_OrNull(string strKey)
 	{
 		List<string> listLocalizeValue = DoGetLocalizeValueContains(strKey);
 		if (listLocalizeValue == null)
@@ -245,9 +253,9 @@ public class CManagerUILocalize : CSingletonDynamicMonoBase<CManagerUILocalize>
     private IEnumerator CoProcParse_Locale(SystemLanguage eLocale)
 	{
 		_pStrBuilder.Length = 0;
-#if UNITY_EDITOR
-		_pStrBuilder.Append("file://");
-#endif
+//#if UNITY_EDITOR
+//		_pStrBuilder.Append("file://");
+//#endif
 		_pStrBuilder.Append(Application.streamingAssetsPath).Append("/").Append(const_strLocalePath).Append("/")
 					.Append(eLocale.ToString()).Append(const_strLocaleFileExtension);
 

@@ -16,11 +16,14 @@ using Spine;
 [UnityEngine.ExecuteInEditMode]
 public class CCompo_SpineColorControl : CObjectBase
 {
-	/* const & readonly declaration             */
+    /* const & readonly declaration             */
 
-	/* enum & struct declaration                */
+    /* enum & struct declaration                */
 
-	/* public - Variable declaration            */
+    /* public - Variable declaration            */
+
+    public Color p_pColorEdit;
+    public bool p_bEditUpdate = false;
 
 	/* protected - Variable declaration         */
 
@@ -75,6 +78,17 @@ public class CCompo_SpineColorControl : CObjectBase
 		//_pSkeletonData = _pAnimation.SkeletonDataAsset.GetSkeletonData( false );
 		_pSkeleton = _pAnimation.skeleton;
 	}
+
+#if UNITY_EDITOR
+    public override void OnUpdate(ref bool bCheckUpdateCount)
+    {
+        base.OnUpdate(ref bCheckUpdateCount);
+
+        if (p_bEditUpdate)
+            DoSetColor(p_pColorEdit);
+    }
+#endif
+
     // ========================================================================== //
 
     /* private - [Proc] Function             

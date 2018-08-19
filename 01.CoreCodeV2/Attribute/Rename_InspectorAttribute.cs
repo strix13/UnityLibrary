@@ -3,6 +3,26 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+#if ODIN_INSPECTOR
+
+[AttributeUsage(AttributeTargets.Method | AttributeTargets.Property | AttributeTargets.Field, AllowMultiple = false, Inherited = true)]
+public class Rename_InspectorAttribute : Attribute
+{
+    public string strInspectorName;
+    public bool bIsEditPossibleInspector;
+
+    public Rename_InspectorAttribute(string text)
+    {
+        strInspectorName = text;
+    }
+
+    public Rename_InspectorAttribute(string text, bool bIsEditPossibleInspector)
+    {
+        strInspectorName = text;
+        this.bIsEditPossibleInspector = bIsEditPossibleInspector;
+    }
+}
+#else
 [AttributeUsage(AttributeTargets.Field, Inherited = true, AllowMultiple = false)]
 public class Rename_InspectorAttribute : PropertyAttribute
 {
@@ -20,3 +40,4 @@ public class Rename_InspectorAttribute : PropertyAttribute
         this.bIsEditPossibleInspector = bIsEditPossibleInspector;
     }
 }
+#endif

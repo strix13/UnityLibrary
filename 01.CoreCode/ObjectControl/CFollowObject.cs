@@ -21,6 +21,8 @@ public class CFollowObject : CObjectBase
         Update,   
     }
 
+    public event System.Action<bool> p_Event_OnArrive_SmoothFollow;
+
 	[Header("쫓아가기 옵션")]
     [SerializeField]
     private EFollowPos _eFollowPos = EFollowPos.All;
@@ -28,7 +30,21 @@ public class CFollowObject : CObjectBase
     private Transform _pTransTarget = null;
 
     public EFollowMode p_eFollowMode = EFollowMode.Update;
+
+    [Header("부드러운 따라가기 관련 옵션")]
+    [Rename_Inspector("부드러운 따라가기를 할건지")]
 	public bool p_bIsSmoothFollow = false;
+
+    [Rename_Inspector("부드러운 따라가기를 했을 때 도착 판정 거리")]
+    public float p_fCondition_ArriveDistance = 1f;
+
+    [Rename_Inspector("스무스 팔로우 모드일 때 현재 거리", false)]
+    [SerializeField]
+    private float _fArriveDistance;
+
+    [Rename_Inspector("스무스 팔로우 모드일 때 근접했는지", false)]
+    [SerializeField]
+    private bool _bArrive_OnSmooth;
 
     [SerializeField] [Range(0, 1f)]
 	private float _fSmoothFollowDelta = 0.1f;
@@ -37,7 +53,8 @@ public class CFollowObject : CObjectBase
 	[SerializeField]
     private float _fShakeMinusDelta = 0.1f;
 
-	[Header( "디버그용" )]
+    [Rename_Inspector("현재 따라가는 중인지", false)]
+    [SerializeField]
 	private bool _bIsFollow = false;
 
 	private Vector3 _vecAwakePos;
@@ -123,10 +140,12 @@ public class CFollowObject : CObjectBase
     public override void OnUpdate(ref bool bCheckUpdateCount)
     {
         base.OnUpdate(ref bCheckUpdateCount);
-        bCheckUpdateCount = true;
 
         if (p_eFollowMode == EFollowMode.Update)
+        {
+            bCheckUpdateCount = true;
             DoUpdateFollow();
+        }
     }
 
     private void FixedUpdate()
@@ -142,7 +161,13 @@ public class CFollowObject : CObjectBase
 		Vector3 vecDestPos = vecFollowPos;
 		ProcFollow_Normal( ref vecDestPos, vecTargetPos );
 		vecFollowPos = Vector3.Lerp(transform.position, vecDestPos, _fSmoothFollowDelta );
-	}
+        _fArriveDistance = Vector3.Distance(vecFollowPos, vecDestPos);
+
+        bool bArrive = _fArriveDistance <= p_fCondition_ArriveDistance;
+        _bArrive_OnSmooth = bArrive;
+        if (p_Event_OnArrive_SmoothFollow != null)
+            p_Event_OnArrive_SmoothFollow(bArrive);
+    }
 
 	private void ProcFollow_Normal( ref Vector3 vecFollowPos, Vector3 vecTargetPos )
 	{

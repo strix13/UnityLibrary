@@ -7,7 +7,7 @@ public class CEditorWindowFindMissingScripts : EditorWindow
 {
     static int go_count = 0, components_count = 0, missing_count = 0;
 
-    [MenuItem("Strix_Tools/FindMissingScripts")]
+    [MenuItem("Tools/Strix_Tools/FindMissingScripts")]
     public static void ShowWindow()
     {
         EditorWindow.GetWindow(typeof(CEditorWindowFindMissingScripts));

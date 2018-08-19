@@ -31,7 +31,7 @@ public class CEditorWindow_MaterialChanger : CEditorWindowBase<CEditorWindow_Mat
 	/* public - [Do] Function
      * 외부 객체가 호출(For External class call)*/
 
-	[MenuItem("Strix_Tools/MaterialChanger")]
+	[MenuItem("Tools/Strix_Tools/MaterialChanger")]
 	public static void ShowWindow()
 	{
 		GetWindow(typeof(CEditorWindow_MaterialChanger));

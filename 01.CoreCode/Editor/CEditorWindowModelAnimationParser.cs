@@ -48,7 +48,7 @@ public class CEditorWindowModelAnimationParser : EditorWindow
     /* public - [Do] Function
      * 외부 객체가 호출                         */
 
-    [MenuItem("Strix_Tools/Model_Animation Parser Keyframe")]
+    [MenuItem("Tools/Strix_Tools/Model_Animation Parser Keyframe")]
     public static void DoOpen_Model_AnimationParser()
     {
         GetWindow<CEditorWindowModelAnimationParser>(true, "Model_Animation Parser Keyframe", true);

@@ -26,26 +26,34 @@ public class C3DObjectGrid : CObjectBase
 
 	/* public - Variable declaration            */
 
+    [Rename_Inspector("포지션 오프셋")]
 	public Vector3 _vecLocalPosOffset = Vector3.zero;
 
-	public ECircleOption _eCircleOption = ECircleOption.None;
-	public Vector3 _vecRotate_OnCircle;
-	public Vector3 _vecPos_OnCircle;
+    [Header("원형 옵션 관련")]
+    [Rename_Inspector("원형 옵션")]
+    public ECircleOption _eCircleOption = ECircleOption.None;
+    [Rename_Inspector("원형일 때 회전 값")]
+    public Vector3 _vecRotate_OnCircle;
+    [Rename_Inspector("원형일 때 위치 값")]
+    public Vector3 _vecPos_OnCircle;
 
-	public bool p_bPivotIsCenter = false;
+    [Rename_Inspector("오브젝트들의 한가운데를 중앙으로 할것인지")]
+    public bool p_bPivotIsCenter = false;
+    [Rename_Inspector("항상 자동 정렬시킬것인지")]
+    public bool p_bUseUpdateSort = false;
 
-	public bool p_bIsUpdateRectTransform = false;
+    public bool p_bIsUpdateRectTransform = false;
 
-	/* protected - Variable declaration         */
+    /* protected - Variable declaration         */
 
-	/* private - Variable declaration           */
+    /* private - Variable declaration           */
 
-	// ========================================================================== //
+    // ========================================================================== //
 
-	/* public - [Do] Function
+    /* public - [Do] Function
      * 외부 객체가 호출                         */
 
-	public void DoSetGrid()
+    public void DoSetGrid()
 	{
 		Vector3 vecOffset = Vector3.zero;
 		if (p_bPivotIsCenter)
@@ -123,7 +131,7 @@ public class C3DObjectGrid : CObjectBase
 
 		if (transform.childCount == 0)
 		{
-			Debug.LogWarning( "자식이 없어서 정렬을 못합니다. 부모 오브젝트에게 붙여주세요" );
+			Debug.LogWarning( name + " 자식이 없어서 정렬을 못합니다. 부모 오브젝트에게 붙여주세요", this );
 			return;
 		}
 	}
@@ -140,12 +148,15 @@ public class C3DObjectGrid : CObjectBase
 
     public override void OnUpdate(ref bool bCheckUpdateCount)
 	{
-		base.OnUpdate();
+		base.OnUpdate(ref bCheckUpdateCount);
+
+        if (p_bUseUpdateSort == false)
+            return;
+        if (transform.childCount == 0)
+            return;
+
         bCheckUpdateCount = true;
-
-        if (transform.childCount == 0) return;
-
-		DoSetGrid();
+        DoSetGrid();
 	}
 
 	// ========================================================================== //

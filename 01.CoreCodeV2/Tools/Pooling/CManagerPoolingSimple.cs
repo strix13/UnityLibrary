@@ -23,6 +23,7 @@ public class CManagerPoolingSimple : CSingletonDynamicMonoBase<CManagerPoolingSi
 
     /* public - Field declaration            */
 
+    public bool p_bIsDebug = false;
 
     /* protected & private - Field declaration         */
 
@@ -30,18 +31,49 @@ public class CManagerPoolingSimple : CSingletonDynamicMonoBase<CManagerPoolingSi
     public Dictionary<int, LinkedList<GameObject>> _mapUsed = new Dictionary<int, LinkedList<GameObject>>();
     public Dictionary<int, LinkedList<GameObject>> _mapUnUsed = new Dictionary<int, LinkedList<GameObject>>();
 
+    public Dictionary<int, int> _mapLayerBackup = new Dictionary<int, int>();
+
     // ========================================================================== //
 
     /* public - [Do] Function
      * 외부 객체가 호출(For External class call)*/
 
-    public GameObject DoPop(GameObject pObjectCopyTarget, bool bActive = true)
+    public void DoPrePooling(GameObject pObjectCopyTarget, int iCount)
     {
+        if (pObjectCopyTarget == null)
+            return;
+
         int iID = pObjectCopyTarget.GetHashCode();
         if (_mapUnUsed.ContainsKey(iID) == false)
         {
             _mapUsed.Add(iID, new LinkedList<GameObject>());
             _mapUnUsed.Add(iID, new LinkedList<GameObject>());
+        }
+
+        int iTotalCount = _mapUnUsed[iID].Count + _mapUnUsed[iID].Count;
+        if (iTotalCount > iCount)
+            return;
+
+        LinkedList<GameObject> listTemp = new LinkedList<GameObject>();
+        int iPoolingCount = iCount - iTotalCount;
+        for (int i = 0; i < iPoolingCount; i++)
+            listTemp.AddLast(DoPop(pObjectCopyTarget));
+
+        foreach(var pPrePoolingObject in listTemp)
+            DoPush(pPrePoolingObject);
+    }
+
+    public GameObject DoPop(GameObject pObjectCopyTarget, Vector3 vecPos)
+    {
+        if (pObjectCopyTarget == null)
+            return null;
+
+        int iID = pObjectCopyTarget.GetHashCode();
+        if (_mapUnUsed.ContainsKey(iID) == false)
+        {
+            _mapUsed.Add(iID, new LinkedList<GameObject>());
+            _mapUnUsed.Add(iID, new LinkedList<GameObject>());
+            _mapLayerBackup.Add(iID, pObjectCopyTarget.layer);
         }
 
         GameObject pObjectUnUsed = null;
@@ -53,18 +85,30 @@ public class CManagerPoolingSimple : CSingletonDynamicMonoBase<CManagerPoolingSi
         else
         {
             pObjectUnUsed = Instantiate(pObjectCopyTarget);
+            pObjectUnUsed.name = string.Format("{0}_{1}", pObjectCopyTarget.name, _mapUnUsed[iID].Count + _mapUsed[iID].Count);
             pObjectUnUsed.transform.SetParent(transform);
 
             CCompoEventTrigger pEventTrigger = pObjectUnUsed.AddComponent<CCompoEventTrigger>();
-            pEventTrigger.p_eInputType = CCompoEventTrigger.EInputType.OnDisable;
+            // pEventTrigger.p_bIsDebuging = true;
+            pEventTrigger.p_eConditionType = CCompoEventTrigger.EConditionTypeFlags.OnDisable;
             pEventTrigger.p_Event_IncludeThisObject += DoPush;
 
             _mapAllInstance.Add(pObjectUnUsed, iID);
         }
 
+        if (p_bIsDebug)
+            Debug.Log("Pooling Simple Pop - " + pObjectUnUsed.name, this);
+            
+        pObjectUnUsed.transform.position = vecPos;
+        pObjectUnUsed.SetActive(true);
+        pObjectUnUsed.layer = _mapLayerBackup[iID];
         _mapUsed[iID].AddLast(pObjectUnUsed);
-        pObjectUnUsed.SetActive(bActive);
         return pObjectUnUsed;
+    }
+
+    public GameObject DoPop(GameObject pObjectCopyTarget)
+    {
+        return DoPop(pObjectCopyTarget, Vector3.zero);
     }
 
     public void DoPush(GameObject pObjectReturn)
@@ -72,12 +116,19 @@ public class CManagerPoolingSimple : CSingletonDynamicMonoBase<CManagerPoolingSi
         if (_mapAllInstance.ContainsKey(pObjectReturn) == false)
             return;
 
+        int iID = _mapAllInstance[pObjectReturn];
+
+        if (_mapUsed.ContainsKey(iID))
+            _mapUsed[iID].Remove(pObjectReturn);
+
+        if (_mapUnUsed.ContainsKey(iID))
+            _mapUnUsed[iID].AddLast(pObjectReturn);
+
+        if (p_bIsDebug)
+            Debug.Log("Pooling Simple Pushed - " + pObjectReturn.name, this);
+
         if (pObjectReturn.activeSelf)
             pObjectReturn.SetActive(false);
-
-        int iID = _mapAllInstance[pObjectReturn];
-        _mapUsed[iID].Remove(pObjectReturn);
-        _mapUnUsed[iID].AddLast(pObjectReturn);
     }
 
     // ========================================================================== //

@@ -130,6 +130,7 @@ public class CEffect : CObjectBase
 
 	virtual protected void ProcPlayEffect()
 	{
+        //Debug.Log(name + "Play Effect", this);
 		gameObject.SetActive( true );
 		switch (_eEffectType)
 		{

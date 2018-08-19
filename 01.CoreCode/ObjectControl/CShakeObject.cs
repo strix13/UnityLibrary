@@ -27,6 +27,8 @@ public class CShakeObject : CObjectBase
     private float _fRemainShakePow;
     private bool _bBackToOriginPos;
 
+    Coroutine _pCoroutine;
+
 	// ========================== [ Division ] ========================== //
 
 	public void DoSetShakeOnMobileShake(bool bEnable)
@@ -41,8 +43,10 @@ public class CShakeObject : CObjectBase
 
         _bBackToOriginPos = bBackToOriginPos;
         _fRemainShakePow = _fDefaultShakePow;
-        StopAllCoroutines();
-        StartCoroutine(CoStartShake());
+
+        if (_pCoroutine != null)
+            StopCoroutine(_pCoroutine);
+        _pCoroutine = StartCoroutine(CoStartShake());
 
 		//if (_bMachineShaking)
 		//	.instance.DoShakeMobile();
@@ -55,12 +59,14 @@ public class CShakeObject : CObjectBase
 
         _bBackToOriginPos = bReverseOrigin;
         _fRemainShakePow = fShakePow;
-        StopAllCoroutines();
-        StartCoroutine(CoStartShake());
+
+        if (_pCoroutine != null)
+            StopCoroutine(_pCoroutine);
+        _pCoroutine = StartCoroutine(CoStartShake());
     }
 
     // ========================== [ Division ] ========================== //
-    
+
     private IEnumerator CoStartShake()
     {
         _vecOriginPos = transform.localPosition;

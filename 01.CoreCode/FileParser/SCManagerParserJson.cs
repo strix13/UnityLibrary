@@ -57,6 +57,30 @@ public class SCManagerParserJson : SCManagerResourceBase<SCManagerParserJson, st
 
     // ========================== [ Division ] ========================== //
 
+    static public bool DoReadJson_FromResource<ENUM_FILE_NAME, T>(string strFolderPath, ENUM_FILE_NAME eFileName, out T sData)
+        where ENUM_FILE_NAME : System.IConvertible, System.IComparable
+        where T : class
+    {
+        bool bSuccess = true;
+        try
+        {
+            string strText = "";
+
+            string strFilePath = ExtractLocalFilePath(eFileName, strFolderPath);
+            if (System.IO.File.Exists(strFilePath))
+                strText = System.IO.File.ReadAllText(strFilePath);
+
+            sData = JsonUtility.FromJson<T>(strText);
+        }
+        catch { sData = null; bSuccess = false; }
+
+        if (sData == null)
+            bSuccess = false;
+
+        return bSuccess;
+    }
+
+
     static public bool DoReadJson<T>(string strJsonFormatText, out T sData)
     {
         bool bSuccess = true;
@@ -68,7 +92,7 @@ public class SCManagerParserJson : SCManagerResourceBase<SCManagerParserJson, st
 
         return bSuccess;
     }
-
+    
     static public bool DoReadJsonArray<T>(WWW www, out T[] arrData)
     {
         bool bSuccess = true;
@@ -132,28 +156,28 @@ public class SCManagerParserJson : SCManagerResourceBase<SCManagerParserJson, st
         return bSuccess;
     }
 
-    public bool DoReadJson_FromResource<ENUM_FILE_NAME, T>(string strFolderPath, ENUM_FILE_NAME eFileName, out T sData)
-    where ENUM_FILE_NAME : System.IConvertible, System.IComparable
-    where T : class
-    {
-        bool bSuccess = true;
-        try
-        {
-            string strText = "";
+    //public bool DoReadJson_FromResource<ENUM_FILE_NAME, T>(string strFolderPath, ENUM_FILE_NAME eFileName, out T sData)
+    //where ENUM_FILE_NAME : System.IConvertible, System.IComparable
+    //where T : class
+    //{
+    //    bool bSuccess = true;
+    //    try
+    //    {
+    //        string strText = "";
 
-            string strFilePath = ExtractLocalFilePath(eFileName, strFolderPath);
-            if (System.IO.File.Exists(strFilePath))
-                strText = System.IO.File.ReadAllText(strFilePath);
+    //        string strFilePath = ExtractLocalFilePath(eFileName, strFolderPath);
+    //        if (System.IO.File.Exists(strFilePath))
+    //            strText = System.IO.File.ReadAllText(strFilePath);
 
-            sData = JsonUtility.FromJson<T>(strText);
-        }
-        catch { sData = null; bSuccess = false; }
+    //        sData = JsonUtility.FromJson<T>(strText);
+    //    }
+    //    catch { sData = null; bSuccess = false; }
 
-        if (sData == null)
-            bSuccess = false;
+    //    if (sData == null)
+    //        bSuccess = false;
 
-        return bSuccess;
-    }
+    //    return bSuccess;
+    //}
 
     public bool DoReadJson_FromResource<ENUM_FILE_NAME, T>(ENUM_FILE_NAME eFileName, out T sData)
         where ENUM_FILE_NAME : System.IConvertible, System.IComparable

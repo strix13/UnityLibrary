@@ -61,18 +61,21 @@ public class CCompoSortingLayer : CObjectBase
 	/* protected - Override & Unity API         */
 
 	protected override void OnAwake()
-	{
-		base.OnAwake();
+    {
+        base.OnAwake();
 
-		Renderer pRenderer = GetComponent<Renderer>();
-		if (pRenderer != null)
-		{
-			pRenderer.sortingLayerName = strSortingLayer;
-			pRenderer.sortingOrder = iSortOrder;
-		}
+        SetSortingLayer();
+    }
 
-		enabled = false;
-	}
+    private void SetSortingLayer()
+    {
+        Renderer pRenderer = GetComponent<Renderer>();
+        if (pRenderer != null)
+        {
+            pRenderer.sortingLayerName = strSortingLayer;
+            pRenderer.sortingOrder = iSortOrder;
+        }
+    }
 
     #endregion Protected
 
@@ -84,16 +87,13 @@ public class CCompoSortingLayer : CObjectBase
        로직을 처리(Process Local logic)           */
 
 #if UNITY_EDITOR
-    public override void OnUpdate(ref bool bCheckUpdateCount)
-	{
-		base.OnUpdate();
-        bCheckUpdateCount = true;
-
-        Renderer pRenderer = GetComponent<Renderer>();
-		if (pRenderer != null)
-			pRenderer.sortingLayerName = this.strSortingLayer;
-	}
-
+    private void Update()
+    {
+        if(Application.isPlaying)
+        {
+            SetSortingLayer();
+        }
+    }
 #endif
 
 	/* private - Other[Find, Calculate] Func 

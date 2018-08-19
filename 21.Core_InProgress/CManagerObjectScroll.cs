@@ -92,7 +92,7 @@ public class CManagerObjectScroll : CObjectBase
 		if (_pScrollObject_Last == null) return;
 
 		float fTargetPos = p_pTransTarget.position.x;
-		if (fTargetPos + _fCameraWidth > (_pScrollObject_Last.p_vecPos.x - _fObjectWidth_Last) / 2f)
+		if (fTargetPos + _fCameraWidth > (_pScrollObject_Last.p_vecPosition.x - _fObjectWidth_Last) / 2f)
 		{
 			//Debug.Log( name + _pScrollObject_Last  + "Clear" );
 			CManagerPooling<string, CScrollObject>.instance.DoPush( _pScrollObject_Last );
@@ -189,7 +189,7 @@ public class CManagerObjectScroll : CObjectBase
 		// 타겟의 위치 + 카메라 넓이가
 		// 가장 우측의 스크롤 오브젝트의 위치 - 가장 우측의 오브젝트의 넓이보다 크다면
 		// 가장 우측에 스크롤 오브젝트 새로 생성
-		while (fTargetPos + _fCameraWidth > _pScrollObject_Last.p_vecPos.x - _fObjectWidth_Last)
+		while (fTargetPos + _fCameraWidth > _pScrollObject_Last.p_vecPosition.x - _fObjectWidth_Last)
 		{
 			//Debug.Log( "Target Pos : " + fTargetPos + " _fCameraWidth : " + _fCameraWidth + " _pScrollObject_Last.p_vecPos.x : " + _pScrollObject_Last.p_vecPos.x + " _fObjectWidth_Last: " + _fObjectWidth_Last );
 
@@ -201,7 +201,7 @@ public class CManagerObjectScroll : CObjectBase
 		// 타겟의 위치 - 카메라 넓이가
 		// 가장 좌측의 스크롤 오브젝트의 위치 + 가장 좌측의 스크롤 오브젝트의 넓이보다 크다면
 		// 좌측의 스크롤 오브젝트는 카메라에 비추지 않으므로 사라져야 한다.
-		if (fTargetPos - _fCameraWidth > _pScrollObject_Old.p_vecPos.x + _fObjectWidth_Old)
+		if (fTargetPos - _fCameraWidth > _pScrollObject_Old.p_vecPosition.x + _fObjectWidth_Old)
 		{
 			// Debug.Log( "Target Pos : " + fTargetPos + " _fCameraWidth : " + _fCameraWidth + " _pScrollObject_Old.p_vecPos.x : " + _pScrollObject_Old.p_vecPos.x + " _fObjectWidth_Old : " + _fObjectWidth_Old );
 

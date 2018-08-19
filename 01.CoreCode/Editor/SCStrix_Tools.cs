@@ -39,7 +39,7 @@ public class SCStrix_Tools
 				prefabType == PrefabType.DisconnectedPrefabInstance)
 			{
 				var goRoot = PrefabUtility.FindValidUploadPrefabInstanceRoot( go );
-				var prefabParent = PrefabUtility.GetPrefabParent( goRoot );
+				var prefabParent = PrefabUtility.GetCorrespondingObjectFromSource( goRoot );
 				var option = ReplacePrefabOptions.ConnectToPrefab;
 
 				PrefabUtility.ReplacePrefab( goRoot, prefabParent, option );

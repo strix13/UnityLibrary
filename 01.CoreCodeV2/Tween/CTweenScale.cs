@@ -28,6 +28,9 @@ public class CTweenScale : CTweenBase
 
     /* protected & private - Field declaration         */
 
+    Transform _pTransformTarget;
+    Vector3 _vecScale_Backup;
+
 
     // ========================================================================== //
 
@@ -47,9 +50,44 @@ public class CTweenScale : CTweenBase
         p_vecPosDest = transform.localScale;
     }
 
+    protected override void OnSetTarget(GameObject pObjectNewTarget)
+    {
+        _pTransformTarget = pObjectNewTarget.transform;
+    }
+
     protected override void OnTween(float fProgress_0_1)
     {
-        transform.localScale = p_vecPosStart * (1f - fProgress_0_1) + p_vecPosDest * fProgress_0_1;
+        _pTransformTarget.localScale = p_vecPosStart * (1f - fProgress_0_1) + p_vecPosDest * fProgress_0_1;
+    }
+
+    public override void OnEditorButtonClick_SetStartValue_IsCurrentValue()
+    {
+        p_vecPosStart = _pTransformTarget.localScale;
+    }
+
+    public override void OnEditorButtonClick_SetDestValue_IsCurrentValue()
+    {
+        p_vecPosDest = _pTransformTarget.localScale;
+    }
+
+    public override void OnEditorButtonClick_SetCurrentValue_IsStartValue()
+    {
+        _pTransformTarget.localScale = p_vecPosStart;
+    }
+
+    public override void OnEditorButtonClick_SetCurrentValue_IsDestValue()
+    {
+        _pTransformTarget.localScale = p_vecPosDest;
+    }
+
+    public override void OnInitTween_EditorOnly()
+    {
+        _vecScale_Backup = _pTransformTarget.localScale;
+    }
+
+    public override void OnReleaseTween_EditorOnly()
+    {
+        _pTransformTarget.localScale = _vecScale_Backup;
     }
 
     /* protected - [abstract & virtual]         */

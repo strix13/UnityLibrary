@@ -3,8 +3,18 @@ using System.Collections;
 
 public class CPlatformerController_InputMove : CObjectBase {
 
+    [Rename_Inspector("현재 움직임 멈춤")]
+    public bool p_bMoveIsLock = false;
+
     [GetComponent]
     protected CPlatformerController _pPlayer = null;
+
+    public void DoSet_MoveIsLock(bool bMoveLock)
+    {
+        p_bMoveIsLock = bMoveLock;
+
+        // Debug.LogError(" DoSet_MoveIsLock : " + bMoveLock);
+    }
 
     public override void OnUpdate(ref bool bCheckUpdateCount)
     {
@@ -15,19 +25,30 @@ public class CPlatformerController_InputMove : CObjectBase {
         JumpCharacter();
     }
 
-    protected void StopMoveCharacter()
+    public void StopMoveCharacter()
     {
         _pPlayer.DoInputVelocity(Vector2.zero, false);
     }
 
-    protected void MoveCharacter()
+    public void MoveCharacter()
     {
-        Vector2 directionalInput = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
-        _pPlayer.DoInputVelocity(directionalInput, Input.GetKey(KeyCode.LeftShift));
+        if (p_bMoveIsLock)
+        {
+            _pPlayer.DoInputVelocity(Vector3.zero, false);
+        }
+        else
+        {
+            Vector2 directionalInput = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
+            _pPlayer.DoInputVelocity(directionalInput, Input.GetKey(KeyCode.LeftShift));
+        }
+
     }
 
-    protected void JumpCharacter()
+    public void JumpCharacter()
     {
+        if (p_bMoveIsLock)
+            return;
+
         if (Input.GetKeyDown(KeyCode.Space))
             _pPlayer.DoJumpInputDown();
 

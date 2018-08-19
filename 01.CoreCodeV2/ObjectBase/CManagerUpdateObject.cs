@@ -15,12 +15,15 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
 
+using Unity.Jobs;
+using Unity.Collections;
+
 public interface IUpdateAble
 {
     void OnUpdate(ref bool bCheckUpdateCount);
 }
 
-public class CManagerUpdateObject : CSingletonDynamicMonoBase<CManagerUpdateObject>
+public class CManagerUpdateObject : CSingletonSOBase<CManagerUpdateObject>
 {
     /* const & readonly declaration             */
 
@@ -30,7 +33,20 @@ public class CManagerUpdateObject : CSingletonDynamicMonoBase<CManagerUpdateObje
 
     /* protected & private - Field declaration         */
 
-    private List<IUpdateAble> _listObject = new List<IUpdateAble>();
+#if UNITY_EDITOR
+
+    [Sirenix.OdinInspector.ShowInInspectorAttribute]
+    public List<IUpdateAble> _listObject_ForDebug = new List<IUpdateAble>();
+
+#endif
+
+    static private LinkedList<IUpdateAble> g_listObject = new LinkedList<IUpdateAble>();
+    static private HashSet<IUpdateAble> g_setUpdateObject = new HashSet<IUpdateAble>();
+
+    LinkedList<IUpdateAble> _listDelete = new LinkedList<IUpdateAble>();
+
+    GameObject _pObjectManager;
+    int _iPrevObjectCount;
 
     // ========================================================================== //
 
@@ -39,33 +55,75 @@ public class CManagerUpdateObject : CSingletonDynamicMonoBase<CManagerUpdateObje
 
     public void DoAddObject(IUpdateAble pObject)
     {
-        _listObject.Add(pObject);
+        if (g_setUpdateObject.Contains(pObject))
+            return;
+
+        g_setUpdateObject.Add(pObject);
+        g_listObject.AddLast(pObject);
+
+#if UNITY_EDITOR
+        _listObject_ForDebug.Add(pObject);
+#endif
     }
 
     public void DoRemoveObject(IUpdateAble pObject)
     {
-        _listObject.Remove(pObject);
+        if (g_setUpdateObject.Contains(pObject) == false)
+            return;
+
+        g_setUpdateObject.Remove(pObject);
+        g_listObject.Remove(pObject);
+
+#if UNITY_EDITOR
+        _listObject_ForDebug.Remove(pObject);
+#endif
     }
 
     // ========================================================================== //
 
     /* protected - Override & Unity API         */
 
-    protected override IEnumerator OnEnableObjectCoroutine()
+    protected override void OnGenerate_SingletonGameObject()
     {
-        while(true)
+        _pObjectManager = _pObjectAttacher.gameObject;
+        _pObjectAttacher.StartCoroutine(OnEnableObjectCoroutine());
+        DontDestroyOnLoad(_pObjectManager);
+    }
+
+    protected IEnumerator OnEnableObjectCoroutine()
+    {
+        while (true)
         {
+            _listDelete.Clear();
             int iUpdateObjectCount = 0;
-            for (int i = 0; i < _listObject.Count; i++)
+            int iLoopCount = g_listObject.Count;
+            var pNode = g_listObject.First;
+
+            while (pNode != null)
             {
                 bool bCheckUpdate = false;
-                _listObject[i].OnUpdate(ref bCheckUpdate);
-                if(bCheckUpdate)
-                    iUpdateObjectCount++;
+                pNode.Value.OnUpdate(ref bCheckUpdate);
+                if (bCheckUpdate)
+                    ++iUpdateObjectCount;
+                else
+                    _listDelete.AddLast(pNode.Value);
+
+                pNode = pNode.Next;
+            }
+
+            pNode = _listDelete.First;
+            while (pNode != null)
+            {
+                DoRemoveObject(pNode.Value);
+                pNode = pNode.Next;
             }
 
 #if UNITY_EDITOR
-            name = string.Format("업데이트 매니져/{0}개 업데이트중", iUpdateObjectCount);
+            if (iUpdateObjectCount != _iPrevObjectCount)
+            {
+                _iPrevObjectCount = iUpdateObjectCount;
+                _pObjectManager.name = string.Format("업데이트 매니져/{0}개 업데이트중", iUpdateObjectCount);
+            }
 #endif
 
             yield return null;

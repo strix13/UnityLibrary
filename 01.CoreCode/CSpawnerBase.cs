@@ -97,7 +97,7 @@ public partial class CSpawnerBase<Enum_Key, Class_Resource> : CObjectBase
 	{
 		_bIsGenerating = true;
 
-		StopAllCoroutines();
+		// StopAllCoroutines();
 		if (bGameObjectActiveOff)
 			gameObject.SetActive(false);
 	}

@@ -27,6 +27,19 @@ public struct CRaycastHitWrapper
     public Collider collider3D { get; private set; }
     public Collider2D collider2D { get; private set; }
 
+    public bool p_bCollider_IsTrigger
+    {
+        get
+        {
+            if (p_bIs3D)
+                return p_pHitOrigin.collider.isTrigger;
+            else if (p_bIs2D)
+                return p_pHitOrigin2D.collider.isTrigger;
+            else
+                return false;
+        }
+    }
+
     public CRaycastHitWrapper(RaycastHit pHitOrigin)
     {
         p_pHitOrigin = pHitOrigin;

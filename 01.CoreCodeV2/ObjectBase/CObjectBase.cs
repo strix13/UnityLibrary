@@ -25,7 +25,7 @@ public class CObjectBase : MonoBehaviour, IUpdateAble
 	protected bool _bIsExcuteAwake = false;
     private Coroutine _pCoroutineOnEnable;
 
-	public Vector3 p_vecPos
+    public Vector3 p_vecPosition
 	{
 		get { return transform.position; }
 		set { transform.position = value; }
@@ -45,6 +45,32 @@ public class CObjectBase : MonoBehaviour, IUpdateAble
         OnAwake();
     }
 
+    public void EventExcuteDelay(System.Action OnAfterDelayAction, float fDelaySec)
+    {
+        if (fDelaySec == 0f)
+            OnAfterDelayAction();
+        else
+        {
+            if (this != null && gameObject.activeInHierarchy)
+            {
+                if (_mapCoroutinePlaying.ContainsKey(OnAfterDelayAction))
+                    StopCoroutine(_mapCoroutinePlaying[OnAfterDelayAction]);
+
+                Coroutine pCoroutine = StartCoroutine(CoDelayAction(OnAfterDelayAction, fDelaySec));
+                if (_mapCoroutinePlaying.ContainsKey(OnAfterDelayAction) == false)
+                    _mapCoroutinePlaying.Add(OnAfterDelayAction, pCoroutine);
+            }
+        }
+    }
+
+    public void EventStop_ExcuteDelayAll()
+    {
+        foreach (var pCoroutine in _mapCoroutinePlaying.Values)
+            StopCoroutine(pCoroutine);
+
+        _mapCoroutinePlaying.Clear();
+    }
+
     // ========================== [ Division ] ========================== //
 
     void Awake()
@@ -55,12 +81,19 @@ public class CObjectBase : MonoBehaviour, IUpdateAble
 
     void OnEnable()
     {
-        CManagerUpdateObject.instance.DoAddObject(this);
+        Invoke("RegistUpdateObject", 1f);
 
         OnEnableObject();
         if (_pCoroutineOnEnable != null)
             StopCoroutine(_pCoroutineOnEnable);
-        _pCoroutineOnEnable = StartCoroutine(OnEnableObjectCoroutine());
+
+        if (gameObject.activeSelf)
+            _pCoroutineOnEnable = StartCoroutine(OnEnableObjectCoroutine());
+    }
+
+    private void RegistUpdateObject()
+    {
+        CManagerUpdateObject.instance.DoAddObject(this);
     }
 
     void OnDisable()
@@ -77,15 +110,23 @@ public class CObjectBase : MonoBehaviour, IUpdateAble
     {
 		if (_bIsExcuteAwake == false)
         {
-            SCManagerGetComponent.DoUpdateGetComponentAttribute(this);
             _bIsExcuteAwake = true;
+            SCManagerGetComponent.DoUpdateGetComponentAttribute(this);
+
+            if(gameObject.activeSelf)
+            {
+                StopCoroutine("OnAwakeCoroutine");
+                StartCoroutine("OnAwakeCoroutine");
+            }
         }
 
-	}
+    }
 
     virtual protected IEnumerator OnAwakeCoroutine() { yield break; }
     virtual protected void OnStart() { }
     virtual protected void OnEnableObject() {}
+
+    virtual protected IEnumerator OnAwakeCoroutine() { yield break; }
     virtual protected IEnumerator OnEnableObjectCoroutine() { yield break; }
     virtual protected void OnDisableObject() { }
 
@@ -98,18 +139,6 @@ public class CObjectBase : MonoBehaviour, IUpdateAble
     // ========================== [ Division ] ========================== //
 
     Dictionary<System.Action, Coroutine> _mapCoroutinePlaying = new Dictionary<System.Action, Coroutine>();
-	protected void EventDelayExcuteCallBack(System.Action OnAfterDelayAction, float fDelaySec)
-	{
-        if (this != null && gameObject.activeInHierarchy)
-        {
-            if (_mapCoroutinePlaying.ContainsKey(OnAfterDelayAction))
-                StopCoroutine(_mapCoroutinePlaying[OnAfterDelayAction]);
-
-            Coroutine pCoroutine = StartCoroutine(CoDelayAction(OnAfterDelayAction, fDelaySec));
-            if (_mapCoroutinePlaying.ContainsKey(OnAfterDelayAction) == false)
-                _mapCoroutinePlaying.Add(OnAfterDelayAction, pCoroutine);
-        }
-    }
 
 	protected IEnumerator CoDelayAction( System.Action OnAfterDelayAction, float fDelaySec )
 	{

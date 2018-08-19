@@ -21,4 +21,7 @@ public class RenameInspectorAttribute_Test : MonoBehaviour {
     [Rename_Inspector("It's Looooooooooooooooooooooooooooooooooooooooooong", false)]
     private string strValue_Long = "It's Looooooooooooooooooooooooooooooooooooooooooong";
 
+//  [Rename_Inspector("It's Property", false)]
+    public string Property_String { get; private set; }
+
 }
