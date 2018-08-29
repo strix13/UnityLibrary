@@ -50,28 +50,8 @@ https://docs.google.com/document/d/1X8nIU0anstawLqf_pTnylCFLxgAAMJSQILIOZ89hFTs
 
 ㄴ 제가 작성하고 사용하는 Visual Studio - Unity Item Template 입니다.
 
-![](https://postfiles.pstatic.net/MjAxODA1MDdfMjM4/MDAxNTI1NjgyMzE3Nzgw.yGbOqrWKQ8zXPQuGo4GGgAF3CFvL0wNJdtdMWfKFQEcg.1zO8gO6AaNemOFtekPgnoqSigNlRyWJ0jOE4tuYiqaYg.JPEG.strix13/bandicam_2018-05-07_17-38-28-987.jpg?type=w773)
-
-- 최근에 작성한 코드부터는 Test 코드를 작성하기 시작했습니다.
-
-### 읽은 책 목록
-- **C# 및 유니티 관련**
-  - 절대강좌 유니티5, 뇌를 자극하는 C# 5.0 프로그래밍, Effective C#, C# 코딩의 기술 실전편
-
-- **자료구조 및 알고리즘**
-  - 누워서 읽는 알고리즘, 윤성우의 열혈 자료구조, 뇌를 자극하는 알고리즘
-
-- **코드 스타일**
-  - 클린 코드, 리펙토링, 좋은 코딩 나쁜 코딩
-
-- **아키텍트**
-  - HeadFirst DesignPattern, 소프트웨어 설계 테크닉, 프로그래밍 패턴
-
-- **그 외**
-  - 객체지향의 사실과 오해, 게임TCP/IP 윈도우 소켓 프로그래밍, 뇌를 자극하는 윈도우즈 시스템 프로그래밍, TDD 실천법과 도구, 익스트림 프로그래밍, 소프트웨어 장인, 실용주의 프로그래머
-
 ---
-# 라이브러리 구현 기능 목록
+# 라이브러리 기능 목록
 
 ## 루트 클래스
 
@@ -306,6 +286,30 @@ https://postfiles.pstatic.net/MjAxODA1MDdfNjAg/MDAxNTI1NjgzNDYwNTkx.7LVx1ndhvjxd
 - [참고한 코드 링크 2](http://ehclub.co.kr/2484?category=658554)
 
 - [작성한 코드 링크](https://github.com/strix13/UnityLibrary/blob/master/SHangul.cs)
+
+---
+## 그 외
+
+![](https://postfiles.pstatic.net/MjAxODA1MDdfMjM4/MDAxNTI1NjgyMzE3Nzgw.yGbOqrWKQ8zXPQuGo4GGgAF3CFvL0wNJdtdMWfKFQEcg.1zO8gO6AaNemOFtekPgnoqSigNlRyWJ0jOE4tuYiqaYg.JPEG.strix13/bandicam_2018-05-07_17-38-28-987.jpg?type=w773)
+
+- 최근에 작성한 코드부터는 Test 코드를 작성하기 시작했습니다.
+
+### 읽은 책 목록
+- **C# 및 유니티 관련**
+  - 절대강좌 유니티5, 뇌를 자극하는 C# 5.0 프로그래밍, Effective C#, C# 코딩의 기술 실전편
+
+- **자료구조 및 알고리즘**
+  - 누워서 읽는 알고리즘, 윤성우의 열혈 자료구조, 뇌를 자극하는 알고리즘
+
+- **코드 스타일**
+  - 클린 코드, 리펙토링, 좋은 코딩 나쁜 코딩
+
+- **아키텍트**
+  - HeadFirst DesignPattern, 소프트웨어 설계 테크닉, 프로그래밍 패턴
+
+- **그 외**
+  - 객체지향의 사실과 오해, 게임TCP/IP 윈도우 소켓 프로그래밍, 뇌를 자극하는 윈도우즈 시스템 프로그래밍, TDD 실천법과 도구, 익스트림 프로그래밍, 소프트웨어 장인, 실용주의 프로그래머
+
 
 ---
 읽어주셔서 감사합니다.
