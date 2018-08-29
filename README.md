@@ -11,7 +11,7 @@
 https://github.com/strix13/UnityLibrary
 
 - 유니티 워킹 스탠다드 링크 :
-https://docs.google.com/document/d/1X8nIU0anstawLqf_pTnylCFLxgAAMJSQILIOZ89hFTs
+https://github.com/strix13/UnityLibrary/tree/master/99.Docs
 
 
 ---
