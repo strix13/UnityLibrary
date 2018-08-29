@@ -7,48 +7,11 @@
 
 - 이 프로젝트는 프로그래머를 대상으로 설명합니다.
 
--  깃허브 링크 :
+- 이 프로젝트의 유니티 워킹 스탠다드 링크 :
+https://github.com/strix13/UnityLibrary/tree/master/99.Docs/UnityWorkStandard
+
+- 이 문서의 깃허브 링크 :
 https://github.com/strix13/UnityLibrary
-
-- 유니티 워킹 스탠다드 링크 :
-https://github.com/strix13/UnityLibrary/tree/master/99.Docs
-
-
----
-## 작업 스타일
-
-- 저는 체계적인 스타일을 좋아합니다. 폴더부터 코드 네이밍, 코드 변수 및 함수 정의 위치, 유니티 오브젝트 네이밍 및 하이어라키까지 정하는 편입니다.
-  - 이에 대해 항상 부가 설명을 하자면, 프로그래밍은 개발보다 유지보수 비용이 훨씬 크다고 생각합니다.
-  - 또한, **담당자에게 물어보지 않고 스스로 예측 가능 하는 것을 최고로 생각** 하고 있습니다.
-    - 부가 설명을 더 하자면, 현실의 방의 예를 듭니다. 아무리 어두운 방이라도, 우리는 항상 **문고리가 어느 위치쯤에 있는지, 전등 스위치가 문 주변의 벽에 있다는 점을 누가 알려주지 않아도 스스로 예측** 할 수 있습니다.
-  - 이런식으로 네이밍을 하면, 어느 클래스의 이름만 보아도 어느 계층의 어느 패턴을 상속받은 클래스라는 점, 어느 함수의 이름만 보아도 어느 위치에 있는 지를 **스스로 예측** 할 수 있습니다.
-
-- ``깨진 창문``을 주의하기 위하여 클린코드의 ``나중은 오지 않는다``(르블랑의 법칙)와, ``왔을 때보다 좀 더 깔끔하게``보이 스카웃 법칙을 따르도록 노력하는 편입니다.
- - 이에 관련된 SlideShare [링크](https://www.slideshare.net/jrogue/ss-38012889)
-
-
-### 폴더 규칙
-![](https://postfiles.pstatic.net/MjAxODA1MDdfMjEx/MDAxNTI1NjgwODA1NzIy.JJjPfUfZsb1h4pMe43rVI-XsYHAQEx_nH_JjkYERjpgg.__21JNDQ_dOTeevTJvh-lr6Zo2KspJDr1eeShZYE3Nog.JPEG.strix13/bandicam_2018-05-07_17-12-50-429.jpg?type=w773)
-![](https://postfiles.pstatic.net/MjAxODA1MDdfMjg4/MDAxNTI1NjgwODA1NzIy.uMpNjBJQaIbqjvwyUUwcbhV1TleJJJHqe7GgGSjnAKcg.kK584c7PcZVdka3dr3G-eh1s2_g2JqpOrqjsL8DRkQcg.JPEG.strix13/bandicam_2018-05-07_17-13-02-930.jpg?type=w773)
-
-- 저의 오픈 소스인 다른 유니티 프로젝트를 보시면, 폴더 규칙이 있는것을 보실 수 있습니다.
-
-![](https://postfiles.pstatic.net/MjAxODA1MDdfMjcx/MDAxNTI1NjgwOTE3ODc2.tcsBDP5EHuki3zJ6lAQwXkP-s1UsQ3DpZGbowZvwE_8g.qzWFvQFdCb2E15HGyyu_R6OGBEza84LUBE-D1Zt3gZMg.JPEG.strix13/bandicam_2018-05-07_17-14-40-530.jpg?type=w773)
-![](https://postfiles.pstatic.net/MjAxODA1MDdfMTAw/MDAxNTI1NjgwOTE3ODc4.68ZbbOjtquIIK6L9hCaVBW-yzaCJMCJIiwhGtmfjMH8g.K2tB4W2q3Ffo1GdtwSVeGhKyB-3saIgRwLMYEQzqEQQg.JPEG.strix13/bandicam_2018-05-07_17-14-50-448.jpg?type=w773)
-
-- 최상위 폴더는 항상 숫자를 붙이는 편입니다.
-  - Asset을 활용할 경우 최상위 폴더에 없으면 동작 안하는 경우가 있습니다.
-  - 이 때문에, 폴더의 위치가 변경될 수 있어서, 위치를 고정하기 위해 숫자를 붙입니다.
-
-- 그 하위 폴더는 숫자를 붙이지 않습니다.
-  - 항상 폴더를 생성하지 않고, 하위 항목이 5개 이상일 경우 폴더를 생성합니다.
-  - 코드 폴더나, 프리팹, 리소스 등의 특정 폴더의 경우 예외입니다.
-
-### 코드
-
-![](https://postfiles.pstatic.net/MjAxODA1MDdfNjAg/MDAxNTI1NjgyMTk1OTIw.KWb2jh-HlZxIpGvqURDhOToGnoJTmN0PCbjZLzgQUm0g.4hdmcELocTlAEAKNhnFRIvQpRDbemTH05Nik6nNYlYMg.JPEG.strix13/bandicam_2018-05-07_17-36-23-518.jpg?type=w773)
-
-ㄴ 제가 작성하고 사용하는 Visual Studio - Unity Item Template 입니다.
 
 ---
 # 라이브러리 기능 목록
@@ -288,28 +251,14 @@ https://postfiles.pstatic.net/MjAxODA1MDdfNjAg/MDAxNTI1NjgzNDYwNTkx.7LVx1ndhvjxd
 - [작성한 코드 링크](https://github.com/strix13/UnityLibrary/blob/master/SHangul.cs)
 
 ---
+## Tween
+
+---
 ## 그 외
 
 ![](https://postfiles.pstatic.net/MjAxODA1MDdfMjM4/MDAxNTI1NjgyMzE3Nzgw.yGbOqrWKQ8zXPQuGo4GGgAF3CFvL0wNJdtdMWfKFQEcg.1zO8gO6AaNemOFtekPgnoqSigNlRyWJ0jOE4tuYiqaYg.JPEG.strix13/bandicam_2018-05-07_17-38-28-987.jpg?type=w773)
 
 - 최근에 작성한 코드부터는 Test 코드를 작성하기 시작했습니다.
-
-### 읽은 책 목록
-- **C# 및 유니티 관련**
-  - 절대강좌 유니티5, 뇌를 자극하는 C# 5.0 프로그래밍, Effective C#, C# 코딩의 기술 실전편
-
-- **자료구조 및 알고리즘**
-  - 누워서 읽는 알고리즘, 윤성우의 열혈 자료구조, 뇌를 자극하는 알고리즘
-
-- **코드 스타일**
-  - 클린 코드, 리펙토링, 좋은 코딩 나쁜 코딩
-
-- **아키텍트**
-  - HeadFirst DesignPattern, 소프트웨어 설계 테크닉, 프로그래밍 패턴
-
-- **그 외**
-  - 객체지향의 사실과 오해, 게임TCP/IP 윈도우 소켓 프로그래밍, 뇌를 자극하는 윈도우즈 시스템 프로그래밍, TDD 실천법과 도구, 익스트림 프로그래밍, 소프트웨어 장인, 실용주의 프로그래머
-
 
 ---
 읽어주셔서 감사합니다.

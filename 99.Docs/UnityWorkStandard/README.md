@@ -1,11 +1,30 @@
 # 워킹 스탠다드
 
 - 이 문서의 깃허브 링크 :
-https://github.com/strix13/UnityLibrary/tree/master/99.Docs
+https://github.com/strix13/UnityLibrary/tree/master/99.Docs/UnityWorkStandard
 ---
 
 제가 작업한 작업물들은 이 문서에 있는 워킹 스탠다드를 따라 작업하였습니다.
 워킹 스탠다드는 제가 경험하면서 효율적인것은 따르고, 따르다가 비효율적인 것은 버리기도 하였습니다.
+
+
+---
+## 작업 스타일
+
+- 폴더부터 코드 네이밍, 코드 변수 및 함수 정의 위치, 유니티 오브젝트 네이밍 및 하이어라키까지 정하는 편입니다.
+  - 이에 대해 항상 부가 설명을 하자면, 프로그래밍은 개발보다 유지보수 비용이 훨씬 크다고 생각합니다.
+  - 또한, **담당자에게 물어보지 않고 스스로 예측 가능 하는 것을 최고로 생각** 하고 있습니다.
+    - 부가 설명을 더 하자면, 현실의 방의 예를 듭니다. 아무리 어두운 방이라도, 우리는 항상 **문고리가 어느 위치쯤에 있는지, 전등 스위치가 문 주변의 벽에 있다는 점을 누가 알려주지 않아도 스스로 예측** 할 수 있습니다.
+  - 이런식으로 네이밍을 하면, 어느 클래스의 이름만 보아도 어느 계층의 어느 패턴을 상속받은 클래스라는 점, 어느 함수의 이름만 보아도 어느 위치에 있는 지를 **스스로 예측** 할 수 있습니다.
+
+- ``깨진 창문``을 주의하기 위하여 클린코드의 ``나중은 오지 않는다``(르블랑의 법칙)와, ``왔을 때보다 좀 더 깔끔하게``보이 스카웃 법칙을 따르도록 노력하는 편입니다.
+ - 이에 관련된 SlideShare [링크](https://www.slideshare.net/jrogue/ss-38012889)
+
+---
+![](https://postfiles.pstatic.net/MjAxODA1MDdfNjAg/MDAxNTI1NjgyMTk1OTIw.KWb2jh-HlZxIpGvqURDhOToGnoJTmN0PCbjZLzgQUm0g.4hdmcELocTlAEAKNhnFRIvQpRDbemTH05Nik6nNYlYMg.JPEG.strix13/bandicam_2018-05-07_17-36-23-518.jpg?type=w773)
+
+ㄴ 제가 작성하고 사용하는 Visual Studio - Unity Item Template 입니다. [깃허브 링크](https://github.com/strix13/UnityLibrary/tree/master/99.CoreAsset/VSItemTemplate)
+
 
 ---
 ### 목차
@@ -265,7 +284,7 @@ GetSomthing_OrNull()
 ```
 
 ---
-참고 목록
+## 참고 목록
 - 포프님 코딩 스탠다드 (한글 번역): http://lonpeach.com/2017/12/24/CSharp-Coding-Standard/#1-%ED%81%B4%EB%9E%98%EC%8A%A4-%EB%B0%8F-%EA%B5%AC%EC%A1%B0%EC%B2%B4%EC%97%90-%ED%8C%8C%EC%8A%A4%EC%B9%BC-%EC%BC%80%EC%9D%B4%EC%8A%A4-%EC%82%AC%EC%9A%A9
 - 포프님 코딩 스탠다드 (원문)	 : https://docs.google.com/document/d/1ymFFTVpR4lFEkUgYNJPRJda_eLKXMB6Ok4gpNWOo4rc/edit
 
