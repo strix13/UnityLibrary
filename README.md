@@ -7,9 +7,6 @@
 
 - 이 프로젝트는 프로그래머를 대상으로 설명합니다.
 
-- 하단에 있는 구현 목록외의 사항도 있으나, 정리가 덜 되어 따로 작성하지 않았습니다.
-  - 하단에 있는 구현 목록의 경우 비교적 최근에 리펙토링한 결과입니다.
-
 -  깃허브 링크 :
 https://github.com/strix13/UnityLibrary
 
@@ -22,27 +19,21 @@ https://docs.google.com/document/d/1X8nIU0anstawLqf_pTnylCFLxgAAMJSQILIOZ89hFTs
 
 **ㄴ 이미지를 클릭하시면 확대하실 수 있습니다.**
 
+
+
 [![Video Label](http://img.youtube.com/vi/xuhKn5H6ck4/0.jpg)](https://www.youtube.com/watch?v=xuhKn5H6ck4=0s)
 
 **ㄴ 이미지를 클릭하시면 유튜브에서 비디오를 시청하실 수 있습니다.**
 
-- 기존 Unity의 **MonoBehaviour의 기능을 확장** 시킨 루트 클래스입니다.
-
-- **이 클래스를 상속받은 뒤 Update문을 작성하면, 매니져 클래스 한곳의 코루틴에서 Update를 루프로 돌며, 몇 개가 업데이트 중인지 하이어라키 뷰에서 실시간으로 체크할 수 있습니다.**
- - MonoBehaviour가 아닌 클래스도 IUpdateAble을 구현하여 업데이트 매니져에 등록하면 Update처럼 사용할 수 있습니다.
-
-- 이 클래스는 **GetComponentAttribute를 지원**합니다.
-  - GetComponentAttribute는 GetComponent, GetComponentInParents, GetComponentInChildren이 있습니다.
-  - GetComponentInChildren은 자식 중 첫번째를 찾기, 이름으로 찾기, **복수형 자료형**을 지원하며, **Dictionary도 지원**합니다.
-  - Dictionary의 경우 **string을 키값으로 두면 오브젝트의 이름, Enum으로 두면 오브젝트의 이름을 Enum으로 파싱에 성공한 것들만** 저장합니다.
-  **- 만약 하나도 못찾을 시 경고 로그를 출력합니다.**
-
-- 그 외 UnityEvent 함수를 가상함수로 지원합니다.
 
 
-- [링크 - 유니티 블로그 - 10000번의 Update() 호출](https://blogs.unity3d.com/kr/2015/12/23/1k-update-calls/)
-- [링크 - Unity3D 자동 GetComponent](https://openlevel.postype.com/post/683269)
-- [작성한 코드 링크](https://github.com/strix13/UnityLibrary/tree/master/01.CoreCodeV2/ObjectBase)
+- 기존 Unity의 **MonoBehaviour의 기능을 확장** 시킨 루트 클래스입니다. ( MonoBehaviour 대용 )
+- 주요 기능
+  - AwakeCoroutine, EnableCoroutine 기능
+  - 외부에서 Awake 호출 ( 이미 Awake를 실행한 경우 한번 더 실행유무도 지원 )
+  - GetComponentAttribute 지원 ( Awake, Inspector 등에서 할당하지 않고 Attribute로 한줄 작성 )
+
+- [작성한 코드 및 좀 더 알아 보기 링크](https://github.com/strix13/UnityLibrary/tree/master/01.CoreCodeV2/ObjectBase)
 
 ---
 ## UI 클래스 관계도
@@ -51,6 +42,9 @@ https://docs.google.com/document/d/1X8nIU0anstawLqf_pTnylCFLxgAAMJSQILIOZ89hFTs
 https://blogfiles.pstatic.net/MjAxODA1MDVfNSAg/MDAxNTI1NDk2MjEzMzk4.YBGR9hSvFoGqEg5lUCeF346bvZ3x9EEgLQSfjWcyFPsg.DdcKOk5Ml-eeOorUOfqwJcJnscZGxqmvC_Ol40H9eZ4g.PNG.strix13/StrixLibrary_-_UI_%ED%81%B4%EB%9E%98%EC%8A%A4_%EA%B4%80%EA%B3%84%EB%8F%84.png)
 
 **ㄴ 이미지를 클릭하시면 확대하실 수 있습니다.**
+
+
+
 
 - 구조는 크게 Manager, Panel로 이루어져 있으며 Manager는 Panel을 관리하는 싱글톤 패턴입니다.
 
@@ -80,9 +74,15 @@ https://postfiles.pstatic.net/MjAxODA1MDdfMTUg/MDAxNTI1NjYxNjYzOTMw.uTGH7T0d2IFz
 
 **ㄴ 이미지를 클릭하시면 확대하실 수 있습니다.**
 
+
+
+
 [![Video Label](http://img.youtube.com/vi/mLQMwqKgh4I/0.jpg)](https://www.youtube.com/watch?v=mLQMwqKgh4I=0s)
 
 **ㄴ 이미지를 클릭하시면 유튜브에서 비디오를 시청하실 수 있습니다.**
+
+
+
 
 - 로컬라이징의 경우 Key, Value를 가진 임의의 Text파일을 파싱한 데이터를 기반으로 동작합니다.
 
@@ -100,9 +100,15 @@ https://postfiles.pstatic.net/MjAxODA1MDZfODIg/MDAxNTI1NTg2NjI4NDg5.2-piThykc2EW
 
 **ㄴ 이미지를 클릭하시면 확대하실 수 있습니다.**
 
+
+
+
 [![Video Label](http://img.youtube.com/vi/TN145PFwvkI/0.jpg)](https://www.youtube.com/watch?v=TN145PFwvkI=0s)
 
 **ㄴ 이미지를 클릭하시면 유튜브에서 비디오를 시청하실 수 있습니다.**
+
+
+
 
 - 사운드 시스템의 경우, SoundManager가 SoundSlot 클래스를 관리하는 형태입니다.
 
@@ -139,9 +145,15 @@ https://postfiles.pstatic.net/MjAxODA1MDZfMzUg/MDAxNTI1NjEwMDU3MjQz.az-Y7SxCGDV-
 
 **ㄴ 이미지를 클릭하시면 확대하실 수 있습니다.**
 
+
+
+
 [![Video Label](http://img.youtube.com/vi/OQ8UpqBUIJQ/0.jpg)](https://www.youtube.com/watch?v=OQ8UpqBUIJQ=0s)
 
 **ㄴ 이미지를 클릭하시면 유튜브에서 비디오를 시청하실 수 있습니다.**
+
+
+
 
 - 이펙트 시스템은 사운드 시스템과 비슷한 설계입니다.
 
@@ -169,6 +181,7 @@ https://postfiles.pstatic.net/MjAxODA1MDZfMzUg/MDAxNTI1NjEwMDU3MjQz.az-Y7SxCGDV-
 **ㄴ 이미지를 클릭하시면 확대하실 수 있습니다.**
 
 
+
 - [코드 링크](https://github.com/strix13/UnityLibrary/tree/master/01.CoreCodeV2/Editor/MarkdownViewer)
 
 ---
@@ -179,6 +192,9 @@ https://postfiles.pstatic.net/MjAxODA1MDZfMzUg/MDAxNTI1NjEwMDU3MjQz.az-Y7SxCGDV-
 https://postfiles.pstatic.net/MjAxODA1MDdfMTc4/MDAxNTI1Njc5NDU5MzMz.4WXQCeIXmSfGTzxJ7HsOJr8adwepP0JlfNOIrT7vR70g.iXFhfhPCRYxKJVHB7oOmKfpU14Aei4eNv-GbfphEZp0g.PNG.strix13/%EB%A1%9C%EA%B7%B8.png?type=w773)
 
 **ㄴ 이미지를 클릭하시면 확대하실 수 있습니다.**
+
+
+
 
 - 로그 작성자, 로그 레벨에 따라 로그를 출력하지 않는 필터링 기능을 지원합니다.
 
@@ -218,6 +234,9 @@ https://postfiles.pstatic.net/MjAxODA1MDdfMTc4/MDAxNTI1Njc5NDU5MzMz.4WXQCeIXmSfG
 https://postfiles.pstatic.net/MjAxODA1MDdfNjAg/MDAxNTI1NjgzNDYwNTkx.7LVx1ndhvjxdw2992EqJKUM_u6ZZSuYqaGKxwlNv-Cwg.ieXZO9IUNCEUPh_ut5VM-TEf1GaUJknekDBuKTyQUxIg.JPEG.strix13/bandicam_2018-05-07_17-57-24-601.jpg?type=w773)
 
 **ㄴ 이미지를 클릭하시면 확대하실 수 있습니다.**
+
+
+
 
 - VR, 모바일 등에서 커스터마이징 된 키보드로 한글 혹은 영어를 입력할 수 있기 위해 제작하였습니다.
 
