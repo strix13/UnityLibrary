@@ -17,6 +17,8 @@
   - AwakeCoroutine, EnableCoroutine 기능
   - 외부에서 Awake 호출 ( 이미 Awake를 실행한 경우 한번 더 실행유무도 지원 )
   - GetComponentAttribute 지원 ( Awake, Inspector 등에서 할당하지 않고 Attribute로 한줄 작성 )
+  - 자체적인 Update를 통해 Update를 사용하는 Object의 실시간 개수 파악과 퍼포먼스 개선
+
 
 -
 - 이 클래스를 상속받으면 **GetComponentAttribute를 지원**합니다.
