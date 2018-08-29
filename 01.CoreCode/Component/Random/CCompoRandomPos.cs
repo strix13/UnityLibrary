@@ -56,9 +56,9 @@ public class CCompoRandomPos : CCompoEventTrigger
 
 	/* protected - Override & Unity API         */
 
-	protected override void OnPlayEventMain()
+	protected override void OnPlayEvent()
 	{
-		base.OnPlayEventMain();
+		base.OnPlayEvent();
 
 		_vecPos = PrimitiveHelper.RandomRange(_vecRandom_Min, _vecRandom_Max);
         transform.localPosition = _vecPos;

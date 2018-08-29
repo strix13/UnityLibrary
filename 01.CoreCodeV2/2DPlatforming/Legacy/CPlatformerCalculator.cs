@@ -140,7 +140,7 @@ public class CPlatformerCalculator : CRaycastCalculator
 
     /* protected & private - Field declaration         */
 
-    OnHit_VerticalCollider _OnHit_VerticalCollider;
+    //OnHit_VerticalCollider _OnHit_VerticalCollider;
 
     // ========================================================================== //
 
@@ -149,7 +149,7 @@ public class CPlatformerCalculator : CRaycastCalculator
 
     public void DoSet_CalcaulateVerticalCollider(OnHit_VerticalCollider OnHit_VerticalCollider)
     {
-        _OnHit_VerticalCollider = OnHit_VerticalCollider;
+        //_OnHit_VerticalCollider = OnHit_VerticalCollider;
     }
 
     public void DoSet_OnChangeFaceDir(System.Action<int> OnChangeFaceDir)

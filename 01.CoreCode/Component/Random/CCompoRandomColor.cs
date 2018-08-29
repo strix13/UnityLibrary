@@ -76,9 +76,9 @@ public class CCompoRandomColor : CCompoEventTrigger
 			_arrRenderer_Sprite = GetComponentsInChildren<SpriteRenderer>( true );
 	}
 
-	protected override void OnPlayEventMain()
+	protected override void OnPlayEvent()
 	{
-		base.OnPlayEventMain();
+		base.OnPlayEvent();
 		
 		Color pColorRandom = GetRandomColor();
 		if (_pRenderer_Sprite != null)

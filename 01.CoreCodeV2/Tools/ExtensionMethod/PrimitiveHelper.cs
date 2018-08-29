@@ -468,6 +468,20 @@ public static class PrimitiveHelper
         return (fCurrent * (fMax - fMin)) + fMin;
     }
 
+    /// <summary>
+    /// 테스트 코드 링크
+    /// <see cref="PrimitiveHelper_Test.Test_Vector3Extension_InverseLerp"/>
+    /// </summary>
+    /// <param name="vecCurrentValue"></param>
+    /// <param name="vecStart"></param>
+    /// <param name="vecDest"></param>
+    /// <returns></returns>
+    public static float InverseLerp_0_1(this Vector3 vecCurrentValue, Vector3 vecStart, Vector3 vecDest)
+    {
+        Vector3 vecAB = vecDest - vecStart;
+        Vector3 vecAV = vecCurrentValue - vecStart;
+        return Vector3.Dot(vecAV, vecAB) / Vector3.Dot(vecAB, vecAB);
+    }
 
     public static bool ContainEnumFlag<T>(this T eEnumFlag, T eEnum )
         where T : struct, System.IConvertible, System.IComparable, System.IFormattable
@@ -585,6 +599,28 @@ public class PrimitiveHelper_Test
             float fSimilarValue = fTestNum + (fTestSimlarGap * 0.9f);
             Assert.IsTrue(fTestNum.IsSimilar(fSimilarValue, fTestSimlarGap));
         }
+    }
+
+    [Test]
+    public void Test_Vector3Extension_InverseLerp()
+    {
+        Vector3 vecStart = Vector3.one * Random.Range(0, 10);
+        Vector3 vecDest = Vector3.one * Random.Range(0, 1000);
+
+        float fTestLerp = Random.Range(0f, 1f);
+        Vector3 vecTest = Vector3.Lerp(vecStart, vecDest, fTestLerp);
+        float fInverseLerp = vecTest.InverseLerp_0_1(vecStart, vecDest);
+
+        Debug.Log("vecStart : " + vecStart + " vecDest : " + vecDest + " fTestLerp : " + fTestLerp + " fInverseLerp : " + fInverseLerp);
+        Assert.AreEqual(fTestLerp.ToString("F2"), fInverseLerp.ToString("F2"));
+
+        // Start와 Dest가 스왑되면 Lerp값도 다르다.
+        Vector3 vecTest2 = Vector3.Lerp(vecDest, vecStart, fTestLerp);
+        float fInverseLerp2 = vecTest2.InverseLerp_0_1(vecDest, vecStart);
+
+        Debug.Log("vecStart : " + vecDest + " vecDest : " + vecStart + " fTestLerp : " + fTestLerp + " fInverseLerp : " + fInverseLerp2);
+        Assert.AreEqual(fTestLerp.ToString("F2"), fInverseLerp2.ToString("F2"));
+
     }
 }
 

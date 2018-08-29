@@ -16,6 +16,8 @@ using System.Text;
 
 public class CStreammingAssetGetter 
 {
+    public delegate void OnGetStreamingResource(string strPath_With_Extension, WWW pWWW, bool bResult, object pParam);
+
     Dictionary<string, WWW> _mapResourceCashing = new Dictionary<string, WWW>();
     StringBuilder _pStrBuilder = new StringBuilder();
 
@@ -28,31 +30,49 @@ public class CStreammingAssetGetter
         _pCoroutineExcuter = pCoroutineExcuter;
     }
 
-    public void GetResource(string strResourceName_With_Extension, System.Action<WWW> OnGetResource, bool bIsCashing)
+
+    public void GetResource(string strResourceName_With_Extension, OnGetStreamingResource OnGetResource, bool bIsCashing)
     {
         if (bIsCashing)
         {
             WWW pFindResource;
-            if (_mapResourceCashing.TryGetValue(strResourceName_With_Extension, out pFindResource) == false)
-                OnGetResource(pFindResource);
+            if (_mapResourceCashing.TryGetValue(strResourceName_With_Extension, out pFindResource))
+            {
+                OnGetResource(strResourceName_With_Extension, pFindResource, true, null);
+                return;
+            }
         }
 
-        _pCoroutineExcuter.StartCoroutine(CoGetStreammingAsset(strResourceName_With_Extension, OnGetResource, bIsCashing));
+        _pCoroutineExcuter.StartCoroutine(CoGetStreammingAsset(strResourceName_With_Extension, OnGetResource, bIsCashing, null));
     }
 
-    private IEnumerator CoGetStreammingAsset(string strResourceName_With_Extension, System.Action<WWW> OnGetResource, bool bIsCashing)
+    public void GetResource(string strResourceName_With_Extension, OnGetStreamingResource OnGetResource, bool bIsCashing, object pParam)
+    {
+        if (bIsCashing)
+        {
+            WWW pFindResource;
+            if (_mapResourceCashing.TryGetValue(strResourceName_With_Extension, out pFindResource))
+            {
+                OnGetResource(strResourceName_With_Extension, pFindResource, true, pParam);
+                return;
+            }
+        }
+
+        _pCoroutineExcuter.StartCoroutine(CoGetStreammingAsset(strResourceName_With_Extension, OnGetResource, bIsCashing, pParam));
+    }
+
+
+    private IEnumerator CoGetStreammingAsset(string strResourceName_With_Extension, OnGetStreamingResource OnGetResource, bool bIsCashing, object pParam)
     {
         _pStrBuilder.Length = 0;
-#if UNITY_EDITOR
-        _pStrBuilder.Append("file://");
-#endif
-        _pStrBuilder.Append(strResourceName_With_Extension);
+        _pStrBuilder.Append(Application.streamingAssetsPath).Append("/").Append(strResourceName_With_Extension);
 
         WWW www = new WWW(_pStrBuilder.ToString());
         yield return www;
 
-        OnGetResource(www);
+        bool bResult = (www.error != null && www.error.Contains("Error")) == false;
+        OnGetResource(strResourceName_With_Extension, www, bResult, pParam);
         if (bIsCashing)
-            _mapResourceCashing.Add(strResourceName_With_Extension, www);
+            _mapResourceCashing[strResourceName_With_Extension] = www;
     }
 }

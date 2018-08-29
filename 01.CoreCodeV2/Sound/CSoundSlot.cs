@@ -61,7 +61,7 @@ public class CSoundSlot : CObjectBase
     private float _fVolumeNext;
     private bool _bLoopSound;
 
-	private System.Action _OnFinishClip;
+	private System.Action<CSoundSlot> _OnFinishClip;
 
     Coroutine _pCoroutine_FadeInOut;
     Coroutine _pCoroutine_AudioPlay;
@@ -113,7 +113,7 @@ public class CSoundSlot : CObjectBase
 #endif
 	}
 
-	public void DoSetFinishEvent_OneShot(System.Action OnFinishEvent )
+	public void DoSetFinishEvent_OneShot(System.Action<CSoundSlot> OnFinishEvent )
 	{
 		_OnFinishClip = OnFinishEvent;
 	}
@@ -145,7 +145,7 @@ public class CSoundSlot : CObjectBase
 
 	public float DoGetVolume()
 	{
-		return _pAudioSource.volume;
+        return _pAudioSource.volume;
 	}
 
 	public void DoSetVolume(float fVolume)
@@ -305,7 +305,7 @@ public class CSoundSlot : CObjectBase
 		{
             var OnFinisishClip = _OnFinishClip;
 			_OnFinishClip = null;
-            OnFinisishClip();
+            OnFinisishClip(this);
         }
 	}
 }

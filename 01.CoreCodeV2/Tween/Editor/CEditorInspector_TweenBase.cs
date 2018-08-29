@@ -19,7 +19,7 @@ public class CEditorInspector_TweenBase : Editor
         CTweenBase pTarget = target as CTweenBase;
 
         EditorGUILayout.BeginHorizontal();
-        if(GUILayout.Button("현재 값 = Start로"))
+        if(GUILayout.Button("Start에 현재 값을 대입"))
         {
             EditorGUI.BeginChangeCheck();
             pTarget.DoSetTarget(pTarget.p_pObjectTarget);
@@ -27,7 +27,7 @@ public class CEditorInspector_TweenBase : Editor
             if (EditorGUI.EndChangeCheck())
                 Undo.RecordObject(target, "OnEditorButtonClick_SetStartValue_IsCurrentValue");
         }
-        if (GUILayout.Button("현재 값 = Dest로"))
+        if (GUILayout.Button("Dest에 현재 값을 대입"))
         {
             EditorGUI.BeginChangeCheck();
             pTarget.DoSetTarget(pTarget.p_pObjectTarget);
@@ -66,7 +66,7 @@ public class CEditorInspector_TweenBase : Editor
         EditorGUILayout.EndHorizontal();
 
         EditorGUILayout.BeginHorizontal();
-        if (GUILayout.Button("Start값 = 현재값으로"))
+        if (GUILayout.Button("현재 값에 Start값을 대입"))
         {
             EditorGUI.BeginChangeCheck();
             pTarget.DoSetTarget(pTarget.p_pObjectTarget);
@@ -74,7 +74,7 @@ public class CEditorInspector_TweenBase : Editor
             if (EditorGUI.EndChangeCheck())
                 Undo.RecordObject(target, "OnEditorButtonClick_SetStartValue_IsCurrentValue");
         }
-        if (GUILayout.Button("Dest값 = 현재 값으로"))
+        if (GUILayout.Button("현재 값에 Dest값을 대입"))
         {
             EditorGUI.BeginChangeCheck();
             pTarget.DoSetTarget(pTarget.p_pObjectTarget);

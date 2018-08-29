@@ -39,9 +39,9 @@ public class CCompoRandomActiveChild : CCompoEventTrigger
 
 	/* protected - Override & Unity API         */
 
-	protected override void OnPlayEventMain()
+	protected override void OnPlayEvent()
 	{
-		base.OnPlayEventMain();
+		base.OnPlayEvent();
 
 		int iChildCount = transform.childCount;
 		for (int i = 0; i < iChildCount; i++)

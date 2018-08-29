@@ -105,7 +105,6 @@ public class CManagerFrameWorkBase<CLASS_Framework, ENUM_Scene_Name, ENUM_DataFi
 
 	static public CManagerNetworkDB_Project p_pNetworkDB { get { return CManagerNetworkDB_Project.instance; } }
 	static public SCSceneLoader<ENUM_Scene_Name> p_pManagerScene { get { return _pManagerScene; } }
-	static public SCManagerParserJson p_pManagerJsonINI { get { return _pJsonParser_Persistent; } }
 
 	static public event delDBDelgate p_Event_DB_OnRequest_Start
 	{

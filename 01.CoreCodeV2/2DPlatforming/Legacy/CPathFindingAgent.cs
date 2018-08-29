@@ -78,7 +78,7 @@ public class CPathFindingAgent : CObjectBase
     private bool aiJumped = false;
     private bool onewayDropDown = false;
     private bool onewayGrounded = false;
-    private bool usedPortal = false;
+    //private bool usedPortal = false;
 
     // ========================================================================== //
 
@@ -107,7 +107,7 @@ public class CPathFindingAgent : CObjectBase
                 , true
                 , true
                 , false
-                , _characterScript.p_ePlatformerState_Current == CPlatformerController.EPlatformerState.Falling
+                , _characterScript.p_ePlatformerState_Current == ECharacterControllerState.Falling
                 , false
                 );
         }
@@ -133,7 +133,7 @@ public class CPathFindingAgent : CObjectBase
                 , true
                 , true
                 , false
-                , _characterScript.p_ePlatformerState_Current == CPlatformerController.EPlatformerState.Falling
+                , _characterScript.p_ePlatformerState_Current == ECharacterControllerState.Falling
                 , false
                 );
         }

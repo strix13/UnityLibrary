@@ -8,11 +8,11 @@ public class AssetBundleTestEditor : CEditorWindowBase<AssetBundleTestEditor>
 {
     static readonly string const_strBundlePathOutput = "Assets/StreamingAssets/AssetBundle";
 
-#if UNITY_STANDALONE
-    static readonly BuildTarget const_BuildTarget = BuildTarget.StandaloneWindows64;
+//#if UNITY_STANDALONE
+//    static readonly BuildTarget const_BuildTarget = BuildTarget.StandaloneWindows64;
 //#elif UNITY_ANDROID
 //    static readonly BuildTarget const_BuildTarget = BuildTarget.Android;
-#endif
+//#endif
 
     string _strBundleName;
 

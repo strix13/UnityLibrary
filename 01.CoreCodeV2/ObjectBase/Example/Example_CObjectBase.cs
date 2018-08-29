@@ -53,13 +53,6 @@ public class Example_CObjectBase : CObjectBase
         Debug.LogWarning("mapText_Key_Is_Dictionary.Count : " + mapText_Key_Is_Dictionary.Count);
     }
 
-    protected override IEnumerator OnAwakeCoroutine()
-    {
-        yield return new WaitForSeconds(1f);
-
-        Debug.Log("OnAwakeCoroutine - After 1 Sec");
-    }
-
     protected override void OnStart()
     {
         base.OnStart();

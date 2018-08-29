@@ -38,7 +38,7 @@ public class CCompPlatformer_LedgeGrabPoint : CObjectBase
     {
         if (collision.transform.tag == strLedgeGrabTag)
         {
-            _pController_Parents.Event_StartClimbing(collision.transform, collision);
+            _pController_Parents.Event_StartClimbing(collision);
         }
     }
 

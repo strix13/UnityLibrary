@@ -47,9 +47,9 @@ public class CCompoAutoDisable : CCompoEventTrigger
 
 	/* protected - Override & Unity API         */
 
-	protected override void OnPlayEventMain()
+	protected override void OnPlayEvent()
 	{
-		base.OnPlayEventMain();
+		base.OnPlayEvent();
 
         _pCoroutine = StartCoroutine(CoDelayDisable());
 	}

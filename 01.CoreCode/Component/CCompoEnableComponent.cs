@@ -48,9 +48,9 @@ public class CCompoEnableComponent : CCompoEventTrigger
 
 	/* protected - Override & Unity API         */
 
-	protected override void OnPlayEventMain()
+	protected override void OnPlayEvent()
 	{
-		base.OnPlayEventMain();
+		base.OnPlayEvent();
 
 		for(int i = 0; i < p_listComponent.Count; i++)
 		{

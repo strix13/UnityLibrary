@@ -29,6 +29,9 @@ public class CFollowObject : CObjectBase
     [SerializeField]
     private Transform _pTransTarget = null;
 
+    [SerializeField]
+    private bool _bUseDistanceOffset = true;
+
     public EFollowMode p_eFollowMode = EFollowMode.Update;
 
     [Header("부드러운 따라가기 관련 옵션")]
@@ -42,9 +45,9 @@ public class CFollowObject : CObjectBase
     [SerializeField]
     private float _fArriveDistance;
 
-    [Rename_Inspector("스무스 팔로우 모드일 때 근접했는지", false)]
-    [SerializeField]
-    private bool _bArrive_OnSmooth;
+    //[Rename_Inspector("스무스 팔로우 모드일 때 근접했는지", false)]
+    //[SerializeField]
+    //private bool _bArrive_OnSmooth;
 
     [SerializeField] [Range(0, 1f)]
 	private float _fSmoothFollowDelta = 0.1f;
@@ -94,9 +97,12 @@ public class CFollowObject : CObjectBase
 	{
 		if (_pTransTarget == null) return;
 
-		_vecTargetOffset = _pTransTarget.position - transform.position;
+        if (_bUseDistanceOffset)
+            _vecTargetOffset = _pTransTarget.position - transform.position;
+        else
+            _vecTargetOffset = Vector3.zero;
 
-		_bFollowX = _eFollowPos == EFollowPos.All || _eFollowPos == EFollowPos.X || _eFollowPos == EFollowPos.XY || _eFollowPos == EFollowPos.XZ;
+        _bFollowX = _eFollowPos == EFollowPos.All || _eFollowPos == EFollowPos.X || _eFollowPos == EFollowPos.XY || _eFollowPos == EFollowPos.XZ;
 		_bFollowY = _eFollowPos == EFollowPos.All || _eFollowPos == EFollowPos.Y || _eFollowPos == EFollowPos.XY || _eFollowPos == EFollowPos.YZ;
 		_bFollowZ = _eFollowPos == EFollowPos.All || _eFollowPos == EFollowPos.Z || _eFollowPos == EFollowPos.XZ || _eFollowPos == EFollowPos.YZ;
 	}
@@ -164,7 +170,7 @@ public class CFollowObject : CObjectBase
         _fArriveDistance = Vector3.Distance(vecFollowPos, vecDestPos);
 
         bool bArrive = _fArriveDistance <= p_fCondition_ArriveDistance;
-        _bArrive_OnSmooth = bArrive;
+        // _bArrive_OnSmooth = bArrive;
         if (p_Event_OnArrive_SmoothFollow != null)
             p_Event_OnArrive_SmoothFollow(bArrive);
     }

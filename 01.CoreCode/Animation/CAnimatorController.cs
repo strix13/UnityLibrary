@@ -20,39 +20,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System;
 
-public enum EAnimationEvent
-{
-	None = 0,
-	AnimationStart = 1,
-
-	AttackStart = 2,
-	AttackFinish = 3,
-
-	AnimationFinish = 4,
-}
-
-public interface IAnimationController
-{
-    event System.Action<string> p_Event_OnAnimationEvent;
-
-	void DoPlayAnimation<ENUM_ANIMATION_NAME>( ENUM_ANIMATION_NAME eAnimName, System.Action OnFinishAnimation = null )
-		where ENUM_ANIMATION_NAME : System.IConvertible, System.IComparable;
-
-    void DoPlayAnimation_Continuedly<ENUM_ANIMATION_NAME>(System.Action OnFinishAnimationAll, params ENUM_ANIMATION_NAME[] arrAnimName);
-
-    bool DoPlayAnimation_Loop<ENUM_ANIMATION_NAME>( ENUM_ANIMATION_NAME eAnimName )
-		where ENUM_ANIMATION_NAME : System.IConvertible, System.IComparable;
-
-	void DoStopAnimation();
-
-	void DoResetAnimationEvent();
-
-	bool DoCheckIsPlaying<ENUM_ANIMATION_NAME>( ENUM_ANIMATION_NAME eAnimName )
-		where ENUM_ANIMATION_NAME : System.IConvertible, System.IComparable;
-
-    void DoSetAnimationSpeed(float fSpeed);
-}
-
 public class CAnimatorController : CObjectBase, IAnimationController
 {	
 	public bool bPlayDefaultOnAwake = false;
@@ -61,9 +28,9 @@ public class CAnimatorController : CObjectBase, IAnimationController
 
     public bool p_bIsDebuging = false;
 
-	public event Action<string> p_Event_OnAnimationEvent;
+	public event OnCallBackAnimation p_Event_OnAnimationEvent;
 
-	private System.Action _OnFinishAnimation;
+	private OnFinishAnimation _OnFinishAnimation;
 	private Animator _pAnimator;	public Animator p_pAnimator {  get { return _pAnimator; } }
 
 	private float _fCurrentAnimation_NomalizeTime; public float p_fCurrentAnimation_NomalizeTime { get { return _fCurrentAnimation_NomalizeTime; } }
@@ -72,9 +39,9 @@ public class CAnimatorController : CObjectBase, IAnimationController
 
     Coroutine _pCoroutine;
 
-	// ========================== [ Division ] ========================== //
+    // ========================== [ Division ] ========================== //
 
-	public void DoStopAnimation()
+    public void DoStopAnimation()
 	{
         if (_pAnimator.isActiveAndEnabled == false) return;
 
@@ -145,7 +112,7 @@ public class CAnimatorController : CObjectBase, IAnimationController
 	/// </summary>
 	/// <param name="eAnimName">플레이 할 애니메이션 이름의 Enum</param>
 	/// <param name="OnFinishAnimation">애니메이션이 종료될 때 호출할 함수</param>
-	public void DoPlayAnimation<ENUM_ANIMATION_NAME>( ENUM_ANIMATION_NAME eAnimName, System.Action OnFinishAnimation = null )
+	public void DoPlayAnimation<ENUM_ANIMATION_NAME>( ENUM_ANIMATION_NAME eAnimName, OnFinishAnimation OnFinishAnimation = null )
 		where ENUM_ANIMATION_NAME : System.IConvertible, System.IComparable
 	{
         _OnFinishAnimation = OnFinishAnimation;
@@ -230,9 +197,22 @@ public class CAnimatorController : CObjectBase, IAnimationController
 			p_Event_OnAnimationEvent(strAnimationEvent);
 	}
 
-	// ========================== [ Division ] ========================== //
+    public void DoPlayAnimation_Continuedly<ENUM_ANIMATION_NAME>(Action OnFinishAnimationAll, params ENUM_ANIMATION_NAME[] arrAnimName)
+    {
+    }
 
-	protected override void OnAwake()
+    public void DoSeekAnimation<ENUM_ANIMATION_NAME>(ENUM_ANIMATION_NAME eAnimName, float fProgress_0_1)
+    {
+    }
+
+    public string GetCurrentAnimation()
+    {
+        return _strCurrentAnimName;
+    }
+
+    // ========================== [ Division ] ========================== //
+
+    protected override void OnAwake()
 	{
 		base.OnAwake();
 
@@ -352,14 +332,8 @@ public class CAnimatorController : CObjectBase, IAnimationController
         // OnFinishAnimation에 DoPlayAnimation(ENUM_ANIM_NAME eAnimName, System.Action OnFinishAnimation)을 실행하면, 
         // _OnFinishAnimation을 세팅한다. 근데 그 함수가 끝나고 바로 null처리를 하기 때문에,
         // 결과적으로 세팅을 해도 _OnFinishAnimation을은 null이 된다. 따라서, 임시 객체에 일단 저장 후 미리 null처리 후 호출한다.
-        System.Action OnFinishAnimation = _OnFinishAnimation;
+        var OnFinishAnimation = _OnFinishAnimation;
         _OnFinishAnimation = null;
-
-        OnFinishAnimation();
-    }
-
-    public void DoPlayAnimation_Continuedly<ENUM_ANIMATION_NAME>(Action OnFinishAnimationAll, params ENUM_ANIMATION_NAME[] arrAnimName)
-    {
-        throw new NotImplementedException();
+        OnFinishAnimation(GetCurrentAnimation(), false);
     }
 }

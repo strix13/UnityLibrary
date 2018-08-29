@@ -168,8 +168,11 @@ public class CTweenPosition_Radial : CTweenBase
     }
 
 #if UNITY_EDITOR
-    private void OnDrawGizmos()
+
+    protected override void OnDrawGizmos()
     {
+        base.OnDrawGizmos();
+
         if(bIsDebug)
         {
             Gizmos.color = Color.green;

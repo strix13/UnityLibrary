@@ -50,9 +50,9 @@ public class CCompoRandomSprite : CCompoEventTrigger
 
 	/* protected - Override & Unity API         */
 
-	protected override void OnPlayEventMain()
+	protected override void OnPlayEvent()
 	{
-		base.OnPlayEventMain();
+		base.OnPlayEvent();
 
 		Sprite pSprite = _listRandomSprite.GetRandom();
 		UnityEngine.UI.Image pImage = GetComponent<UnityEngine.UI.Image>();

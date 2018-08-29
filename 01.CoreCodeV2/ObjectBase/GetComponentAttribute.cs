@@ -165,32 +165,32 @@ static public class SCManagerGetComponent
 
         System.Type pType = pTarget.GetType();
         MemberInfo[] arrMembers = pType.GetFields(BindingFlags.Public | BindingFlags.Instance);
-        ProcUpdateComponentAttribute(pTarget, arrMembers);
+        UpdateComponentAttribute(pTarget, arrMembers);
 
         arrMembers = pType.GetFields(BindingFlags.NonPublic | BindingFlags.Instance);
-        ProcUpdateComponentAttribute(pTarget, arrMembers);
+        UpdateComponentAttribute(pTarget, arrMembers);
 
         arrMembers = pType.GetFields(BindingFlags.Public | BindingFlags.Static);
-        ProcUpdateComponentAttribute(pTarget, arrMembers);
+        UpdateComponentAttribute(pTarget, arrMembers);
 
         arrMembers = pType.GetFields(BindingFlags.NonPublic | BindingFlags.Static);
-        ProcUpdateComponentAttribute(pTarget, arrMembers);
+        UpdateComponentAttribute(pTarget, arrMembers);
 
         // Property 구간
         arrMembers = pType.GetProperties(BindingFlags.Public | BindingFlags.Instance);
-        ProcUpdateComponentAttribute(pTarget, arrMembers);
+        UpdateComponentAttribute(pTarget, arrMembers);
 
         arrMembers = pType.GetProperties(BindingFlags.NonPublic | BindingFlags.Instance);
-        ProcUpdateComponentAttribute(pTarget, arrMembers);
+        UpdateComponentAttribute(pTarget, arrMembers);
 
         arrMembers = pType.GetProperties(BindingFlags.Public | BindingFlags.Static);
-        ProcUpdateComponentAttribute(pTarget, arrMembers);
+        UpdateComponentAttribute(pTarget, arrMembers);
 
         arrMembers = pType.GetProperties(BindingFlags.NonPublic | BindingFlags.Static);
-        ProcUpdateComponentAttribute(pTarget, arrMembers);
+        UpdateComponentAttribute(pTarget, arrMembers);
     }
 
-    static private void ProcUpdateComponentAttribute(MonoBehaviour pTargetMono, MemberInfo[] arrMember)
+    static private void UpdateComponentAttribute(MonoBehaviour pTargetMono, MemberInfo[] arrMember)
     {
         for (int i = 0; i < arrMember.Length; i++)
         {

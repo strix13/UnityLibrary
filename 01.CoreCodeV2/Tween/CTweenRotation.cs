@@ -62,7 +62,7 @@ public class CTweenRotation : CTweenBase
     /* protected & private - Field declaration         */
 
     Transform _pTransformTarget;
-    Vector3 _vecOriginPos;
+    // Vector3 _vecOriginPos;
 
     // ========================================================================== //
 
@@ -85,7 +85,7 @@ public class CTweenRotation : CTweenBase
     protected override void OnSetTarget(GameObject pObjectNewTarget)
     {
         _pTransformTarget = pObjectNewTarget.transform;
-        _vecOriginPos = _pTransformTarget.position;
+        // _vecOriginPos = _pTransformTarget.position;
     }
 
     protected override void OnTween(float fProgress_0_1)

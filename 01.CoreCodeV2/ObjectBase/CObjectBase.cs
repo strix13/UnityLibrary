@@ -20,9 +20,26 @@ using System.Reflection;
 using NUnit.Framework;
 using UnityEngine.TestTools;
 
+[System.Flags]
+public enum EDebugLevel
+{
+    None = 0,
+
+    Core_Log = 1 << 1,
+    Core_Debug = 1 << 2,
+    Project_Log = 1 << 3,
+    Project_Debug = 1 << 4,
+}
+
+
 public class CObjectBase : MonoBehaviour, IUpdateAble
 {
-	protected bool _bIsExcuteAwake = false;
+    [SerializeField]
+    [Rename_Inspector("디버깅 레벨")]
+    protected EDebugLevel p_eDebugLevel = EDebugLevel.None;
+
+    protected bool _bIsExcuteAwake = false;
+    protected bool _bIsQuitApplciation = false;
     private Coroutine _pCoroutineOnEnable;
 
     public Vector3 p_vecPosition
@@ -73,6 +90,12 @@ public class CObjectBase : MonoBehaviour, IUpdateAble
 
     // ========================== [ Division ] ========================== //
 
+    void Reset()
+    {
+        if (Application.isEditor && Application.isPlaying == false)
+            OnReset();
+    }
+
     void Awake()
     {
         if(_bIsExcuteAwake == false)
@@ -104,6 +127,11 @@ public class CObjectBase : MonoBehaviour, IUpdateAble
 
     void Start() { OnStart(); }
 
+    private void OnApplicationQuit()
+    {
+        _bIsQuitApplciation = true;
+    }
+
     // ========================== [ Division ] ========================== //
 
     virtual protected void OnAwake()
@@ -113,7 +141,7 @@ public class CObjectBase : MonoBehaviour, IUpdateAble
             _bIsExcuteAwake = true;
             SCManagerGetComponent.DoUpdateGetComponentAttribute(this);
 
-            if(gameObject.activeSelf)
+            if(gameObject.activeSelf && Application.isPlaying)
             {
                 StopCoroutine("OnAwakeCoroutine");
                 StartCoroutine("OnAwakeCoroutine");
@@ -122,7 +150,7 @@ public class CObjectBase : MonoBehaviour, IUpdateAble
 
     }
 
-    virtual protected IEnumerator OnAwakeCoroutine() { yield break; }
+    virtual protected void OnReset() { }
     virtual protected void OnStart() { }
     virtual protected void OnEnableObject() {}
 

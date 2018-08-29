@@ -149,8 +149,13 @@ public class SCManagerResourceBase<CLASS, ENUM_RESOURCE_NAME, RESOURCE>
 		else
 		{
 			for (int i = 0; i < arrResources.Length; i++)
-				_mapResourceOrigin.Add( (ENUM_RESOURCE_NAME)(object)arrResources[i].name, arrResources[i] );
-		}
+            {
+                if (_mapResourceOrigin.ContainsKey((ENUM_RESOURCE_NAME)(object)arrResources[i].name))
+                    Debug.LogWarning("InitResourceOrigin Key : " + (ENUM_RESOURCE_NAME)(object)arrResources[i].name, arrResources[i]);
+                else
+                    _mapResourceOrigin.Add((ENUM_RESOURCE_NAME)(object)arrResources[i].name, arrResources[i]);
+            }
+        }
 	}
 
     private IEnumerator CoGetResource_StreammingAsset<TResource>(string strFolderPath, string strResourceName, System.Action<bool, TResource> OnGetResource)

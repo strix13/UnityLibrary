@@ -26,7 +26,7 @@ public class CEffectSpine : CEffect
 
 	private SkeletonAnimation _pSpineAnimation;
 	private CCompoAutoDisable _pAutoDisable;
-	private string _strAnimationName;
+	//private string _strAnimationName;
 
 	// ========================================================================== //
 
@@ -54,11 +54,11 @@ public class CEffectSpine : CEffect
 			_pSpineAnimation = GetComponentInChildren<SkeletonAnimation>();
 			if (_pSpineAnimation != null)
 			{
-				//Spine.Animation[] arrAnimation = _pSpineAnimation.Skeleton.data.Animations.Items;
-				//Spine.Animation pAnimationFirst = arrAnimation[0];
-				//_strAnimationName = pAnimationFirst.name;
-				_pSpineAnimation.loop = false;
-				_pSpineAnimation.AnimationName = _strAnimationName;
+    //            Spine.Animation[] arrAnimation = _pSpineAnimation.Skeleton.data.Animations.Items;
+    //            Spine.Animation pAnimationFirst = arrAnimation[0];
+    //            _strAnimationName = pAnimationFirst.name;
+				//_pSpineAnimation.loop = false;
+				//_pSpineAnimation.AnimationName = _strAnimationName;
 
 				_eEffectType = EEffectType.Spine;
 				//_pAutoDisable = gameObject.AddComponent<CCompoAutoDisable>();
@@ -73,11 +73,11 @@ public class CEffectSpine : CEffect
 	{
 		base.OnEnableObject();
 
-		if (_pSpineAnimation != null)
-		{
-			_pSpineAnimation.AnimationName = "";
-			_pSpineAnimation.AnimationName = _strAnimationName;
-		}
+		//if (_pSpineAnimation != null)
+		//{
+		//	_pSpineAnimation.AnimationName = "";
+		//	_pSpineAnimation.AnimationName = _strAnimationName;
+		//}
 	}
 
 	// ========================================================================== //

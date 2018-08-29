@@ -87,9 +87,9 @@ public class CCompoAddForce : CCompoEventTrigger
 		_pRigidbody2D = GetComponentInChildren<Rigidbody2D>( true );
 	}
 
-	protected override void OnPlayEventMain()
+	protected override void OnPlayEvent()
 	{
-		base.OnPlayEventMain();
+		base.OnPlayEvent();
 
 		DoSetPhysics( true );
 

@@ -40,9 +40,9 @@ public class CCompoRandomScale : CCompoEventTrigger
 
 	/* protected - Override & Unity API         */
 
-	protected override void OnPlayEventMain()
+	protected override void OnPlayEvent()
 	{
-		base.OnPlayEventMain();
+		base.OnPlayEvent();
 
         transform.localScale = PrimitiveHelper.RandomRange( _vecRandomScale_Min, _vecRandomScale_Max );
 	}

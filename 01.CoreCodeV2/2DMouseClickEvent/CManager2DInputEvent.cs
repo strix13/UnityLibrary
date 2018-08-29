@@ -44,6 +44,35 @@ public class CManager2DInputEvent : CSingletonMonoBase<CManager2DInputEvent>
     /* public - [Do] Function
      * 외부 객체가 호출(For External class call)*/
 
+    public Vector3 DoGetMousePos()
+    {
+        return p_pEventCamera.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, p_pEventCamera.nearClipPlane));
+    }
+
+    public Vector3 DoRayCasting_MousePos2(LayerMask pLayerMask_Hit)
+    {
+        int iLayerMask = pLayerMask_Hit.value;
+        iLayerMask = ~iLayerMask;
+
+        Vector3 vecPosStart = p_pEventCamera.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, p_pEventCamera.nearClipPlane));
+        Vector3 vecPosDest = p_pEventCamera.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, p_pEventCamera.farClipPlane));
+        var pHitInfo = Physics2D.GetRayIntersection(new Ray(vecPosStart, vecPosDest - vecPosStart), Mathf.Infinity, iLayerMask);
+
+        if (p_bIsPrintDebug)
+        {
+            Ray pRay = new Ray(vecPosStart, vecPosDest - vecPosStart);
+            if (pHitInfo)
+                Debug.DrawRay(pRay.origin, (Vector3)pHitInfo.point - pRay.origin, Color.red, 1f);
+            else
+                Debug.DrawRay(pRay.origin, pRay.direction * 1000f, Color.green, 1f);
+        }
+
+        if (pHitInfo)
+            return pHitInfo.point;
+        else
+            return Vector3.zero;
+    }
+
     public Vector3 DoRayCasting_MousePos(Camera pCamera, LayerMask pLayerMask_Hit)
     {
         int iLayerMask = pLayerMask_Hit.value;

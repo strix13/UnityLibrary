@@ -50,9 +50,9 @@ public class CCompoMovePos : CCompoEventTrigger
 
 	/* protected - Override & Unity API         */
 
-	protected override void OnPlayEventMain()
+	protected override void OnPlayEvent()
 	{
-		base.OnPlayEventMain();
+		base.OnPlayEvent();
 
 		_vecVelocity = PrimitiveHelper.RandomRange( _vecRandomForce_Min, _vecRandomForce_Max );
 	}

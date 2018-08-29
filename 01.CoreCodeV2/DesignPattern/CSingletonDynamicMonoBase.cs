@@ -62,7 +62,7 @@ public class CSingletonDynamicMonoBase<CLASS_SingletoneTarget> : CObjectBase
 	static protected Transform _pTransManager;
 
 	static private CLASS_SingletoneTarget _instance;
-    static private bool _bIsQuitApplication = false;
+    static protected bool _bIsQuitApplication = false;
 
 	// ========================== [ Division ] ========================== //
 

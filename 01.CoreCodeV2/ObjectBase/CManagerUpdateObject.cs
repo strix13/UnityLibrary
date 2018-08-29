@@ -34,8 +34,9 @@ public class CManagerUpdateObject : CSingletonSOBase<CManagerUpdateObject>
     /* protected & private - Field declaration         */
 
 #if UNITY_EDITOR
-
+#if OdinInspector
     [Sirenix.OdinInspector.ShowInInspectorAttribute]
+#endif
     public List<IUpdateAble> _listObject_ForDebug = new List<IUpdateAble>();
 
 #endif

@@ -73,7 +73,7 @@ public class CSpineRandomPlayer : CObjectBase
     [GetComponent]
 	private CSpineController _pSpineController;
 
-	private int _iInstanceID;
+	// private int _iInstanceID;
 
 	private string _strLastPlayAnimation = null;
 
@@ -102,7 +102,7 @@ public class CSpineRandomPlayer : CObjectBase
 
 		_pSpineController.EventOnAwake();
 
-		_iInstanceID = GetInstanceID();
+		// _iInstanceID = GetInstanceID();
 
 		_mapRandomAnimation.DoAddItem( _listRandomAnimation.ToArray() );
 		CManagerRandomTable<SAnimation>.instance.DoAddRandomItem_Range( _listRandomAnimation );

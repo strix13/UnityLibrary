@@ -28,7 +28,7 @@ public class CPlatformerAIController : CObjectBase
 
     public EAIState state = EAIState.pathfinding;
 
-    private CPlatformerController _characterScript;
+    // private CPlatformerController _characterScript;
     private CPlatformerCalculator _controller;
     private CPathFindingAgent _pathAgent;
 
@@ -107,7 +107,7 @@ public class CPlatformerAIController : CObjectBase
             player = GameObject.FindGameObjectWithTag("Player");
         }
         _controller = GetComponent<CPlatformerCalculator>();
-        _characterScript = GetComponent<CPlatformerController>();
+        //_characterScript = GetComponent<CPlatformerController>();
         _pathAgent = GetComponent<CPathFindingAgent>();
 
         if (_pathScript == null)

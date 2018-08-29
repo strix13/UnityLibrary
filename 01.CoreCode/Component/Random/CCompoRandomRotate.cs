@@ -47,9 +47,9 @@ public class CCompoRandomRotate : CCompoEventTrigger
 
 	/* protected - Override & Unity API         */
 
-	protected override void OnPlayEventMain()
+	protected override void OnPlayEvent()
 	{
-		base.OnPlayEventMain();
+		base.OnPlayEvent();
 
 		_vecRotate = PrimitiveHelper.RandomRange( _vecRandomRotateSpeed_Min, _vecRandomRotateSpeed_Max );
         transform.Rotate(_vecRotate);

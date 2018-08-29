@@ -35,6 +35,9 @@ public class CManagerEffect : CSingletonDynamicMonoBase<CManagerEffect>
 
     public CEffect DoPlayEffect(string strEffectName, Vector3 vecPos)
     {
+        if (_bIsQuitApplication)
+            return null;
+
         CEffect pEffect = _pManagerPooling.DoPop(strEffectName);
 		pEffect.DoPlayEffect(vecPos);
 
@@ -43,6 +46,9 @@ public class CManagerEffect : CSingletonDynamicMonoBase<CManagerEffect>
 
     public CEffect DoPlayEffect(string strEffect, Transform pTransParents, Vector3 vecPos)
 	{
+        if (_bIsQuitApplication)
+            return null;
+
         CEffect pEffect = instance.DoPop( strEffect);
 		pEffect.DoPlayEffect(pTransParents, vecPos);
 
@@ -51,6 +57,9 @@ public class CManagerEffect : CSingletonDynamicMonoBase<CManagerEffect>
 
     public CEffect DoPlayEffect(string strEffect, Vector3 vecPos, Quaternion quatRot)
     {
+        if (_bIsQuitApplication)
+            return null;
+
         CEffect pEffect = instance.DoPop( strEffect);
         pEffect.transform.rotation = quatRot;
         pEffect.DoPlayEffect(vecPos);
@@ -61,6 +70,9 @@ public class CManagerEffect : CSingletonDynamicMonoBase<CManagerEffect>
 
     public CEffect DoPlayEffect(string strEffect, Vector3 vecPos, Vector3 vecRot)
     {
+        if (_bIsQuitApplication)
+            return null;
+
         CEffect pEffect = instance.DoPop( strEffect);
         pEffect.transform.rotation = Quaternion.LookRotation(vecRot);
         pEffect.DoPlayEffect(vecPos);

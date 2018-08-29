@@ -17,35 +17,7 @@ public class CPlatformerController : CObjectBase
     /* const & readonly declaration             */
     
     /* enum & struct declaration                */
-
-    public interface ICharacterController_Listener
-    {
-        void ICharacterController_Listener_OnChangeState(EPlatformerState eStatePrev, EPlatformerState eStateChanged);
-        void ICharacterController_Listener_OnChangeFaceDir(int iOneIsLeft_Direction, bool bIsSlopSliding);
-        void ICharacterController_Listener_OnSlopeSliding(bool bIsSlopeSliding, float fSlopeAngle);
-    }
-
-    public enum EPlatformerState
-    {
-        Standing,
-        Walking,
-        Running,
-
-        Crouching,
-        CrouchWalking,
-
-
-        Slope_Sliding,
-        Wall_Sliding,
-
-        Jumping,
-        MultipleJumping,
-
-        Falling,
-
-        LedgeGrab,
-    }
-
+    
     /* public - Field declaration            */
 
     public bool _bIsDebuging = false;
@@ -109,8 +81,8 @@ public class CPlatformerController : CObjectBase
 
     public CPlatformerCalculator p_pCalculator { get; private set; }
 
-    public EPlatformerState p_ePlatformerState_Current { get; private set; }
-    public EPlatformerState p_ePlatformerState_Prev { get; private set; }
+    public ECharacterControllerState p_ePlatformerState_Current { get; private set; }
+    public ECharacterControllerState p_ePlatformerState_Prev { get; private set; }
 
     public Vector2 p_vecInputDirection { get; private set; }
 
@@ -156,6 +128,12 @@ public class CPlatformerController : CObjectBase
 
     /* public - [Do] Function
      * 외부 객체가 호출(For External class call)*/
+
+    public void DoLookAtDirection(Vector3 vecDirection)
+    {
+        if(vecDirection.x != 0f)
+            p_pCalculator.p_pCollisionInfo.DoSetFaceDir_OneIsLeft(System.Math.Sign(vecDirection.x));
+    }
 
     public void DoSetForce_Falling(bool bFalling)
     {
@@ -371,7 +349,7 @@ public class CPlatformerController : CObjectBase
 
         if (_bIsLedgeGrab)
         {
-            OnChangeState(EPlatformerState.LedgeGrab);
+            OnChangeState(ECharacterControllerState.LedgeGrab);
             return;
         }
 
@@ -425,30 +403,30 @@ public class CPlatformerController : CObjectBase
 
     private void SetState()
     {
-        if (_bIsFalling)
-        {
-            OnChangeState(EPlatformerState.Falling);
-            return;
-        }
-
         if (p_pCalculator.p_pCollisionInfo.slidingDownMaxSlope)
         {
-            OnChangeState(EPlatformerState.Slope_Sliding);
+            OnChangeState(ECharacterControllerState.Slope_Sliding);
             return;
         }
 
         if (_bIsWallSliding)
         {
-            OnChangeState(EPlatformerState.Wall_Sliding);
+            OnChangeState(ECharacterControllerState.Wall_Sliding);
+            return;
+        }
+
+        if (_bIsFalling)
+        {
+            OnChangeState(ECharacterControllerState.Falling);
             return;
         }
 
         if (_bIsJumping)
         {
             if (_iJumpCount == 1)
-                OnChangeState(EPlatformerState.Jumping);
+                OnChangeState(ECharacterControllerState.Jumping);
             else
-                OnChangeState(EPlatformerState.MultipleJumping);
+                OnChangeState(ECharacterControllerState.MultipleJumping);
             return;
         }
 
@@ -456,21 +434,21 @@ public class CPlatformerController : CObjectBase
         if (_bIsMoving)
         {
             if (_fMoveDelta_0_1.Equals(1f))
-                OnChangeState(EPlatformerState.Running);
+                OnChangeState(ECharacterControllerState.Running);
             else
             {
                 if (_bIsCrouching)
-                    OnChangeState(EPlatformerState.CrouchWalking);
+                    OnChangeState(ECharacterControllerState.CrouchWalking);
                 else
-                    OnChangeState(EPlatformerState.Walking);
+                    OnChangeState(ECharacterControllerState.Walking);
             }
         }
         else
         {
             if (_bIsCrouching)
-                OnChangeState(EPlatformerState.Crouching);
+                OnChangeState(ECharacterControllerState.Crouching);
             else
-                OnChangeState(EPlatformerState.Standing);
+                OnChangeState(ECharacterControllerState.Standing);
             return;
         }
     }
@@ -509,7 +487,7 @@ public class CPlatformerController : CObjectBase
 
     /* protected - [abstract & virtual]         */
 
-    virtual protected void OnChangeState(EPlatformerState eState)
+    virtual protected void OnChangeState(ECharacterControllerState eState)
     {
         if (p_ePlatformerState_Current != eState)
             p_ePlatformerState_Prev = p_ePlatformerState_Current;
@@ -570,7 +548,7 @@ public class CPlatformerController : CObjectBase
 
     virtual protected void CalculateVelocity()
     {
-        if (p_ePlatformerState_Prev == EPlatformerState.Slope_Sliding && p_ePlatformerState_Current == EPlatformerState.Jumping)
+        if (p_ePlatformerState_Prev == ECharacterControllerState.Slope_Sliding && p_ePlatformerState_Current == ECharacterControllerState.Jumping)
         {
 
         }
@@ -583,8 +561,6 @@ public class CPlatformerController : CObjectBase
                     fTargetVelocityX = p_vecInputDirection.x * Mathf.Lerp(p_fWalkingSpeed, p_fRunningSpeed, _fMoveDelta_0_1);
                 else if(_fMoveDelta_0_1 > 0f)
                     fTargetVelocityX = _iInput_LastDirectionX_OneIsRight * Mathf.Lerp(p_fWalkingSpeed, p_fRunningSpeed, _fMoveDelta_0_1);
-
-
             }
             else
             {
@@ -678,9 +654,10 @@ public class CPlatformerController : CObjectBase
 
     private void SetOnChangeFaceDir(int iFaceDir)
     {
-        bool bIsSlopSliding = p_pCalculator.p_pCollisionInfo.slidingDownMaxSlope;
-        for (int i = 0; i < _listListener.Count; i++)
-            _listListener[i].ICharacterController_Listener_OnChangeFaceDir(iFaceDir, bIsSlopSliding);
+        //_iInput_LastDirectionX_OneIsRight = iFaceDir;
+        //bool bIsSlopSliding = p_pCalculator.p_pCollisionInfo.slidingDownMaxSlope;
+        //for (int i = 0; i < _listListener.Count; i++)
+        //    _listListener[i].ICharacterController_Listener_OnChangeFaceDir(iFaceDir, bIsSlopSliding);
     }
 
     private void OnChangeBelow(bool bBelow)
@@ -719,8 +696,8 @@ public class CPlatformerController : CObjectBase
 
     private void OnChangeSlopeSliding(bool bSlopeSliding)
     {
-        for (int i = 0; i < _listListener.Count; i++)
-            _listListener[i].ICharacterController_Listener_OnSlopeSliding(bSlopeSliding, p_pCalculator.p_pCollisionInfo.slopeAngle);
+        //for (int i = 0; i < _listListener.Count; i++)
+        //    _listListener[i].ICharacterController_Listener_OnSlopeSliding(bSlopeSliding, p_pCalculator.p_pCollisionInfo.slopeAngle);
     }
 
     private IEnumerator CoDelayFalling()

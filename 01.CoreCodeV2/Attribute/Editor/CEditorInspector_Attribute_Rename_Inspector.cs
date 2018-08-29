@@ -17,6 +17,9 @@ using Sirenix.OdinInspector.Editor;
 using Sirenix.OdinInspector;
 using Sirenix.Utilities.Editor;
 
+#pragma warning disable CS0618 // 형식 또는 멤버는 사용되지 않습니다.
+#pragma warning disable CS0672 // 멤버가 사용되지 않는 멤버를 재정의합니다.
+
 [OdinDrawer]
 [DrawerPriority(DrawerPriorityLevel.SuperPriority)]
 public class CEditorInspector_Attribute_Rename : OdinAttributeDrawer<Rename_InspectorAttribute>
@@ -83,3 +86,6 @@ public class CEditorInspector_Attribute_Rename : PropertyDrawer
     }
 }
 #endif
+
+#pragma warning restore CS0618 // 형식 또는 멤버는 사용되지 않습니다.
+#pragma warning restore CS0672 // 멤버가 사용되지 않는 멤버를 재정의합니다.
