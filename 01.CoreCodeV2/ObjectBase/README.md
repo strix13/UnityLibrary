@@ -2,13 +2,13 @@
 
 ![](https://postfiles.pstatic.net/MjAxODA1MDdfMjEx/MDAxNTI1NjY0ODU2NTc2.pl7EYZNbYzETHR2t9lPE6O2b6gp9eBCOSWRDpAQmvrEg.km7IoWpo9ucfK6lREhRdZ_gEbi_QIkF0QLRt_lxJZ_0g.JPEG.strix13/StrixLibrary_-_%EB%A3%A8%ED%8A%B8_%ED%81%B4%EB%9E%98%EC%8A%A4.jpg?type=w773)
 
-###**ㄴ 이미지를 클릭하시면 확대하실 수 있습니다.**
+#### ㄴ 이미지를 클릭하시면 확대하실 수 있습니다.
 
 
 
 [![Video Label](http://img.youtube.com/vi/xuhKn5H6ck4/0.jpg)](https://www.youtube.com/watch?v=xuhKn5H6ck4=0s)
 
-###**ㄴ 이미지를 클릭하시면 유튜브에서 비디오를 시청하실 수 있습니다.**
+#### ㄴ 이미지를 클릭하시면 유튜브에서 비디오를 시청하실 수 있습니다.
 
 
 
@@ -28,8 +28,13 @@
 -
 - 그 외 UnityEvent 함수를 가상함수로 지원합니다.
 
+---
+### 예제
+- [작성한 Example 코드](https://github.com/strix13/UnityLibrary/tree/master/01.CoreCodeV2/ObjectBase/Example)
 
--
+---
+### 참고 링크
+
 - [참고 링크 - 유니티 블로그 - 10000번의 Update() 호출](https://blogs.unity3d.com/kr/2015/12/23/1k-update-calls/)
 - [참고 링크 - Unity3D 자동 GetComponent](https://openlevel.postype.com/post/683269)
 ---

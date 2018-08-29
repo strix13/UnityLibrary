@@ -17,13 +17,13 @@ https://docs.google.com/document/d/1X8nIU0anstawLqf_pTnylCFLxgAAMJSQILIOZ89hFTs
 
 ![](https://postfiles.pstatic.net/MjAxODA1MDdfMjEx/MDAxNTI1NjY0ODU2NTc2.pl7EYZNbYzETHR2t9lPE6O2b6gp9eBCOSWRDpAQmvrEg.km7IoWpo9ucfK6lREhRdZ_gEbi_QIkF0QLRt_lxJZ_0g.JPEG.strix13/StrixLibrary_-_%EB%A3%A8%ED%8A%B8_%ED%81%B4%EB%9E%98%EC%8A%A4.jpg?type=w773)
 
-**ㄴ 이미지를 클릭하시면 확대하실 수 있습니다.**
+#### ㄴ 이미지를 클릭하시면 확대하실 수 있습니다.
 
 
 
 [![Video Label](http://img.youtube.com/vi/xuhKn5H6ck4/0.jpg)](https://www.youtube.com/watch?v=xuhKn5H6ck4=0s)
 
-**ㄴ 이미지를 클릭하시면 유튜브에서 비디오를 시청하실 수 있습니다.**
+#### ㄴ 이미지를 클릭하시면 유튜브에서 비디오를 시청하실 수 있습니다.
 
 
 
@@ -41,7 +41,7 @@ https://docs.google.com/document/d/1X8nIU0anstawLqf_pTnylCFLxgAAMJSQILIOZ89hFTs
 ![](
 https://blogfiles.pstatic.net/MjAxODA1MDVfNSAg/MDAxNTI1NDk2MjEzMzk4.YBGR9hSvFoGqEg5lUCeF346bvZ3x9EEgLQSfjWcyFPsg.DdcKOk5Ml-eeOorUOfqwJcJnscZGxqmvC_Ol40H9eZ4g.PNG.strix13/StrixLibrary_-_UI_%ED%81%B4%EB%9E%98%EC%8A%A4_%EA%B4%80%EA%B3%84%EB%8F%84.png)
 
-**ㄴ 이미지를 클릭하시면 확대하실 수 있습니다.**
+#### 이미지를 클릭하시면 확대하실 수 있습니다.
 
 
 
@@ -72,14 +72,14 @@ https://blogfiles.pstatic.net/MjAxODA1MDVfNSAg/MDAxNTI1NDk2MjEzMzk4.YBGR9hSvFoGq
 ![](
 https://postfiles.pstatic.net/MjAxODA1MDdfMTUg/MDAxNTI1NjYxNjYzOTMw.uTGH7T0d2IFz7o5BHMhKqZndkZY1_XN_N9HF4FBF9VMg.hGGB_GJmzsuWrqreBhTW40fd806yUgnS4LFqL6gUlmkg.JPEG.strix13/StrixLibrary_-_%EB%A1%9C%EC%BB%AC%EB%9D%BC%EC%9D%B4%EC%A7%95_%EC%8B%9C%EC%8A%A4%ED%85%9C_%ED%81%B4%EB%9E%98%EC%8A%A4_%EA%B4%80%EA%B3%84%EB%8F%84.jpg?type=w773)
 
-**ㄴ 이미지를 클릭하시면 확대하실 수 있습니다.**
+#### ㄴ 이미지를 클릭하시면 확대하실 수 있습니다.
 
 
 
 
 [![Video Label](http://img.youtube.com/vi/mLQMwqKgh4I/0.jpg)](https://www.youtube.com/watch?v=mLQMwqKgh4I=0s)
 
-**ㄴ 이미지를 클릭하시면 유튜브에서 비디오를 시청하실 수 있습니다.**
+#### ㄴ 이미지를 클릭하시면 유튜브에서 비디오를 시청하실 수 있습니다.
 
 
 
@@ -98,23 +98,23 @@ https://postfiles.pstatic.net/MjAxODA1MDdfMTUg/MDAxNTI1NjYxNjYzOTMw.uTGH7T0d2IFz
 ![](
 https://postfiles.pstatic.net/MjAxODA1MDZfODIg/MDAxNTI1NTg2NjI4NDg5.2-piThykc2EWXJVPdEQUx0FlQ9PoSANx5ZLP1S8-KWwg.vvcEPNS5G5_jlnjJqcXHSgF2I94o_bMPaWWPa4537BEg.JPEG.strix13/StrixLibrary_-_%EC%82%AC%EC%9A%B4%EB%93%9C_%EC%8B%9C%EC%8A%A4%ED%85%9C_%ED%81%B4%EB%9E%98%EC%8A%A4_%EA%B4%80%EA%B3%84%EB%8F%84.jpg?type=w773)
 
-**ㄴ 이미지를 클릭하시면 확대하실 수 있습니다.**
+#### ㄴ 이미지를 클릭하시면 확대하실 수 있습니다.
 
 
 
 
 [![Video Label](http://img.youtube.com/vi/TN145PFwvkI/0.jpg)](https://www.youtube.com/watch?v=TN145PFwvkI=0s)
 
-**ㄴ 이미지를 클릭하시면 유튜브에서 비디오를 시청하실 수 있습니다.**
+#### ㄴ 이미지를 클릭하시면 유튜브에서 비디오를 시청하실 수 있습니다.
 
 
 
 
 - 사운드 시스템의 경우, SoundManager가 SoundSlot 클래스를 관리하는 형태입니다.
 
-- **Instnace 요청 시 없을 경우 Instance를 생성하여 Initialize하여 플레이 할 수 있게끔 적용**하였습니다.
+- **Instnace 요청 시 없을 경우 Instance를 생성하여 Initialize하여 플레이 할 수 있게끔 적용** 하였습니다.
 
-- SoundManager는 외부에서 사운드 플레이 요청 시 AudioClip을 얻고, **SoundSlot을 풀링**하여 Slot에게 플레이 합니다.
+- SoundManager는 외부에서 사운드 플레이 요청 시 AudioClip을 얻고, **SoundSlot을 풀링** 하여 Slot에게 플레이 합니다.
 
 - **MainVolume, 개개별 사운드 Volume, Effect Volume, BGM Volume을 지원합니다.**
 
@@ -126,9 +126,9 @@ https://postfiles.pstatic.net/MjAxODA1MDZfODIg/MDAxNTI1NTg2NjI4NDg5.2-piThykc2EW
 - **FadeIn / Out** 효과를 지원합니다.
 
 
-- **SoundPlayer의 경우 임의의 게임오브젝트에 추가하여 쉽게 사운드를 플레이할 수 있는 클래스**입니다.
+- **SoundPlayer의 경우 임의의 게임오브젝트에 추가하여 쉽게 사운드를 플레이할 수 있는 클래스** 입니다.
 
-- 인스펙터에 세팅한 값을 토대로 SoundManager에게 요청하는 형태이기 때문에, **SoundManager에서 관리하는 옵션값(MainVolume, 개개별 사운드 Volume, Effect Volume 등) 및 SoundSlot 풀링을 지원**합니다.
+- 인스펙터에 세팅한 값을 토대로 SoundManager에게 요청하는 형태이기 때문에, **SoundManager에서 관리하는 옵션값(MainVolume, 개개별 사운드 Volume, Effect Volume 등) 및 SoundSlot 풀링을 지원** 합니다.
 
 - 그 외로 그룹 내 랜덤 사운드 플레이, 사운드가 끝났을 때 이벤트 통보를 지원합니다.
 
@@ -143,26 +143,26 @@ https://postfiles.pstatic.net/MjAxODA1MDZfODIg/MDAxNTI1NTg2NjI4NDg5.2-piThykc2EW
 ![](
 https://postfiles.pstatic.net/MjAxODA1MDZfMzUg/MDAxNTI1NjEwMDU3MjQz.az-Y7SxCGDV-jlb4YCi06dZMTi5DQpIbyeBIzaLJwJkg.kfdc4L_DxkRORmGBFbGdlu6vHzu1MqnzrZKj3CL_kZIg.JPEG.strix13/StrixLibrary_-_%EC%9D%B4%ED%8E%99%ED%8A%B8_%EC%8B%9C%EC%8A%A4%ED%85%9C_%ED%81%B4%EB%9E%98%EC%8A%A4_%EA%B4%80%EA%B3%84%EB%8F%84.jpg?type=w773)
 
-**ㄴ 이미지를 클릭하시면 확대하실 수 있습니다.**
+#### ㄴ 이미지를 클릭하시면 확대하실 수 있습니다.
 
 
 
 
 [![Video Label](http://img.youtube.com/vi/OQ8UpqBUIJQ/0.jpg)](https://www.youtube.com/watch?v=OQ8UpqBUIJQ=0s)
 
-**ㄴ 이미지를 클릭하시면 유튜브에서 비디오를 시청하실 수 있습니다.**
+#### ㄴ 이미지를 클릭하시면 유튜브에서 비디오를 시청하실 수 있습니다.
 
 
 
 
 - 이펙트 시스템은 사운드 시스템과 비슷한 설계입니다.
 
-- **Instnace 요청 시 없을 경우 Instance를 생성하여 Initialize하여 플레이 할 수 있게끔 적용**하였습니다.
+- **Instnace 요청 시 없을 경우 Instance를 생성하여 Initialize하여 플레이 할 수 있게끔 적용*  *하였습니다.
 
 
 - EffectManager는 CEffect라는 클래스를 관리합니다.
 
-- EffectManager에 이펙트를 요청시, 원하는 위치에 이펙트를 실행하며, **풀링**합니다.
+- EffectManager에 이펙트를 요청시, 원하는 위치에 이펙트를 실행하며, **풀링** 합니다.
 
 
 - CEffect의 경우 NGUI, Spine, Particle System을 래핑하였습니다.
@@ -178,7 +178,7 @@ https://postfiles.pstatic.net/MjAxODA1MDZfMzUg/MDAxNTI1NjEwMDU3MjQz.az-Y7SxCGDV-
 
 ![](https://camo.githubusercontent.com/6651c1a8b118bb47b030aa998be60db73d057f8d/68747470733a2f2f706f737466696c65732e707374617469632e6e65742f4d6a41784f4441314d4456664d6a4d342f4d4441784e5449314e5445354e4459354e4441312e775252445f66685450675239423470716b71496151574b4e4d586b543435757a575f526753323272494c30672e45756153622d417733516552434b4e73795f4d6643357566475561456f6448674d666435335550766f724d672e4a5045472e737472697831332f62616e646963616d5f323031382d30352d30355f32302d31392d32302d3732392e6a70673f747970653d77373733)
 
-**ㄴ 이미지를 클릭하시면 확대하실 수 있습니다.**
+#### ㄴ 이미지를 클릭하시면 확대하실 수 있습니다.
 
 
 
@@ -191,7 +191,7 @@ https://postfiles.pstatic.net/MjAxODA1MDZfMzUg/MDAxNTI1NjEwMDU3MjQz.az-Y7SxCGDV-
 ![](
 https://postfiles.pstatic.net/MjAxODA1MDdfMTc4/MDAxNTI1Njc5NDU5MzMz.4WXQCeIXmSfGTzxJ7HsOJr8adwepP0JlfNOIrT7vR70g.iXFhfhPCRYxKJVHB7oOmKfpU14Aei4eNv-GbfphEZp0g.PNG.strix13/%EB%A1%9C%EA%B7%B8.png?type=w773)
 
-**ㄴ 이미지를 클릭하시면 확대하실 수 있습니다.**
+#### ㄴ 이미지를 클릭하시면 확대하실 수 있습니다.
 
 
 
@@ -209,9 +209,9 @@ https://postfiles.pstatic.net/MjAxODA1MDdfMTc4/MDAxNTI1Njc5NDU5MzMz.4WXQCeIXmSfG
 
 - 랜덤 매니져는 IRandomItem 을 구현한 클래스에 대해 랜덤으로 리턴해주는 관리자입니다.
 
-- **IRandomItem의 경우 랜덤확률을 구현하게끔 되어있으며, 랜덤확률에 따라 클래스를 리턴**합니다.
+- **IRandomItem의 경우 랜덤확률을 구현하게끔 되어있으며, 랜덤확률에 따라 클래스를 리턴** 합니다.
 
-- **랜덤모드로 Peek, Delete 모드를 지원**합니다.
+- **랜덤모드로 Peek, Delete 모드를 지원** 합니다.
   - Peek의 경우 Random Item List에서 **아이템을 뽑을 때, List에 지장이 없습니다.**
   - Delete의 경우 List에서 **아이템을 뽑을 때 해당 아이템은List에서 제거됩니다.**
 
@@ -233,8 +233,7 @@ https://postfiles.pstatic.net/MjAxODA1MDdfMTc4/MDAxNTI1Njc5NDU5MzMz.4WXQCeIXmSfG
 ![](
 https://postfiles.pstatic.net/MjAxODA1MDdfNjAg/MDAxNTI1NjgzNDYwNTkx.7LVx1ndhvjxdw2992EqJKUM_u6ZZSuYqaGKxwlNv-Cwg.ieXZO9IUNCEUPh_ut5VM-TEf1GaUJknekDBuKTyQUxIg.JPEG.strix13/bandicam_2018-05-07_17-57-24-601.jpg?type=w773)
 
-**ㄴ 이미지를 클릭하시면 확대하실 수 있습니다.**
-
+#### ㄴ 이미지를 클릭하시면 확대하실 수 있습니다.
 
 
 
@@ -255,8 +254,8 @@ https://postfiles.pstatic.net/MjAxODA1MDdfNjAg/MDAxNTI1NjgzNDYwNTkx.7LVx1ndhvjxd
 
 - 저는 체계적인 스타일을 좋아합니다. 폴더부터 코드 네이밍, 코드 변수 및 함수 정의 위치까지 다 정하는 편입니다.
   - 이에 대해 항상 부가 설명을 하자면, 프로그래밍은 개발보다 유지보수 비용이 훨씬 크다고 생각합니다.
-  - 또한, **담당자에게 물어보지 않고 스스로 예측 가능 하는 것을 최고로 생각**하고 있습니다.
-    - 부가 설명을 더 하자면, 현실의 방의 예를 듭니다. 아무리 어두운 방이라도, 우리는 항상 **문고리가 어느 위치쯤에 있는지, 전등 스위치가 문 주변의 벽에 있다는 점을 누가 알려주지 않아도 스스로 예측**합니다.
+  - 또한, **담당자에게 물어보지 않고 스스로 예측 가능 하는 것을 최고로 생각** 하고 있습니다.
+    - 부가 설명을 더 하자면, 현실의 방의 예를 듭니다. 아무리 어두운 방이라도, 우리는 항상 **문고리가 어느 위치쯤에 있는지, 전등 스위치가 문 주변의 벽에 있다는 점을 누가 알려주지 않아도 스스로 예측** 합니다.
   - 이런식으로 네이밍을 하면, 어느 클래스의 이름만 보아도 어느 계층의 어느 패턴을 상속받은 클래스라는 점, 어느 함수의 이름만 보아도 어디쯤의 위치에 있는 지를 **담당자에게 물어보지 않고 예측 할 수 있습니다.**
 
 - 코드를 작성하기 전에 간단한 설계부터 하는 편입니다.
