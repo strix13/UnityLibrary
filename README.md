@@ -253,6 +253,31 @@ https://postfiles.pstatic.net/MjAxODA1MDdfNjAg/MDAxNTI1NjgzNDYwNTkx.7LVx1ndhvjxd
 ---
 ## Tween
 
+![](https://postfiles.pstatic.net/MjAxODA4MzBfMjA0/MDAxNTM1NTkzMTU0NDY5.MViQaLuMEAPWTndcryjA5nPCrqt41XAdx7etDxTzdscg.G8W_Jbnc3CD-OEqLzu34NpF69ORxHBp_vonWVFHMr30g.GIF.strix13/TweenPlay.gif?type=w773)
+
+![](
+https://postfiles.pstatic.net/MjAxODA4MzBfMjk5/MDAxNTM1NTkyOTQ5NDA1.n09HmR-JsfqCLMeSnddWhTWJlPje_eUlA_PAjughF08g.F9VbH9azaoKUpUev2L-CLqtUbd6r_OuCULxlGgy9sY0g.GIF.strix13/TweenButton.gif?type=w773)
+
+
+
+NGUI의 트윈을 참고하여 제작한 Tweener입니다.
+NGUI 트위너에 없는 기능으로
+  - Editor Play ( 단일 트윈 재생, 현재 오브젝트에 있는 모든 트윈 동시 재생 )
+  - 트윈 스타일 - PingPong_ReverseCurve 기능
+    - 애니메이션 커브를 Forward와 Reverse 둘다 같은 커브 적용
+    - 기존 핑퐁은 Reverse의 경우 커브를 역행하며 트윈하지만, 이 스타일은 Reverse도 순행하며 트윈
+  - FixedUpdate를 사용할 것인지
+  - Rotation의 경우 Vector Lerp를 사용할 것인지 Quaternion Lerp을 사용할 것인지
+  - Radiaul Direction Objects Tween
+
+  - 그 외 쉬운 확장 ( CTweenBase를 상속받아 몇개의 함수만 구현하면 끝 [Tween Scale 참고](https://github.com/strix13/UnityLibrary/blob/master/01.CoreCode/Tween/CTweenScale.cs) )
+
+개선 해야 할 사항
+- 트윈 데이터를 ScriptableObject와 Inspector에서 즉석으로 세팅할 수 있도록 병행  (Bolt 참고)
+- 한 컴포넌트에 여러 트윈 데이터를 저장 및 실행
+
+- [작성한 코드 링크](https://github.com/strix13/UnityLibrary/tree/master/01.CoreCode/Tween)
+
 ---
 ## 그 외
 
