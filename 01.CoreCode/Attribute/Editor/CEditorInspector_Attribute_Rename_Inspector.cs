@@ -61,7 +61,7 @@ public class CEditorInspector_Attribute_Rename : PropertyDrawer
                    SerializedProperty property, GUIContent label)
     {
         pAttributeTarget = (Rename_InspectorAttribute)attribute;
-        Vector2 vecSize = CalculateSize(pAttributeTarget);
+        // Vector2 vecSize = CalculateSize(pAttributeTarget);
 
         // Todo - 인스펙터 이름이 길어지면 재조정
         // Todo - Array 등 복수형 자료에서도 적용해야 함

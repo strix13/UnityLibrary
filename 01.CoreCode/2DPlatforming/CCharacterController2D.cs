@@ -198,7 +198,7 @@ public class CCharacterController2D : CObjectBase
     Vector2 _vecCurrentSlopeNormal;
     Queue<Vector2> _queueVelocityPrev = new Queue<Vector2>();
 
-    float _fJumpVelocity;
+    // float _fJumpVelocity;
     float _fMoveDelta_0_1;
     float _fWaitSecond;
     float _fTime_WallSlidingStart = -1f;
@@ -376,7 +376,7 @@ public class CCharacterController2D : CObjectBase
     {
         base.OnAwake();
 
-        _fJumpVelocity = UpdateJumpVelocity(p_fJumpForce);
+        // _fJumpVelocity = UpdateJumpVelocity(p_fJumpForce);
         p_ePlatformerState_Current = (ECharacterControllerState)(-1);
 
         if (_pBoxCollider_LeftCheck)
