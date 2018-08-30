@@ -7,7 +7,7 @@
 
 - 이 프로젝트는 프로그래머를 대상으로 설명합니다.
 
-- **이 프로젝트의 유니티 워킹 스탠다드 링크**
+- **이 프로젝트의 유니티 워크 스탠다드 링크**
 https://github.com/strix13/UnityLibrary/tree/master/99.Docs/UnityWorkStandard
 
 - 이 문서의 깃허브 링크 :
@@ -292,7 +292,7 @@ NGUI 트위너에 없는 기능으로
 
 
 ### 이 프로젝트 내 다른 링크
-- **이 프로젝트의 유니티 워킹 스탠다드 링크**
+- **이 프로젝트의 유니티 워크 스탠다드 링크**
 https://github.com/strix13/UnityLibrary/tree/master/99.Docs/UnityWorkStandard
 
 
