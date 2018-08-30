@@ -37,7 +37,7 @@ https://github.com/strix13/UnityLibrary
   - GetComponentAttribute 지원 ( Awake, Inspector 등에서 할당하지 않고 Attribute로 한줄 작성 )
   - 자체적인 Update를 통해 Update를 사용하는 Object의 실시간 개수 파악과 퍼포먼스 개선
 
-- [작성한 코드 및 좀 더 알아 보기 링크](https://github.com/strix13/UnityLibrary/tree/master/01.CoreCodeV2/ObjectBase)
+- [작성한 코드 및 좀 더 알아 보기 링크](https://github.com/strix13/UnityLibrary/tree/master/01.CoreCode/ObjectBase)
 
 ---
 ## UI 클래스 관계도
@@ -73,7 +73,7 @@ https://blogfiles.pstatic.net/MjAxODA1MDVfNSAg/MDAxNTI1NDk2MjEzMzk4.YBGR9hSvFoGq
 ---
 - [작성한 UI 베이스 코드 링크](https://github.com/strix13/UnityLibrary/tree/master/02.UI)
 - [작성한 UGUI 베이스 코드 링크](https://github.com/strix13/UnityLibrary/tree/master/03.UGUI)
-- [작성한 NGUI 베이스 코드 링크](https://github.com/strix13/UnityLibrary/tree/master/04.NGUI)
+- [작성한 NGUI 베이스 코드 링크](https://github.com/strix13/UnityLibrary/tree/master/10.ExternalLibraryWrapper/NGUI)
 
 ---
 ## 로컬 라이징 시스템
@@ -99,7 +99,7 @@ https://postfiles.pstatic.net/MjAxODA1MDdfMTUg/MDAxNTI1NjYxNjYzOTMw.uTGH7T0d2IFz
 
 - 작성한 Text, Sprite 컴포넌트 외에 이벤트를 받고 싶으면 ILocalizeListner를 구현하고, Manager에 등록하면 됩니다.
 
-- [작성한 코드 링크](https://github.com/strix13/UnityLibrary/tree/master/01.CoreCodeV2/Localize)
+- [작성한 코드 링크](https://github.com/strix13/UnityLibrary/tree/master/01.CoreCode/Localize)
 
 ---
 ## 사운드 시스템 클래스 관계도
@@ -140,7 +140,7 @@ https://postfiles.pstatic.net/MjAxODA1MDZfODIg/MDAxNTI1NTg2NjI4NDg5.2-piThykc2EW
   - 어떤 사운드 슬롯을 통해 실행되는지 확인 가능 [ Editor Only ]
   - 현재 재생중인지 지원 [ Editor Only ]
 
-- [작성한 코드 링크](https://github.com/strix13/UnityLibrary/tree/master/01.CoreCodeV2/Sound)
+- [작성한 코드 링크](https://github.com/strix13/UnityLibrary/tree/master/01.CoreCode/Sound)
 
 ---
 ## 이펙트 시스템 클래스 관계도
@@ -170,7 +170,7 @@ https://postfiles.pstatic.net/MjAxODA1MDZfMzUg/MDAxNTI1NjEwMDU3MjQz.az-Y7SxCGDV-
   - NGUI, Spine, Particle System을 지원.
   - 이펙트가 끝날 때 이벤트 통보를 지원.
 
-- [작성한 코드 및 좀 더 알아 보기 링크 링크](https://github.com/strix13/UnityLibrary/tree/master/01.CoreCodeV2/Effect)
+- [작성한 코드 및 좀 더 알아 보기 링크 링크](https://github.com/strix13/UnityLibrary/tree/master/01.CoreCode/Effect)
 
 ---
 ## 유니티 마크다운 뷰어
@@ -181,7 +181,7 @@ https://postfiles.pstatic.net/MjAxODA1MDZfMzUg/MDAxNTI1NjEwMDU3MjQz.az-Y7SxCGDV-
 
 
 - 유니티 내에서 마크다운 문서를 읽기 위해 만들었습니다.
-- [작성한 코드 링크](https://github.com/strix13/UnityLibrary/tree/master/01.CoreCodeV2/Editor/MarkdownViewer)
+- [작성한 코드 링크](https://github.com/strix13/UnityLibrary/tree/master/01.CoreCode/Editor/MarkdownViewer)
 
 ---
 ## 유니티 로그 래핑 클래스
@@ -226,7 +226,7 @@ https://postfiles.pstatic.net/MjAxODA1MDdfMTc4/MDAxNTI1Njc5NDU5MzMz.4WXQCeIXmSfG
 
 - **이펙트, 몬스터 스폰 등에 쓰입니다.** ( 스폰 시 주변에 골고루 나오게 하기 위한 로직 )
 
-- [작성한 코드 링크](https://github.com/strix13/UnityLibrary/tree/master/01.CoreCodeV2/Random)
+- [작성한 코드 링크](https://github.com/strix13/UnityLibrary/tree/master/01.CoreCode/Random)
 
 ---
 ## 한글 파서
@@ -248,7 +248,7 @@ https://postfiles.pstatic.net/MjAxODA1MDdfNjAg/MDAxNTI1NjgzNDYwNTkx.7LVx1ndhvjxd
 
 - [참고한 코드 링크 2](http://ehclub.co.kr/2484?category=658554)
 
-- [작성한 코드 링크](https://github.com/strix13/UnityLibrary/blob/master/SHangul.cs)
+- [작성한 코드 링크](https://github.com/strix13/UnityLibrary/blob/master/01.CoreCode/HangleParser/SHangul.cs)
 
 ---
 ## Tween
