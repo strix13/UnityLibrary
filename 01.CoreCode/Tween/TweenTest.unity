@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.37311953, g: 0.38074014, b: 0.3587274, a: 1}
+  m_IndirectSpecularColor: {r: 0.37311992, g: 0.38074034, b: 0.35872713, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -281,6 +281,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 73b3aaf10a06f1b4cab61aefb8bac71e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  p_eDebugLevel: 0
   _vecLocalPosOffset: {x: 2.59, y: 0, z: 0}
   _eCircleOption: 0
   _vecRotate_OnCircle: {x: 0, y: 0, z: 0}
@@ -348,6 +349,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0ad99fc95edf59f41ad3066a14169814, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  p_eDebugLevel: 0
   bIsDebug: 1
   p_pObjectTarget: {fileID: 0}
   p_pAnimationCurve:
@@ -491,6 +493,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 19262a84bee90b447b5e68b034874499, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  p_eDebugLevel: 0
   bIsDebug: 0
   p_pObjectTarget: {fileID: 45886880}
   p_pAnimationCurve:
@@ -618,6 +621,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 54a88a358755e3541b1d90e75014611a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  p_eDebugLevel: 0
   bIsDebug: 0
   p_pObjectTarget: {fileID: 68522408}
   p_pAnimationCurve:
@@ -721,6 +725,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aad85e1ce76a628409967804fc943546, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  p_eDebugLevel: 0
   bIsDebug: 0
   p_pObjectTarget: {fileID: 68522408}
   p_pAnimationCurve:
@@ -807,6 +812,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 19262a84bee90b447b5e68b034874499, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  p_eDebugLevel: 0
   bIsDebug: 0
   p_pObjectTarget: {fileID: 107112369}
   p_pAnimationCurve:
@@ -862,6 +868,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 95c736c08eacd9b4c80b4d3063be3f39, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  p_eDebugLevel: 0
   bIsDebug: 0
   p_pObjectTarget: {fileID: 107112369}
   p_pAnimationCurve:
@@ -1089,6 +1096,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 19262a84bee90b447b5e68b034874499, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  p_eDebugLevel: 0
   bIsDebug: 0
   p_pObjectTarget: {fileID: 205685469}
   p_pAnimationCurve:
@@ -1144,6 +1152,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 95c736c08eacd9b4c80b4d3063be3f39, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  p_eDebugLevel: 0
   bIsDebug: 0
   p_pObjectTarget: {fileID: 205685469}
   p_pAnimationCurve:
@@ -1370,6 +1379,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 54a88a358755e3541b1d90e75014611a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  p_eDebugLevel: 0
   bIsDebug: 0
   p_pObjectTarget: {fileID: 268170071}
   p_pAnimationCurve:
@@ -1493,6 +1503,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 73b3aaf10a06f1b4cab61aefb8bac71e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  p_eDebugLevel: 0
   _vecLocalPosOffset: {x: 2.59, y: 0, z: 0}
   _eCircleOption: 0
   _vecRotate_OnCircle: {x: 0, y: 0, z: 0}
@@ -1560,6 +1571,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 19262a84bee90b447b5e68b034874499, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  p_eDebugLevel: 0
   bIsDebug: 0
   p_pObjectTarget: {fileID: 427761860}
   p_pAnimationCurve:
@@ -1702,6 +1714,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 19262a84bee90b447b5e68b034874499, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  p_eDebugLevel: 0
   bIsDebug: 0
   p_pObjectTarget: {fileID: 444037540}
   p_pAnimationCurve:
@@ -1757,6 +1770,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 95c736c08eacd9b4c80b4d3063be3f39, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  p_eDebugLevel: 0
   bIsDebug: 0
   p_pObjectTarget: {fileID: 444037540}
   p_pAnimationCurve:
@@ -1993,6 +2007,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 54a88a358755e3541b1d90e75014611a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  p_eDebugLevel: 0
   bIsDebug: 0
   p_pObjectTarget: {fileID: 485436894}
   p_pAnimationCurve:
@@ -2116,6 +2131,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 73b3aaf10a06f1b4cab61aefb8bac71e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  p_eDebugLevel: 0
   _vecLocalPosOffset: {x: 2.59, y: 0, z: 0}
   _eCircleOption: 0
   _vecRotate_OnCircle: {x: 0, y: 0, z: 0}
@@ -2183,6 +2199,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 54a88a358755e3541b1d90e75014611a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  p_eDebugLevel: 0
   bIsDebug: 0
   p_pObjectTarget: {fileID: 543432988}
   p_pAnimationCurve:
@@ -2323,6 +2340,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 19262a84bee90b447b5e68b034874499, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  p_eDebugLevel: 0
   bIsDebug: 0
   p_pObjectTarget: {fileID: 559642051}
   p_pAnimationCurve:
@@ -2526,6 +2544,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 54a88a358755e3541b1d90e75014611a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  p_eDebugLevel: 0
   bIsDebug: 0
   p_pObjectTarget: {fileID: 697362844}
   p_pAnimationCurve:
@@ -2612,6 +2631,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 19262a84bee90b447b5e68b034874499, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  p_eDebugLevel: 0
   bIsDebug: 0
   p_pObjectTarget: {fileID: 722190064}
   p_pAnimationCurve:
@@ -2667,6 +2687,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 95c736c08eacd9b4c80b4d3063be3f39, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  p_eDebugLevel: 0
   bIsDebug: 0
   p_pObjectTarget: {fileID: 722190064}
   p_pAnimationCurve:
@@ -2805,6 +2826,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 95c736c08eacd9b4c80b4d3063be3f39, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  p_eDebugLevel: 0
   bIsDebug: 0
   p_pObjectTarget: {fileID: 743572399}
   p_pAnimationCurve:
@@ -2969,6 +2991,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0ad99fc95edf59f41ad3066a14169814, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  p_eDebugLevel: 0
   bIsDebug: 1
   p_pObjectTarget: {fileID: 0}
   p_pAnimationCurve:
@@ -2997,7 +3020,7 @@ MonoBehaviour:
     m_RotationOrder: 4
   p_bIgnoreTimeScale: 0
   p_fDuration: 0.5
-  p_eTweenStyle: 1
+  p_eTweenStyle: 2
   p_bIsPlay_OnEnable: 1
   p_eTweenDirection_OnDefaultPlay: 0
   p_fFirstDelaySec: 0
@@ -3113,6 +3136,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 19262a84bee90b447b5e68b034874499, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  p_eDebugLevel: 0
   bIsDebug: 0
   p_pObjectTarget: {fileID: 923202445}
   p_pAnimationCurve:
@@ -3168,6 +3192,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 95c736c08eacd9b4c80b4d3063be3f39, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  p_eDebugLevel: 0
   bIsDebug: 0
   p_pObjectTarget: {fileID: 923202445}
   p_pAnimationCurve:
@@ -3319,6 +3344,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 54a88a358755e3541b1d90e75014611a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  p_eDebugLevel: 0
   bIsDebug: 0
   p_pObjectTarget: {fileID: 929994557}
   p_pAnimationCurve:
@@ -3458,6 +3484,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 047769fe1b97e3a459bdc3fadaff00ce, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  p_eDebugLevel: 0
   bIsDebug: 0
   p_pObjectTarget: {fileID: 953677599}
   p_pAnimationCurve:
@@ -3581,6 +3608,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 73b3aaf10a06f1b4cab61aefb8bac71e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  p_eDebugLevel: 0
   _vecLocalPosOffset: {x: 2.59, y: 0, z: 0}
   _eCircleOption: 0
   _vecRotate_OnCircle: {x: 0, y: 0, z: 0}
@@ -3649,6 +3677,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 19262a84bee90b447b5e68b034874499, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  p_eDebugLevel: 0
   bIsDebug: 0
   p_pObjectTarget: {fileID: 1057638337}
   p_pAnimationCurve:
@@ -3853,6 +3882,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 19262a84bee90b447b5e68b034874499, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  p_eDebugLevel: 0
   bIsDebug: 0
   p_pObjectTarget: {fileID: 1314395494}
   p_pAnimationCurve:
@@ -3908,6 +3938,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 95c736c08eacd9b4c80b4d3063be3f39, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  p_eDebugLevel: 0
   bIsDebug: 0
   p_pObjectTarget: {fileID: 1314395494}
   p_pAnimationCurve:
@@ -4059,6 +4090,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 95c736c08eacd9b4c80b4d3063be3f39, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  p_eDebugLevel: 0
   bIsDebug: 0
   p_pObjectTarget: {fileID: 1328098734}
   p_pAnimationCurve:
@@ -4345,6 +4377,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 047769fe1b97e3a459bdc3fadaff00ce, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  p_eDebugLevel: 0
   bIsDebug: 0
   p_pObjectTarget: {fileID: 1446798281}
   p_pAnimationCurve:
@@ -4484,6 +4517,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 19262a84bee90b447b5e68b034874499, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  p_eDebugLevel: 0
   bIsDebug: 0
   p_pObjectTarget: {fileID: 1460341079}
   p_pAnimationCurve:
@@ -4625,6 +4659,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 19262a84bee90b447b5e68b034874499, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  p_eDebugLevel: 0
   bIsDebug: 0
   p_pObjectTarget: {fileID: 1529526680}
   p_pAnimationCurve:
@@ -4750,6 +4785,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 73b3aaf10a06f1b4cab61aefb8bac71e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  p_eDebugLevel: 0
   _vecLocalPosOffset: {x: 2.59, y: 0, z: 0}
   _eCircleOption: 0
   _vecRotate_OnCircle: {x: 0, y: 0, z: 0}
@@ -4965,6 +5001,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 95c736c08eacd9b4c80b4d3063be3f39, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  p_eDebugLevel: 0
   bIsDebug: 0
   p_pObjectTarget: {fileID: 1683758142}
   p_pAnimationCurve:
@@ -5130,6 +5167,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 19262a84bee90b447b5e68b034874499, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  p_eDebugLevel: 0
   bIsDebug: 0
   p_pObjectTarget: {fileID: 1705992649}
   p_pAnimationCurve:
@@ -5185,6 +5223,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 95c736c08eacd9b4c80b4d3063be3f39, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  p_eDebugLevel: 0
   bIsDebug: 0
   p_pObjectTarget: {fileID: 1705992649}
   p_pAnimationCurve:
@@ -5320,6 +5359,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 73b3aaf10a06f1b4cab61aefb8bac71e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  p_eDebugLevel: 0
   _vecLocalPosOffset: {x: 2.59, y: 0, z: 0}
   _eCircleOption: 0
   _vecRotate_OnCircle: {x: 0, y: 0, z: 0}
@@ -5386,6 +5426,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 19262a84bee90b447b5e68b034874499, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  p_eDebugLevel: 0
   bIsDebug: 0
   p_pObjectTarget: {fileID: 1765687700}
   p_pAnimationCurve:
@@ -5441,6 +5482,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 95c736c08eacd9b4c80b4d3063be3f39, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  p_eDebugLevel: 0
   bIsDebug: 0
   p_pObjectTarget: {fileID: 1765687700}
   p_pAnimationCurve:
@@ -5592,6 +5634,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 95c736c08eacd9b4c80b4d3063be3f39, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  p_eDebugLevel: 0
   bIsDebug: 0
   p_pObjectTarget: {fileID: 1892344654}
   p_pAnimationCurve:
@@ -5807,6 +5850,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: efb35cbbc4d149749beb079f84ad5ee4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  p_eDebugLevel: 0
   bPrintDebug: 0
   p_bIsAlwaysShow: 0
   p_bIsFixedSortOrder: 0
@@ -5838,6 +5882,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 73b3aaf10a06f1b4cab61aefb8bac71e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  p_eDebugLevel: 0
   _vecLocalPosOffset: {x: 2.59, y: 0, z: 0}
   _eCircleOption: 0
   _vecRotate_OnCircle: {x: 0, y: 0, z: 0}
