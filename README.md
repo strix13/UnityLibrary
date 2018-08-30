@@ -270,7 +270,7 @@ NGUI 트위너에 없는 기능으로
   - Rotation의 경우 Vector Lerp를 사용할 것인지 Quaternion Lerp을 사용할 것인지
   - Radiaul Direction Objects Tween
   - 어느 트윈을 어떻게 사용하는지 일부 Gizmo 지원
-  -
+
   - 그 외 쉬운 확장 ( CTweenBase를 상속받아 몇개의 함수만 구현하면 끝 [Tween Scale 참고](https://github.com/strix13/UnityLibrary/blob/master/01.CoreCode/Tween/CTweenScale.cs) )
 
 ---

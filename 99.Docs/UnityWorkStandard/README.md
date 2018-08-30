@@ -2,10 +2,9 @@
 
 - 이 문서의 깃허브 링크 :
 https://github.com/strix13/UnityLibrary/tree/master/99.Docs/UnityWorkStandard
----
-
-제가 작업한 작업물들은 이 문서에 있는 워킹 스탠다드를 따라 작업하였습니다.
-워킹 스탠다드는 제가 경험하면서 효율적인것은 따르고, 따르다가 비효율적인 것은 버리기도 하였습니다.
+-
+- 제가 작업한 작업물들은 이 문서에 있는 워킹 스탠다드를 따라 작업하였습니다.
+- 워킹 스탠다드는 제가 경험하면서 효율적인것은 따르고, 따르다가 비효율적인 것은 버리기도 하였습니다.
 
 
 ---
@@ -13,8 +12,8 @@ https://github.com/strix13/UnityLibrary/tree/master/99.Docs/UnityWorkStandard
 
 - 폴더부터 코드 네이밍, 코드 변수 및 함수 정의 위치, 유니티 오브젝트 네이밍 및 하이어라키까지 정하는 편입니다.
   - 이에 대해 항상 부가 설명을 하자면, 프로그래밍은 개발보다 유지보수 비용이 훨씬 크다고 생각합니다.
-  - 또한, **담당자에게 물어보지 않고 스스로 예측 가능 하는 것을 최고로 생각** 하고 있습니다.
-    - 부가 설명을 더 하자면, 현실의 방의 예를 듭니다. 아무리 어두운 방이라도, 우리는 항상 **문고리가 어느 위치쯤에 있는지, 전등 스위치가 문 주변의 벽에 있다는 점을 누가 알려주지 않아도 스스로 예측** 할 수 있습니다.
+  - 또한, **담당자에게 물어보지 않고 스스로 예측 가능** 하는 것을 최고로 생각 하고 있습니다.
+    - 부가 설명을 더 하자면, 현실의 방의 예를 듭니다. 아무리 어두운 방이라도, 우리는 항상 문고리가 어느 위치쯤에 있는지, 전등 스위치가 문 주변의 벽에 있다는 점을 누가 알려주지 않아도 **스스로 예측** 할 수 있습니다.
   - 이런식으로 네이밍을 하면, 어느 클래스의 이름만 보아도 어느 계층의 어느 패턴을 상속받은 클래스라는 점, 어느 함수의 이름만 보아도 어느 위치에 있는 지를 **스스로 예측** 할 수 있습니다.
 
 - ``깨진 창문``을 주의하기 위하여 클린코드의 ``나중은 오지 않는다``(르블랑의 법칙)와, ``왔을 때보다 좀 더 깔끔하게``보이 스카웃 법칙을 따르도록 노력하는 편입니다.
@@ -47,7 +46,7 @@ https://github.com/strix13/UnityLibrary/tree/master/99.Docs/UnityWorkStandard
 - 프로젝트 뷰의 경우 폴더 앞에 숫자를 사용하여 폴더를 상단에 배치할 수 있습니다.
 - 하이어라키 뷰의 경우 자식 순서나 컴포넌트의 순서를 상단에 배치할 수 있습니다.
 
-1-3. 한 공간 안에 5개 이상의 요소가 있을 경우, 카테고리를 하나 만들어 분류합니다.
+1-3. 한 공간 안에 5개 이상의 요소가 있을 경우, 되도록이면 카테고리를 하나 만들어 분류합니다.
 
 - 프로젝트 뷰의 경우 카테고리 성격의 폴더를 생성합니다.
 - 하이어라키 뷰의 경우 카테고리 성격의 Empty Game Object를 생성합니다.
@@ -229,12 +228,9 @@ const string const_strSomthing = "";
 
 6-4. 가급적이면 매직넘버를 쓰지 말고 상수를 선언합니다.
 ```csharp
-{
 	// int iClockMaximum = 24;
-
 	const int const_iClockMaximum;
 	int iClockMaximum = const_iClockMaximum;
-}
 ```
 
 6-5. event 명명법의 경우 p_Event_ + 기능으로 작명합니다.
@@ -242,10 +238,16 @@ const string const_strSomthing = "";
   - `p_`만 작성 후에 Visual Studio의 자동 완성(인텔리센스) 기능을 활용하기 위함입니다.
 
 ```csharp
-	delegate void OnChangeClock(int iHour, int iMinute);
-	event OnChangeClock p_Event_OnChangeClock;
+delegate void OnChangeClock(int iHour, int iMinute);
+event OnChangeClock p_Event_OnChangeClock;
 ```
 
+6-6. int 혹은 float의 경우 제한이 있으면 그 제한을 명시합니다.
+```csharp
+int iPercent_1_100;
+float fProgress_0_1;
+int iCardCount_1_5;
+```
 
 ---
 ## 7. 스크립팅 - 함수
