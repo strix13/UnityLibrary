@@ -26,7 +26,7 @@ https://github.com/strix13/UnityLibrary
 
 [![Video Label](http://img.youtube.com/vi/xuhKn5H6ck4/0.jpg)](https://www.youtube.com/watch?v=xuhKn5H6ck4=0s)
 
-### ㄴ 이미지를 클릭하시면 유튜브에서 비디오를 시청하실 수 있습니다. ( 영상은 GetComponent Attribute를 통해 컴포넌트를 얻은 것과 Update Object 를 사용한 예시입니다.)
+### ㄴ 이미지를 클릭하시면 유튜브에서 비디오를 시청하실 수 있습니다.
 
 
 
