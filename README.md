@@ -16,10 +16,10 @@ https://github.com/strix13/UnityLibrary
 ---
 # 목차
 - [루트 클래스](https://github.com/strix13/UnityLibrary#%EB%A3%A8%ED%8A%B8-%ED%81%B4%EB%9E%98%EC%8A%A4)
-- [UI Panel 시스템 (NGUI 래핑, UGUI 래핑)](https://github.com/strix13/UnityLibrary#ui-%ED%81%B4%EB%9E%98%EC%8A%A4-%EA%B4%80%EA%B3%84%EB%8F%84)
+- [UI Panel 시스템 (NGUI 래핑, UGUI 래핑)](https://github.com/strix13/UnityLibrary#ui-panel)
 - [로컬라이징 시스템](https://github.com/strix13/UnityLibrary#%EB%A1%9C%EC%BB%AC-%EB%9D%BC%EC%9D%B4%EC%A7%95-%EC%8B%9C%EC%8A%A4%ED%85%9C)
-- [사운드 시스템](https://github.com/strix13/UnityLibrary#%EC%82%AC%EC%9A%B4%EB%93%9C-%EC%8B%9C%EC%8A%A4%ED%85%9C-%ED%81%B4%EB%9E%98%EC%8A%A4-%EA%B4%80%EA%B3%84%EB%8F%84)
-- [이펙트 시스템](https://github.com/strix13/UnityLibrary#%EC%9D%B4%ED%8E%99%ED%8A%B8-%EC%8B%9C%EC%8A%A4%ED%85%9C-%ED%81%B4%EB%9E%98%EC%8A%A4-%EA%B4%80%EA%B3%84%EB%8F%84)
+- [사운드 시스템](https://github.com/strix13/UnityLibrary#%EC%82%AC%EC%9A%B4%EB%93%9C-%EC%8B%9C%EC%8A%A4%ED%85%9C)
+- [이펙트 시스템](https://github.com/strix13/UnityLibrary#%EC%9D%B4%ED%8E%99%ED%8A%B8-%EC%8B%9C%EC%8A%A4%ED%85%9C)
 - [유니티 마크다운 뷰어](https://github.com/strix13/UnityLibrary#%EC%9C%A0%EB%8B%88%ED%8B%B0-%EB%A7%88%ED%81%AC%EB%8B%A4%EC%9A%B4-%EB%B7%B0%EC%96%B4)
 - [유니티 로그 래핑 클래스](https://github.com/strix13/UnityLibrary#%EC%9C%A0%EB%8B%88%ED%8B%B0-%EB%A1%9C%EA%B7%B8-%EB%9E%98%ED%95%91-%ED%81%B4%EB%9E%98%EC%8A%A4)
 - [랜덤 관련 클래스](https://github.com/strix13/UnityLibrary#%EB%9E%9C%EB%8D%A4-%EA%B4%80%EB%A0%A8-%ED%81%B4%EB%9E%98%EC%8A%A4)
