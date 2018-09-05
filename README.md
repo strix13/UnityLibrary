@@ -63,19 +63,16 @@ https://blogfiles.pstatic.net/MjAxODA1MDVfNSAg/MDAxNTI1NDk2MjEzMzk4.YBGR9hSvFoGq
 
 - 구조는 크게 Manager, Panel로 이루어져 있으며 Manager는 Panel을 관리하는 싱글톤 패턴입니다.
 - NGUI 버젼, UGUI 버젼을 구분하였으며 모두 같은 클래스와 인터페이스를 상속받게 하였습니다.
--
 - **Manager 주요 기능**
   - Singleton - 언제 어디서든 호출 가능
   - Panel의 Show, Hide 함수 지원
       - Sorting Layer 관리
       - Show, Hide Animation Coroutine 지원
-  -
   - Panel FadeIn / Out 효과 지원
   - 해당 Panel Class Get 지원
 
 ---
 - Panel의 경우 NGUI로는 NGUIPanel, UGUI로는 Canvas 단위로 된 하나의 Window 단위 입니다.
--
 - **Panel 주요 기능**
   - 하위 **UI Element의 이벤트 ( 버튼, DropItem, Input 입력 ) 등을 쉽게 override하여 쉽게 사용할 수 있도록 지원**
   - **UI Element를 쉽게 Get** 할 수 있도록 지원
@@ -131,7 +128,6 @@ https://postfiles.pstatic.net/MjAxODA1MDZfODIg/MDAxNTI1NTg2NjI4NDg5.2-piThykc2EW
 
 
 - 사운드 시스템의 경우, SoundManager가 SoundSlot 클래스를 관리하며, 스크립트 혹은 Sound Player를 통해 사운드를 재생합니다.
--
 - **사운드 매니져 주요 기능**
   - Singleton - 언제 어디서든지 호출 가능
   - SoundSlot을 통해 AudioClip 재생, SoundSlot은 풀링
@@ -307,7 +303,7 @@ NGUI 트위너에 없는 기능으로
 https://github.com/strix13/UnityLibrary/tree/master/99.Docs/UnityWorkStandard
 
 
-### 개발자 연락처
+### 개발자 연락 및 활동처
 
 - 카카오톡 ( 유니티 개발자 모임 ) : https://open.kakao.com/o/gOi17az
 
