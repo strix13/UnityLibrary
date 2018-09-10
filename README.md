@@ -29,12 +29,6 @@ https://github.com/strix13/UnityLibrary
 ---
 ## [루트 클래스](https://github.com/strix13/UnityLibrary#%EB%AA%A9%EC%B0%A8)
 
-![](https://postfiles.pstatic.net/MjAxODA1MDdfMjEx/MDAxNTI1NjY0ODU2NTc2.pl7EYZNbYzETHR2t9lPE6O2b6gp9eBCOSWRDpAQmvrEg.km7IoWpo9ucfK6lREhRdZ_gEbi_QIkF0QLRt_lxJZ_0g.JPEG.strix13/StrixLibrary_-_%EB%A3%A8%ED%8A%B8_%ED%81%B4%EB%9E%98%EC%8A%A4.jpg?type=w773)
-
-### ㄴ 이미지를 클릭하시면 확대하실 수 있습니다.
-
-
-
 [![Video Label](http://img.youtube.com/vi/xuhKn5H6ck4/0.jpg)](https://www.youtube.com/watch?v=xuhKn5H6ck4=0s)
 
 ### ㄴ 이미지를 클릭하시면 유튜브에서 비디오를 시청하실 수 있습니다.
@@ -48,7 +42,7 @@ https://github.com/strix13/UnityLibrary
   - GetComponentAttribute 지원 ( Awake, Inspector 등에서 할당하지 않고 Attribute로 한줄 작성 )
   - 자체적인 Update를 통해 Update를 사용하는 Object의 실시간 개수 파악과 퍼포먼스 개선
 
-- [작성한 코드 및 좀 더 알아 보기 링크](https://github.com/strix13/UnityLibrary/tree/master/01.CoreCode/ObjectBase)
+- [작성한 코드 및 좀 더 알아보기 링크](https://github.com/strix13/UnityLibrary/tree/master/01.CoreCode/ObjectBase)
 
 ---
 ## [UI Panel](https://github.com/strix13/UnityLibrary#%EB%AA%A9%EC%B0%A8)
@@ -63,6 +57,8 @@ https://blogfiles.pstatic.net/MjAxODA1MDVfNSAg/MDAxNTI1NDk2MjEzMzk4.YBGR9hSvFoGq
 
 - 구조는 크게 Manager, Panel로 이루어져 있으며 Manager는 Panel을 관리하는 싱글톤 패턴입니다.
 - NGUI 버젼, UGUI 버젼을 구분하였으며 모두 같은 클래스와 인터페이스를 상속받게 하였습니다.
+- Panel의 경우 NGUI로는 NGUIPanel, UGUI로는 Canvas 단위로 된 하나의 Window 단위 입니다.
+
 - **Manager 주요 기능**
   - Singleton - 언제 어디서든 호출 가능
   - Panel의 Show, Hide 함수 지원
@@ -71,28 +67,17 @@ https://blogfiles.pstatic.net/MjAxODA1MDVfNSAg/MDAxNTI1NDk2MjEzMzk4.YBGR9hSvFoGq
   - Panel FadeIn / Out 효과 지원
   - 해당 Panel Class Get 지원
 
----
-- Panel의 경우 NGUI로는 NGUIPanel, UGUI로는 Canvas 단위로 된 하나의 Window 단위 입니다.
 - **Panel 주요 기능**
   - 하위 **UI Element의 이벤트 ( 버튼, DropItem, Input 입력 ) 등을 쉽게 override하여 쉽게 사용할 수 있도록 지원**
   - **UI Element를 쉽게 Get** 할 수 있도록 지원
   - OnShow / OnHide의 이벤트가 있으며, **Show / Hide 시 코루틴이 동작합니다. ( 애니메이션을 기다리기 위함, 코루틴 끝날 때 콜백 지원 )**
 
----
 - [작성한 UI 베이스 코드 링크](https://github.com/strix13/UnityLibrary/tree/master/02.UI)
 - [작성한 UGUI 베이스 코드 링크](https://github.com/strix13/UnityLibrary/tree/master/03.UGUI)
 - [작성한 NGUI 베이스 코드 링크](https://github.com/strix13/UnityLibrary/tree/master/10.ExternalLibraryWrapper/NGUI)
 
 ---
 ## [로컬 라이징 시스템](https://github.com/strix13/UnityLibrary#%EB%AA%A9%EC%B0%A8)
-
-![](
-https://postfiles.pstatic.net/MjAxODA1MDdfMTUg/MDAxNTI1NjYxNjYzOTMw.uTGH7T0d2IFz7o5BHMhKqZndkZY1_XN_N9HF4FBF9VMg.hGGB_GJmzsuWrqreBhTW40fd806yUgnS4LFqL6gUlmkg.JPEG.strix13/StrixLibrary_-_%EB%A1%9C%EC%BB%AC%EB%9D%BC%EC%9D%B4%EC%A7%95_%EC%8B%9C%EC%8A%A4%ED%85%9C_%ED%81%B4%EB%9E%98%EC%8A%A4_%EA%B4%80%EA%B3%84%EB%8F%84.jpg?type=w773)
-
-### ㄴ 이미지를 클릭하시면 확대하실 수 있습니다.
-
-
-
 
 [![Video Label](http://img.youtube.com/vi/mLQMwqKgh4I/0.jpg)](https://www.youtube.com/watch?v=mLQMwqKgh4I=0s)
 
@@ -107,47 +92,17 @@ https://postfiles.pstatic.net/MjAxODA1MDdfMTUg/MDAxNTI1NjYxNjYzOTMw.uTGH7T0d2IFz
 
 - 작성한 Text, Sprite 컴포넌트 외에 이벤트를 받고 싶으면 ILocalizeListner를 구현하고, Manager에 등록하면 됩니다.
 
-- [작성한 코드 링크](https://github.com/strix13/UnityLibrary/tree/master/01.CoreCode/Localize)
+- [작성한 코드 및 더 알아보기 링크](https://github.com/strix13/UnityLibrary/tree/master/01.CoreCode/Localize)
 
 ---
 ## [사운드 시스템](https://github.com/strix13/UnityLibrary#%EB%AA%A9%EC%B0%A8)
-
-![](
-https://postfiles.pstatic.net/MjAxODA1MDZfODIg/MDAxNTI1NTg2NjI4NDg5.2-piThykc2EWXJVPdEQUx0FlQ9PoSANx5ZLP1S8-KWwg.vvcEPNS5G5_jlnjJqcXHSgF2I94o_bMPaWWPa4537BEg.JPEG.strix13/StrixLibrary_-_%EC%82%AC%EC%9A%B4%EB%93%9C_%EC%8B%9C%EC%8A%A4%ED%85%9C_%ED%81%B4%EB%9E%98%EC%8A%A4_%EA%B4%80%EA%B3%84%EB%8F%84.jpg?type=w773)
-
-### ㄴ 이미지를 클릭하시면 확대하실 수 있습니다.
-
-
-
 
 [![Video Label](http://img.youtube.com/vi/TN145PFwvkI/0.jpg)](https://www.youtube.com/watch?v=TN145PFwvkI=0s)
 
 ### ㄴ 이미지를 클릭하시면 유튜브에서 비디오를 시청하실 수 있습니다.
 
-
-
-
 - 사운드 시스템의 경우, SoundManager가 SoundSlot 클래스를 관리하며, 스크립트 혹은 Sound Player를 통해 사운드를 재생합니다.
-- **사운드 매니져 주요 기능**
-  - Singleton - 언제 어디서든지 호출 가능
-  - SoundSlot을 통해 AudioClip 재생, SoundSlot은 풀링
-  - 현재 설정된 BGM Volume, Game Effect Volume, 몇개의 SoundSlot이 플레이 중인지 지원 [ Editor Only ]
-  - Sound의 Mute, FadeIn, Out 지원
-  - 그룹을 설정하여 랜덤 Sound 플레이 기능
-
----
-- **사운드 슬롯 주요 기능**
-  - AudioSource 래핑한 클래스
-  - Local Volume, AudioClip이 끝날 때 Event 통지
-  - 현재 재생중인지, 총 몇초 중 몇초 플레이 중인지 지원 [ Editor Only ]
----
-- **사운드 플레이어 주요 기능**
-  - 인스펙터에 세팅하여 유니티 주요 이벤트 ( Awake, Enable, Disable 등 )시에 사운드 재생
-  - Key(string) - AudioClip 로 세팅하여 한 플레이어에 임의의 AudioClip 실행 가능
-  - 어떤 사운드 슬롯을 통해 실행되는지 확인 가능 [ Editor Only ]
-  - 현재 재생중인지 지원 [ Editor Only ]
-
-- [작성한 코드 링크](https://github.com/strix13/UnityLibrary/tree/master/01.CoreCode/Sound)
+- [작성한 코드 및 더 알아보기 링크](https://github.com/strix13/UnityLibrary/tree/master/01.CoreCode/Sound)
 
 ---
 ## [이펙트 시스템](https://github.com/strix13/UnityLibrary#%EB%AA%A9%EC%B0%A8)
@@ -164,20 +119,9 @@ https://postfiles.pstatic.net/MjAxODA1MDZfMzUg/MDAxNTI1NjEwMDU3MjQz.az-Y7SxCGDV-
 
 ### ㄴ 이미지를 클릭하시면 유튜브에서 비디오를 시청하실 수 있습니다.
 
-
-
-
 - 이펙트 시스템은 사운드 시스템과 비슷한 설계입니다. 매니져와, 리소스 래퍼와, 플레이어로 이루어져 있습니다.
 
-- Manager 주요 기능
-  - Effect 풀링
-  - 현재 몇개의 Effect가 플레이 중이고, 몇개를 생성했는지 지원
----
-- CEffect 주요 기능
-  - NGUI, Spine, Particle System을 지원.
-  - 이펙트가 끝날 때 이벤트 통보를 지원.
-
-- [작성한 코드 및 좀 더 알아 보기 링크 링크](https://github.com/strix13/UnityLibrary/tree/master/01.CoreCode/Effect)
+- [작성한 코드 및 좀 더 알아보기 링크](https://github.com/strix13/UnityLibrary/tree/master/01.CoreCode/Effect)
 
 ---
 ## [유니티 마크다운 뷰어](https://github.com/strix13/UnityLibrary#%EB%AA%A9%EC%B0%A8)
