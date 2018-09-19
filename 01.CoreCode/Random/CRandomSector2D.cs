@@ -7,13 +7,13 @@ using System.Collections.Generic;
    Description : 
    ============================================ */
 
-public class CRandomSector2D : MonoBehaviour
+public class CRandomSector2D : CObjectBase
 {
 	/* const & readonly declaration             */
 
 	/* enum & struct declaration                */
 
-	public enum ESectorArroundCheckOption
+	public enum ESectorAroundCheckOption
 	{
 		None,
 		//Side,
@@ -34,7 +34,7 @@ public class CRandomSector2D : MonoBehaviour
 			this.iY = iY;
 		}
 
-		public bool CheckIsEqual(ref SSectorIndex pTargetSectorIndex)
+		public bool CheckIsEqual(SSectorIndex pTargetSectorIndex)
 		{
 			return (iX == pTargetSectorIndex.iX && iY == pTargetSectorIndex.iY);
 		}
@@ -56,14 +56,13 @@ public class CRandomSector2D : MonoBehaviour
 
 	[Header( "주변 섹터에 생성 금지 옵션" )]
 	[SerializeField]
-	private ESectorArroundCheckOption eCheckOption = ESectorArroundCheckOption.None;
+	private ESectorAroundCheckOption eCheckOption = ESectorAroundCheckOption.None;
 
 	/* protected - Variable declaration         */
 
 	/* private - Variable declaration           */
 
-	private Dictionary<int, SSectorIndex> _mapUseSector = new Dictionary<int, SSectorIndex>();
-	private HashSet<SSectorIndex> _setCheckSector = new HashSet<SSectorIndex>();
+	private Dictionary<int, HashSet<SSectorIndex>> _mapUseSector = new Dictionary<int, HashSet<SSectorIndex>>();
 
 	private float _fSectorTotalPos_Right;
 	private float _fSectorTotalPos_Down;
@@ -79,19 +78,19 @@ public class CRandomSector2D : MonoBehaviour
 	/* public - [Do] Function
      * 외부 객체가 호출                         */
 
-	public Vector2 GetRandomSector( )
+	public Vector2 GetRandomPosition_UseCheckOption( )
 	{
-		return GetRandomPosition();
+        return ProcCheckEmptySector(GetInstanceID(), true);
 	}
 
-	public Vector2 GetRandomSector(MonoBehaviour pTarget)
+	public Vector2 GetRandomPosition_UseCheckOption(MonoBehaviour pTarget)
 	{
-		return ProcCheckEmptySector( pTarget.GetInstanceID());
+		return ProcCheckEmptySector( pTarget.GetInstanceID(), false);
 	}
 
-	public Vector2 GetRandomSector( int iObjectID )
+	public Vector2 GetRandomPosition_UseCheckOption( int iObjectID )
 	{
-		return ProcCheckEmptySector( iObjectID);
+		return ProcCheckEmptySector( iObjectID, false);
 	}
 
 	public void DoRemoveUseSector( MonoBehaviour pTarget )
@@ -112,33 +111,37 @@ public class CRandomSector2D : MonoBehaviour
 		return new Vector2(fRandX, fRandY);
 	}
 
-	/* public - [Event] Function             
+    /* public - [Event] Function             
        프랜드 객체가 호출                       */
 
-	// ========================================================================== //
+    // ========================================================================== //
 
-	/* protected - [abstract & virtual]         */
+    /* protected - [abstract & virtual]         */
 
-	/* protected - [Event] Function           
+    /* protected - [Event] Function           
        자식 객체가 호출                         */
 
-	/* protected - Override & Unity API         */
+    /* protected - Override & Unity API         */
 
-    private void Awake()
+    protected override void OnAwake()
     {
-		_fSectorTotalPos_Up = _pTrans_RightUp.position.y;
-		_fSectorTotalPos_Down = _pTrans_LeftDown.position.y;
+        base.OnAwake();
 
-		_fSectorTotalPos_Left = _pTrans_LeftDown.position.x;
-		_fSectorTotalPos_Right = _pTrans_RightUp.position.x;
+        _fSectorTotalPos_Up = _pTrans_RightUp.position.y;
+        _fSectorTotalPos_Down = _pTrans_LeftDown.position.y;
 
-		_fSectorUnit_X = Mathf.Abs(_fSectorTotalPos_Right - _fSectorTotalPos_Left) / _iSectorDivision_X;
-		_fSectorUnit_Y = Mathf.Abs(_fSectorTotalPos_Up - _fSectorTotalPos_Down) / _iSectorDivision_Y;
-	}
+        _fSectorTotalPos_Left = _pTrans_LeftDown.position.x;
+        _fSectorTotalPos_Right = _pTrans_RightUp.position.x;
 
-	private void OnDrawGizmosSelected()
+        _fSectorUnit_X = Mathf.Abs(_fSectorTotalPos_Right - _fSectorTotalPos_Left) / _iSectorDivision_X;
+        _fSectorUnit_Y = Mathf.Abs(_fSectorTotalPos_Up - _fSectorTotalPos_Down) / _iSectorDivision_Y;
+    }
+
+#if UNITY_EDITOR
+    private void OnDrawGizmosSelected()
 	{
-		Gizmos.color = Color.red;
+        EventOnAwake_Force();
+        Gizmos.color = Color.red;
 
 		float fDrawPosX = _fSectorTotalPos_Left;
 		float fDrawPos_StartY = _fSectorTotalPos_Up;
@@ -160,20 +163,26 @@ public class CRandomSector2D : MonoBehaviour
 			fDrawPosY += _fSectorUnit_Y;
 		}
 	}
+#endif
 
-	// ========================================================================== //
+    // ========================================================================== //
 
-	/* private - [Proc] Function             
+    /* private - [Proc] Function             
        중요 로직을 처리                         */
 
-	/* private - Other[Find, Calculate] Func 
+    /* private - Other[Find, Calculate] Func 
        찾기, 계산 등의 비교적 단순 로직         */
 
-	private Vector2 ProcCheckEmptySector(int iObjectID)
+    private Vector2 ProcCheckEmptySector(int iObjectID, bool bCheckOnlyOnce)
 	{
-		// 총길이(300) _arrPosition[(int)EVector2.X].x - 랜덤좌표(-115)
+        // 총길이(300) _arrPosition[(int)EVector2.X].x - 랜덤좌표(-115)
 
-		int iCount = 0;
+        if (_mapUseSector.ContainsKey(iObjectID) == false)
+            _mapUseSector.Add(iObjectID, new HashSet<SSectorIndex>());
+
+        HashSet<SSectorIndex> setCheckSector = _mapUseSector[iObjectID];
+
+        int iCount = 0;
 		while (iCount < 100)
 		{
 			Vector2 v2RandPos = GetRandomPosition();
@@ -181,16 +190,21 @@ public class CRandomSector2D : MonoBehaviour
 			sSectorIndex.iX = (int)(Mathf.Abs(_fSectorTotalPos_Right - v2RandPos.x) / _fSectorUnit_X);
 			sSectorIndex.iY = (int)(Mathf.Abs(_fSectorTotalPos_Up - v2RandPos.y) / _fSectorUnit_Y);
 
-			if (_mapUseSector.ContainsValue( sSectorIndex ) == false)
-			{
-				if (eCheckOption == ESectorArroundCheckOption.None || CheckArroundIs_AlreadyExistUnit( ref sSectorIndex ))
-				{
-					_mapUseSector.Add( iObjectID, sSectorIndex );
-					return v2RandPos;
-				}
-			}
+            if(setCheckSector.Contains(sSectorIndex) == false)
+            {
+                if (eCheckOption == ESectorAroundCheckOption.None || CheckIs_AlreadyUse_SectorAround(setCheckSector, sSectorIndex) == false)
+                {
+                    if (bCheckOnlyOnce)
+                        setCheckSector.Clear();
 
-			iCount++;
+                    setCheckSector.Add(sSectorIndex);
+                    AddCheckSector(setCheckSector, sSectorIndex);
+
+                    return v2RandPos;
+                }
+            }
+
+            iCount++;
 		}
 
 		if (iCount >= 100)
@@ -199,44 +213,71 @@ public class CRandomSector2D : MonoBehaviour
 		return Vector2.zero;
 	}
 
-	private bool CheckArroundIs_AlreadyExistUnit( ref SSectorIndex pSectorIndex)
+	private bool CheckIs_AlreadyUse_SectorAround(HashSet<SSectorIndex> setCheckSector, SSectorIndex pSectorIndex)
 	{
-		_setCheckSector.Clear();
-
-		if(eCheckOption == ESectorArroundCheckOption.FourWay)
+		if(eCheckOption == ESectorAroundCheckOption.FourWay)
 		{
-			for (int i = pSectorIndex.iX - 1; i < 3; i++)
+			for (int i = 0; i < 3; i++)
 			{
-				SSectorIndex sCurrentCheckSector = new SSectorIndex( i, pSectorIndex.iY );
-				if (pSectorIndex.CheckIsEqual( ref sCurrentCheckSector ) == false &&
-					_mapUseSector.ContainsValue( new SSectorIndex( i, pSectorIndex.iY ) ))
-					return false;
+                int iIndexX = pSectorIndex.iX - 1 + i;
+				if (setCheckSector.Contains( new SSectorIndex(iIndexX, pSectorIndex.iY ) ))
+					return true;
 			}
 
-			for (int i = pSectorIndex.iY - 1; i < 3; i++)
+			for (int i = 0; i < 3; i++)
 			{
-				SSectorIndex sCurrentCheckSector = new SSectorIndex( pSectorIndex.iX, i );
-				if (pSectorIndex.CheckIsEqual( ref sCurrentCheckSector ) == false &&
-					_mapUseSector.ContainsValue( new SSectorIndex( pSectorIndex.iX, i ) ))
-					return false;
+                int iIndexY = pSectorIndex.iY - 1 + i;
+				if (setCheckSector.Contains(new SSectorIndex(pSectorIndex.iX, iIndexY)))
+					return true;
 			}
 		}
-		else if(eCheckOption == ESectorArroundCheckOption.EightWay)
+		else if(eCheckOption == ESectorAroundCheckOption.EightWay)
 		{
-			for (int i = pSectorIndex.iX - 1; i < 3; i++)
+			for (int i = 0; i < 3; i++)
 			{
-				for (int j = pSectorIndex.iY - 1; j < 3; j++)
+				for (int j = 0; j < 3; j++)
 				{
-					SSectorIndex sCurrentCheckSector = new SSectorIndex( i, j );
-					if (pSectorIndex.CheckIsEqual( ref sCurrentCheckSector) == false &&
-						_mapUseSector.ContainsValue( new SSectorIndex( i, j ) ))
-						return false;
+                    int iIndexX = pSectorIndex.iX - 1 + i;
+                    int iIndexY = pSectorIndex.iY - 1 + j;
+
+                    if (setCheckSector.Contains(new SSectorIndex(iIndexX, iIndexY)))
+						return true;
 				}
 			}
 		}
 
-		return true;
+		return false;
 	}
+
+    private void AddCheckSector(HashSet<SSectorIndex> setCheckSector, SSectorIndex pSectorIndex)
+    {
+        if (eCheckOption == ESectorAroundCheckOption.FourWay)
+        {
+            for (int i = 0; i < 3; i++)
+            {
+                int iIndexX = pSectorIndex.iX - 1 + i;
+                setCheckSector.Add(new SSectorIndex(iIndexX, pSectorIndex.iY));
+            }
+
+            for (int i = 0; i < 3; i++)
+            {
+                int iIndexY = pSectorIndex.iY - 1 + i;
+                setCheckSector.Add(new SSectorIndex(pSectorIndex.iX, iIndexY));
+            }
+        }
+        else if (eCheckOption == ESectorAroundCheckOption.EightWay)
+        {
+            for (int i = 0; i < 3; i++)
+            {
+                for (int j = 0; j < 3; j++)
+                {
+                    int iIndexX = pSectorIndex.iX - 1 + i;
+                    int iIndexY = pSectorIndex.iY - 1 + j;
+                    setCheckSector.Add(new SSectorIndex(iIndexX, iIndexY));
+                }
+            }
+        }
+    }
 }
 
 #region Test

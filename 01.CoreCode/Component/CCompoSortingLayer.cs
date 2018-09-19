@@ -15,17 +15,11 @@
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
-#if UNITY_EDITOR
-using UnityEditor;
-using UnityEditorInternal;
-using System.Reflection;
-
-[ExecuteInEditMode]
-[System.Serializable]
-#endif
 
 // 참고 링크
 // https://answers.unity.com/questions/682285/editor-script-for-setting-the-sorting-layer-of-an.html
+[ExecuteInEditMode]
+[System.Serializable]
 public class CCompoSortingLayer : CObjectBase
 {
 	/* const & readonly declaration             */
@@ -89,10 +83,7 @@ public class CCompoSortingLayer : CObjectBase
 #if UNITY_EDITOR
     private void Update()
     {
-        if(Application.isPlaying)
-        {
-            SetSortingLayer();
-        }
+        SetSortingLayer();
     }
 #endif
 

@@ -21,22 +21,22 @@ using NUnit.Framework;
 using UnityEngine.TestTools;
 
 [System.Flags]
-public enum EDebugLevel
+public enum EDebugFilter
 {
     None = 0,
 
-    Core_Log = 1 << 1,
-    Core_Debug = 1 << 2,
-    Project_Log = 1 << 3,
-    Project_Debug = 1 << 4,
+    Log_Level_1 = 1 << 1,
+    Log_Level_2 = 1 << 2,
+    Debug_Level_1 = 1 << 5,
+    Debug_Level_2 = 1 << 6,
 }
 
 
 public class CObjectBase : MonoBehaviour, IUpdateAble
 {
     [SerializeField]
-    [Rename_Inspector("디버깅 레벨")]
-    protected EDebugLevel p_eDebugLevel = EDebugLevel.None;
+    [Rename_Inspector("디버깅 필터")]
+    protected EDebugFilter p_eDebugFilter = EDebugFilter.None;
 
     protected bool _bIsExcuteAwake = false;
     protected bool _bIsQuitApplciation = false;
@@ -104,8 +104,8 @@ public class CObjectBase : MonoBehaviour, IUpdateAble
 
     void OnEnable()
     {
-        Invoke("RegistUpdateObject", 1f);
-
+        //Invoke("RegistUpdateObject", 1f);
+        CManagerUpdateObject.instance.DoAddObject(this);
         OnEnableObject();
         if (_pCoroutineOnEnable != null)
             StopCoroutine(_pCoroutineOnEnable);
@@ -158,11 +158,11 @@ public class CObjectBase : MonoBehaviour, IUpdateAble
     virtual protected IEnumerator OnEnableObjectCoroutine() { yield break; }
     virtual protected void OnDisableObject() { }
 
-    public void OnUpdate() { bool bCheckUpdate = true; OnUpdate(ref bCheckUpdate); }
+    public void OnUpdate() { bool bIsCurrentUpdating = false; OnUpdate(ref bIsCurrentUpdating); }
     /// <summary>
     /// Unity Update와 동일한 로직입니다.
     /// </summary>
-    virtual public void OnUpdate(ref bool bCheckUpdateCount) { }
+    virtual public void OnUpdate(ref bool bIsCurrentUpdating) { }
 
     // ========================== [ Division ] ========================== //
 

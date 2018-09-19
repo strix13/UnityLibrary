@@ -131,13 +131,13 @@ public class CCompoEventTrigger : CObjectBase, IPointerClickHandler, IPointerDow
 	/* public - [Do] Function
      * 외부 객체가 호출                         */
 
-	public void DoRecieveMessage_OnShow()
+	public void OnUIEvent_Show()
 	{
 		if (p_eConditionType.ContainEnumFlag(EConditionTypeFlags.OnUIEvent_Show))
 			DoPlayEventTrigger();
 	}
 
-	public void DoRecieveMessage_OnHide()
+	public void OnUIEvent_Hide()
 	{
         if (p_eConditionType.ContainEnumFlag(EConditionTypeFlags.OnUIEvent_Hide))
 			DoPlayEventTrigger();

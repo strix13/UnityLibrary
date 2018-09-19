@@ -489,7 +489,7 @@ public class CCharacterController2D : CObjectBase
         {
             if (p_vecWallJumpClimb.Equals(Vector3.zero) == false)
             {
-                if (p_eDebugLevel.ContainEnumFlag(EDebugLevel.Project_Debug))
+                if (p_eDebugFilter.ContainEnumFlag(EDebugFilter.Debug_Level_1))
                     Debug.Log(name + " WallJumpClimb", this);
 
 
@@ -500,7 +500,7 @@ public class CCharacterController2D : CObjectBase
         {
             if (p_vecWallLeap.Equals(Vector3.zero) == false)
             {
-                if (p_eDebugLevel.ContainEnumFlag(EDebugLevel.Project_Debug))
+                if (p_eDebugFilter.ContainEnumFlag(EDebugFilter.Debug_Level_1))
                     Debug.Log(name + " WallJumpLeap", this);
 
                 vecClimbJump = p_vecWallLeap;
@@ -549,7 +549,7 @@ public class CCharacterController2D : CObjectBase
         if (_pRigidbody == null || _pCollider_Leg == null || (p_bUseCrouching && _pTransform_CeilingCheck == null))
             EventOnAwake_Force();
 
-        if (p_eDebugLevel.ContainEnumFlag(EDebugLevel.Project_Debug))
+        if (p_eDebugFilter.ContainEnumFlag(EDebugFilter.Debug_Level_1))
         {
             bool bHitGround = false;
             Collider2D pColliderTerrain = null;

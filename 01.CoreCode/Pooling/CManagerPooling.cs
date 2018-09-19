@@ -240,8 +240,9 @@ public class CManagerPooling<ENUM_Resource_Name, Class_Resource> : CSingletonNot
 
     public void OnUpdate(ref bool bCheckUpdateCount)
     {
-        bCheckUpdateCount = true;
-        _pTransManager.name = p_strManagerName;
+        bCheckUpdateCount = p_ObjectParents != null;
+        if(bCheckUpdateCount)
+            _pTransManager.name = p_strManagerName;
     }
 #endif
 
@@ -282,6 +283,8 @@ public class CManagerPooling<ENUM_Resource_Name, Class_Resource> : CSingletonNot
         string strEnumName = pType_Enum.Name;
         string strClassName = pType_Class.Name;
 
+        _mapResourceOrigin.Clear();
+        _mapResourceOriginCopy.Clear();
         for (int i = 0; i < listObject.Count; i++)
         {
             ENUM_Resource_Name eResourceName = default(ENUM_Resource_Name);

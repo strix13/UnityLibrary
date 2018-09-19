@@ -259,10 +259,13 @@ public class CAnimatorController : CObjectBase, IAnimationController
 		_bIsLoop = bIsLoop;
 		_fCurrentAnimation_NomalizeTime = 0f;
 
-        if (_pCoroutine != null)
-            StopCoroutine(_pCoroutine);
-        _pCoroutine = StartCoroutine(CoUpdateAnimation());
-	}
+        if(_bIsLoop || _OnFinishAnimation != null)
+        {
+            if (_pCoroutine != null)
+                StopCoroutine(_pCoroutine);
+            _pCoroutine = StartCoroutine(CoUpdateAnimation());
+        }
+    }
 
 	private IEnumerator CoDelayPlayAnimation( string strAnimationName, bool bIsLoop, int iAnimationLayer )
 	{

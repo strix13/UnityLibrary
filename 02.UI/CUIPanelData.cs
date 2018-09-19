@@ -121,9 +121,10 @@ abstract public partial class CManagerUIBase<CLASS_Instance, ENUM_Panel_Name, CL
 
 		protected IEnumerator CoProcShowPanel( int iSortOrder )
 		{
-			// if (_bIsShowCurrent) yield break;
+            // if (_bIsShowCurrent) yield break;
 
-			_bIsShowCurrent = true;
+            _pPanel.gameObject.SendMessage("OnUIEvent_Show", SendMessageOptions.DontRequireReceiver);
+            _bIsShowCurrent = true;
 			_bIsPlayUIAnimation = true;
 			yield return _pPanel.StartCoroutine( _pPanel.IUIPanel_OnShowPanel_PlayingAnimation( iSortOrder ) );
 			_bIsPlayUIAnimation = false;
@@ -137,7 +138,8 @@ abstract public partial class CManagerUIBase<CLASS_Instance, ENUM_Panel_Name, CL
 
 		protected IEnumerator CoProcHidePanel(bool bAnimationPlay)
 		{
-			if(bAnimationPlay)
+            _pPanel.gameObject.SendMessage("OnUIEvent_Hide", SendMessageOptions.DontRequireReceiver);
+            if (bAnimationPlay)
 			{
 				_bIsPlayUIAnimation = true;
 				yield return _pPanel.StartCoroutine( _pPanel.IUIPanel_OnHidePanel_PlayingAnimation() );

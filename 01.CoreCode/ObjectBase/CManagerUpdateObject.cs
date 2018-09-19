@@ -34,7 +34,7 @@ public class CManagerUpdateObject : CSingletonSOBase<CManagerUpdateObject>
     /* protected & private - Field declaration         */
 
 #if UNITY_EDITOR
-#if OdinInspector
+#if ODIN_INSPECTOR
     [Sirenix.OdinInspector.ShowInInspectorAttribute]
 #endif
     public List<IUpdateAble> _listObject_ForDebug = new List<IUpdateAble>();
@@ -43,8 +43,6 @@ public class CManagerUpdateObject : CSingletonSOBase<CManagerUpdateObject>
 
     static private LinkedList<IUpdateAble> g_listObject = new LinkedList<IUpdateAble>();
     static private HashSet<IUpdateAble> g_setUpdateObject = new HashSet<IUpdateAble>();
-
-    LinkedList<IUpdateAble> _listDelete = new LinkedList<IUpdateAble>();
 
     GameObject _pObjectManager;
     int _iPrevObjectCount;
@@ -95,7 +93,6 @@ public class CManagerUpdateObject : CSingletonSOBase<CManagerUpdateObject>
     {
         while (true)
         {
-            _listDelete.Clear();
             int iUpdateObjectCount = 0;
             int iLoopCount = g_listObject.Count;
             var pNode = g_listObject.First;
@@ -106,18 +103,10 @@ public class CManagerUpdateObject : CSingletonSOBase<CManagerUpdateObject>
                 pNode.Value.OnUpdate(ref bCheckUpdate);
                 if (bCheckUpdate)
                     ++iUpdateObjectCount;
-                else
-                    _listDelete.AddLast(pNode.Value);
 
                 pNode = pNode.Next;
             }
 
-            pNode = _listDelete.First;
-            while (pNode != null)
-            {
-                DoRemoveObject(pNode.Value);
-                pNode = pNode.Next;
-            }
 
 #if UNITY_EDITOR
             if (iUpdateObjectCount != _iPrevObjectCount)

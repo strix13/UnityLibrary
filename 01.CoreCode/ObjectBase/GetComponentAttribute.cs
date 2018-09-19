@@ -129,7 +129,7 @@ public class GetComponentInChildrenAttribute : GetComponentAttributeBase
             .GetMethod("GetComponentsInChildren", new Type[] { typeof(bool) })
             .MakeGenericMethod(pElementType);
         return getter.Invoke(pTargetMono,
-                new object[] { true });
+                new object[] { this.bInclude_DeActive });
     }
 }
 
@@ -381,9 +381,9 @@ public class GetComponentAttribute_Test : MonoBehaviour
     private Dictionary<ETestChildObject, Test_ComponentChild> p_mapTest_KeyIsEnum = new Dictionary<ETestChildObject, Test_ComponentChild>();
 
     [GetComponentInChildren("TestObject_Other_FindString")]
-    private Test_ComponentChild p_pChildComponent_FindString;
+    private Test_ComponentChild p_pChildComponent_FindString = null;
     [GetComponentInChildren(ETestChildObject.TestObject_Other_FindEnum)]
-    private Test_ComponentChild p_pChildComponent_FindEnum;
+    private Test_ComponentChild p_pChildComponent_FindEnum = null;
 
     [GetComponentInChildren]
     public Test_ComponentChild p_pChildComponent_FindEnumProperty { get; private set; }

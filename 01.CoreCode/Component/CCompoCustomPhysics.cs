@@ -246,7 +246,9 @@ public class CCompoCustomPhysics : CObjectBase
         {
             if (p_bIsDebuging)
                 Debug.Log(Time.realtimeSinceStartup.ToString("F2") + " Enter - " + _listCollider2D_NewInner.ToStringList());
-            p_Event_OnPhysicsEvent_Custom2D?.Invoke(_listCollider2D_NewInner, EPhysicsEventCustom.Enter);
+
+            if (p_Event_OnPhysicsEvent_Custom2D != null)
+                p_Event_OnPhysicsEvent_Custom2D.Invoke(_listCollider2D_NewInner, EPhysicsEventCustom.Enter);
         }
 
         if (_listCollider2D_InCollider.Count != 0)
@@ -254,7 +256,8 @@ public class CCompoCustomPhysics : CObjectBase
             if (p_bIsDebuging)
                 Debug.Log(Time.realtimeSinceStartup.ToString("F2") + " Stay - " + _listCollider2D_InCollider.ToStringList());
 
-            p_Event_OnPhysicsEvent_Custom2D?.Invoke(_listCollider2D_InCollider, EPhysicsEventCustom.Stay);
+            if(p_Event_OnPhysicsEvent_Custom2D != null)
+                p_Event_OnPhysicsEvent_Custom2D.Invoke(_listCollider2D_InCollider, EPhysicsEventCustom.Stay);
         }
 
         if (_listCollider2D_Exit.Count != 0)
@@ -262,7 +265,8 @@ public class CCompoCustomPhysics : CObjectBase
             if (p_bIsDebuging)
                 Debug.Log(Time.realtimeSinceStartup.ToString("F2") + " Exit - " + _listCollider2D_Exit.ToStringList());
 
-            p_Event_OnPhysicsEvent_Custom2D?.Invoke(_listCollider2D_Exit, EPhysicsEventCustom.Exit);
+            if (p_Event_OnPhysicsEvent_Custom2D != null)
+                p_Event_OnPhysicsEvent_Custom2D.Invoke(_listCollider2D_Exit, EPhysicsEventCustom.Exit);
         }
 
         _listCollider2D_InCollider.AddRange(_listCollider2D_NewInner);

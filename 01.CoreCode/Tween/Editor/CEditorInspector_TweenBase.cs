@@ -103,7 +103,7 @@ public class CEditorInspector_TweenBase : Editor
     {
         foreach (var pTweenTestPlay in g_listTweenTestPlay)
         {
-            pTweenTestPlay.DoSetTweening();
+            pTweenTestPlay.DoSetTweening(Time.deltaTime);
 
             CTweenPosition pTweenPos = pTweenTestPlay as CTweenPosition;
             if (pTweenPos)

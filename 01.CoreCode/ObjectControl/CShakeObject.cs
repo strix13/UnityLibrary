@@ -36,7 +36,7 @@ public class CShakeObject : CObjectBase
 		//_bMachineShaking = bEnable;
 	}
 
-	public void DoShakeObject(bool bBackToOriginPos)
+	public void DoShakeObject(bool bBackToOriginPos = true)
     {
         if (_bBackToOriginPos)
             transform.localPosition = _vecOriginPos;
@@ -72,18 +72,18 @@ public class CShakeObject : CObjectBase
         _vecOriginPos = transform.localPosition;
         while (_fRemainShakePow > 0f)
         {
-            Vector3 vecOriginPos = transform.localPosition;
-            Vector3 vecShakePos = PrimitiveHelper.RandomRange(vecOriginPos.AddFloat(-_fRemainShakePow), vecOriginPos.AddFloat(_fRemainShakePow));
+            // Vector3 vecOriginPos = transform.localPosition;
+            Vector3 vecShakePos = PrimitiveHelper.RandomRange(_vecOriginPos.AddFloat(-_fRemainShakePow), _vecOriginPos.AddFloat(_fRemainShakePow));
             if(_eShakePosType != EShakePos.All)
             {
                 if (_eShakePosType == EShakePos.Y || _eShakePosType == EShakePos.YZ || _eShakePosType == EShakePos.Z)
-                    vecShakePos.x = vecOriginPos.x;
+                    vecShakePos.x = _vecOriginPos.x;
 
                 if (_eShakePosType == EShakePos.X || _eShakePosType == EShakePos.XZ|| _eShakePosType == EShakePos.Z)
-                    vecShakePos.y = vecOriginPos.y;
+                    vecShakePos.y = _vecOriginPos.y;
 
                 if (_eShakePosType == EShakePos.X || _eShakePosType == EShakePos.XY || _eShakePosType == EShakePos.Y)
-                    vecShakePos.z = vecOriginPos.z;
+                    vecShakePos.z = _vecOriginPos.z;
             }
 
             transform.localPosition = vecShakePos;

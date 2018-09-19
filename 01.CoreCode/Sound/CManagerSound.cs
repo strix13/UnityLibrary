@@ -43,7 +43,7 @@ public class CManagerSound : CSingletonDynamicMonoBase<CManagerSound>
     [Rename_Inspector("이펙트볼륨")]
     public float _fVolumeEffect = 1f;
     [Rename_Inspector("BGM볼륨")]
-    public float _fVolumeBGM;
+    public float _fVolumeBGM = 1f;
 
     // ===================================== //
     // protected - Variable declaration      //

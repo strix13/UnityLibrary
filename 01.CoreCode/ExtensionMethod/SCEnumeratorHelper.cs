@@ -294,6 +294,18 @@ public static class SCEnumeratorHelper
         return mapDataTable.Remove(pValue.IDictionaryItem_GetKey());
     }
 
+    static public void Add<TKey, TSource>(this Dictionary<TKey, TSource> mapDataTable, TSource pAddSource)
+        where TSource : IDictionaryItem<TKey>
+    {
+        TKey hDataID = pAddSource.IDictionaryItem_GetKey();
+        if (mapDataTable.ContainsKey(hDataID))
+        {
+            mapDataTable.Remove(hDataID);
+        }
+
+        mapDataTable.Add(hDataID, pAddSource);
+    }
+
     static public void Add<TKey, TSource>(this Dictionary<TKey, List<TSource>> mapDataTable, TSource pAddSource)
         where TSource : IDictionaryItem<TKey>
     {

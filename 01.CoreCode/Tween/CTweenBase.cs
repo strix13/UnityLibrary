@@ -147,6 +147,12 @@ abstract public class CTweenBase : CObjectBase
     /* public - [Do] Function
      * 외부 객체가 호출(For External class call)*/
 
+    public void DoClearEventList()
+    {
+        p_Event_OnStartTween_InCludeArg = null;
+        p_Event_OnFinishTween_InCludeArg = null;
+    }
+
     public void DoSetTarget(GameObject pObjectTarget)
     {
         if (pObjectTarget == null)
@@ -213,7 +219,7 @@ abstract public class CTweenBase : CObjectBase
         OnTween(fProgress_0_1);
     }
 
-    public void DoSetTweening()
+    public void DoSetTweening(float fDeltaTime)
     {
         if (p_eTweenDirection == ETweenDirection.Forward && _fProgress_0_1 > 1f)
             _bIsFinishForward = true;
@@ -271,7 +277,7 @@ abstract public class CTweenBase : CObjectBase
 
         if (_bIsFinishForward == false && _bIsFinishRevese == false)
         {
-            _fProgress_0_1 += Mathf.Abs(1f / p_fDuration) * Time.deltaTime * _iTweenDirectionDelta;
+            _fProgress_0_1 += Mathf.Abs(1f / p_fDuration) * fDeltaTime * _iTweenDirectionDelta;
 
             if (p_eTweenStyle == ETweenStyle.PingPong_ReverseCurve && p_eTweenDirection == ETweenDirection.Reverse)
                 OnTween(_pAnimationCurve_OnReverseCurvePlay.Evaluate(p_fProgress_0_1));
@@ -321,7 +327,7 @@ abstract public class CTweenBase : CObjectBase
 
         if (_bIsFinishForward == _bIsFinishRevese)
         {
-            DoSetTweening();
+            DoSetTweening(Time.fixedDeltaTime);
             return;
         }
 
@@ -398,13 +404,13 @@ abstract public class CTweenBase : CObjectBase
         else
         {
             if (p_bIgnoreTimeScale)
-                _pCoroutineTween = StartCoroutine(CoStartTween(bReset_Progress, eTweenDirection, OnCreate_YieldForSecond_Real));
+                _pCoroutineTween = StartCoroutine(CoStartTween(bReset_Progress, eTweenDirection, OnCreate_YieldForSecond_Real, OnGetTimeDelta_Real));
             else
-                _pCoroutineTween = StartCoroutine(CoStartTween(bReset_Progress, eTweenDirection, OnCreate_YieldForSecond));
+                _pCoroutineTween = StartCoroutine(CoStartTween(bReset_Progress, eTweenDirection, OnCreate_YieldForSecond, OnGetTimeDelta));
         }
     }
 
-    private IEnumerator CoStartTween(bool bReset_Progress, ETweenDirection eTweenDirection, OnCreateYield OnCreatorYield)
+    private IEnumerator CoStartTween(bool bReset_Progress, ETweenDirection eTweenDirection, OnCreateYield OnCreatorYield, System.Func<float> OnGetDeltaTime)
     {
         if (p_fFirstDelaySec != 0f)
         {
@@ -421,7 +427,7 @@ abstract public class CTweenBase : CObjectBase
 
         while (_bIsFinishForward == _bIsFinishRevese)
         {
-            DoSetTweening();
+            DoSetTweening(OnGetDeltaTime());
 
             CustomYieldInstruction pYield;
             OnCreatorYield(out pYield);
@@ -457,6 +463,16 @@ abstract public class CTweenBase : CObjectBase
     public void OnCreate_YieldForSecond_Real(out CustomYieldInstruction pReturn)
     {
         pReturn = new WaitForSecondsRealtime(Time.unscaledDeltaTime);
+    }
+
+    public float OnGetTimeDelta()
+    {
+        return Time.deltaTime;
+    }
+
+    public float OnGetTimeDelta_Real()
+    {
+        return Time.unscaledDeltaTime;
     }
 
     #endregion Private

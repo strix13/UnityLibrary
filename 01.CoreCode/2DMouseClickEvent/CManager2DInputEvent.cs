@@ -35,6 +35,10 @@ public class CManager2DInputEvent : CSingletonMonoBase<CManager2DInputEvent>
 
     /* protected & private - Field declaration         */
 
+    List<Collider2D> _listCollider_EnterAlready = new List<Collider2D>();
+    List<Collider2D> _listCollider_EnterNew = new List<Collider2D>();
+    List<Collider2D> _listCollider_ExitEnter = new List<Collider2D>();
+
     RaycastHit2D[] _arrHit = new RaycastHit2D[10];
     Ray pRay_OnClick_ForDebug;
     int _iLastHitCount;
@@ -47,30 +51,6 @@ public class CManager2DInputEvent : CSingletonMonoBase<CManager2DInputEvent>
     public Vector3 DoGetMousePos()
     {
         return p_pEventCamera.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, p_pEventCamera.nearClipPlane));
-    }
-
-    public Vector3 DoRayCasting_MousePos2(LayerMask pLayerMask_Hit)
-    {
-        int iLayerMask = pLayerMask_Hit.value;
-        iLayerMask = ~iLayerMask;
-
-        Vector3 vecPosStart = p_pEventCamera.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, p_pEventCamera.nearClipPlane));
-        Vector3 vecPosDest = p_pEventCamera.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, p_pEventCamera.farClipPlane));
-        var pHitInfo = Physics2D.GetRayIntersection(new Ray(vecPosStart, vecPosDest - vecPosStart), Mathf.Infinity, iLayerMask);
-
-        if (p_bIsPrintDebug)
-        {
-            Ray pRay = new Ray(vecPosStart, vecPosDest - vecPosStart);
-            if (pHitInfo)
-                Debug.DrawRay(pRay.origin, (Vector3)pHitInfo.point - pRay.origin, Color.red, 1f);
-            else
-                Debug.DrawRay(pRay.origin, pRay.direction * 1000f, Color.green, 1f);
-        }
-
-        if (pHitInfo)
-            return pHitInfo.point;
-        else
-            return Vector3.zero;
     }
 
     public Vector3 DoRayCasting_MousePos(Camera pCamera, LayerMask pLayerMask_Hit)
@@ -160,11 +140,14 @@ public class CManager2DInputEvent : CSingletonMonoBase<CManager2DInputEvent>
         while (true)
         {
             p_listLastHit.Clear();
-            bool bMouseClick = Input.GetMouseButtonDown(0);
+            bool bMouseClick = Input.GetMouseButton(0) || Input.touchCount != 0;
+
             _iLastHitCount = Physics2D.GetRayIntersectionNonAlloc(p_pEventCamera.ScreenPointToRay(Input.mousePosition), _arrHit, Mathf.Infinity, p_pLayerMask_Hit.value);
             if (p_bIsPrintDebug && bMouseClick)
                 pRay_OnClick_ForDebug = p_pEventCamera.ScreenPointToRay(Input.mousePosition);
 
+            _listCollider_EnterNew.Clear();
+            _listCollider_ExitEnter.Clear();
             for (int i = 0; i < _iLastHitCount; i++)
             {
                 RaycastHit2D pHit = _arrHit[i];
@@ -172,15 +155,7 @@ public class CManager2DInputEvent : CSingletonMonoBase<CManager2DInputEvent>
                 Transform pTransformHit = pHit.transform;
 
                 if (p_bIsPrintDebug)
-                    Debug.Log(pTransformHit.name + " RayCast Hit", pTransformHit);
-
-                var pEnter = pTransformHit.GetComponent<IPointerEnterHandler>();
-                if (pEnter != null)
-                    pEnter.OnPointerEnter(null);
-
-                //var pExit = pTransformHit.GetComponent<IPointerExitHandler>();
-                //if (pExit != null)
-                //    pExit.OnPointerExit(null);
+                    Debug.Log(pTransformHit.name + " RayCast Hit bMouseClick: " + bMouseClick, pTransformHit);
 
                 if (bMouseClick)
                 {
@@ -188,7 +163,38 @@ public class CManager2DInputEvent : CSingletonMonoBase<CManager2DInputEvent>
                     if (pClick != null)
                         pClick.OnPointerClick(null);
                 }
+
+                _listCollider_EnterNew.Add(pHit.collider);
             }
+
+            for (int i = 0; i < _listCollider_EnterAlready.Count; i++)
+            {
+                Collider2D pCollider = _listCollider_EnterAlready[i];
+                if (_listCollider_EnterNew.Contains(pCollider))
+                    _listCollider_EnterNew.Remove(pCollider);
+                else
+                    _listCollider_ExitEnter.Add(pCollider);
+            }
+
+            for(int i = 0; i < _listCollider_EnterNew.Count; i++)
+            {
+                var pEnter = _listCollider_EnterNew[i].GetComponent<IPointerEnterHandler>();
+                if (pEnter != null)
+                    pEnter.OnPointerEnter(null);
+            }
+
+            for(int i = 0; i < _listCollider_ExitEnter.Count; i++)
+            {
+                Collider2D pCollider = _listCollider_ExitEnter[i];
+                _listCollider_EnterAlready.Remove(pCollider);
+
+                var pExit = pCollider.GetComponent<IPointerExitHandler>();
+                if (pExit != null)
+                    pExit.OnPointerExit(null);
+
+            }
+
+            _listCollider_EnterAlready.AddRange(_listCollider_EnterNew);
 
             yield return null;
         }
