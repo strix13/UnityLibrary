@@ -63,7 +63,7 @@ public class CManagerPoolingSimple : CSingletonDynamicMonoBase<CManagerPoolingSi
             DoPush(pPrePoolingObject);
     }
 
-    public GameObject DoPop(GameObject pObjectCopyTarget, Vector3 vecPos)
+    public GameObject DoPop(GameObject pObjectCopyTarget, Vector3 vecPos, bool bAutoReturn_OnDisable = true)
     {
         if (pObjectCopyTarget == null)
             return null;
@@ -98,7 +98,13 @@ public class CManagerPoolingSimple : CSingletonDynamicMonoBase<CManagerPoolingSi
 
         if (p_bIsDebug)
             Debug.Log("Pooling Simple Pop - " + pObjectUnUsed.name, this);
-            
+
+        CCompoEventTrigger pEventTrigger_AutoReturn = pObjectUnUsed.GetComponent<CCompoEventTrigger>();
+        if (bAutoReturn_OnDisable)
+            pEventTrigger_AutoReturn.p_eConditionType = CCompoEventTrigger.EConditionTypeFlags.OnDisable;
+        else
+            pEventTrigger_AutoReturn.p_eConditionType = CCompoEventTrigger.EConditionTypeFlags.None;
+
         pObjectUnUsed.transform.position = vecPos;
         pObjectUnUsed.SetActive(true);
         pObjectUnUsed.layer = _mapLayerBackup[iID];
@@ -106,9 +112,9 @@ public class CManagerPoolingSimple : CSingletonDynamicMonoBase<CManagerPoolingSi
         return pObjectUnUsed;
     }
 
-    public GameObject DoPop(GameObject pObjectCopyTarget)
+    public GameObject DoPop(GameObject pObjectCopyTarget, bool bAutoReturn_OnDisable = true)
     {
-        return DoPop(pObjectCopyTarget, Vector3.zero);
+        return DoPop(pObjectCopyTarget, Vector3.zero, bAutoReturn_OnDisable);
     }
 
     public void DoPush(GameObject pObjectReturn)

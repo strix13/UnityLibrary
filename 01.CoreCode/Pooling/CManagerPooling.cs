@@ -41,7 +41,7 @@ public class CManagerPooling<ENUM_Resource_Name, Class_Resource> : CSingletonNot
     private Dictionary<ENUM_Resource_Name, int> _mapResourcePoolingCount = new Dictionary<ENUM_Resource_Name, int>();
 
     public int p_iPopCount { get; private set; }
-    public string p_strResourcesPath { get; private set; }
+    public string p_strResourcesPath;
 
     public GameObject p_ObjectParents { get; private set; }
     private Transform _pTransManager { get { return p_ObjectParents.transform; } }
@@ -60,6 +60,7 @@ public class CManagerPooling<ENUM_Resource_Name, Class_Resource> : CSingletonNot
 
     public void DoInitPoolingObject(string strResourcesPath)
     {
+        p_strResourcesPath = strResourcesPath;
         GameObject[] arrResources = Resources.LoadAll<GameObject>(string.Format("{0}/", strResourcesPath));
         ProcInitManagerPooling(arrResources.ToList());
     }
@@ -163,6 +164,7 @@ public class CManagerPooling<ENUM_Resource_Name, Class_Resource> : CSingletonNot
                     continue;
 
                 Class_Resource pResource = MakeResource(eResourceName);
+                p_iPopCount++;
                 ProcReturnResource(pResource, true);
             }
         }
@@ -186,6 +188,7 @@ public class CManagerPooling<ENUM_Resource_Name, Class_Resource> : CSingletonNot
             for (int j = 0; j < iPoolingCount; j++)
             {
                 Class_Resource pResource = MakeResource(eResourceName);
+                p_iPopCount++;
                 ProcReturnResource(pResource, true);
             }
         }
@@ -263,6 +266,9 @@ public class CManagerPooling<ENUM_Resource_Name, Class_Resource> : CSingletonNot
             return;
         }
 
+        if (Application.isPlaying == false)
+            return;
+
         GameObject[] arrResources = Resources.LoadAll<GameObject>(string.Format("{0}/", p_strResourcesPath));
         ProcInitManagerPooling(arrResources.ToList());
     }
@@ -311,8 +317,11 @@ public class CManagerPooling<ENUM_Resource_Name, Class_Resource> : CSingletonNot
 
             GameObject pObjectOrigin = listObject[i].gameObject;
             Class_Resource pResourceOrigin = pObjectOrigin.GetComponent<Class_Resource>();
+            if (pResourceOrigin == null)
+                continue;
+            _mapResourceOrigin.Add(eResourceName, pResourceOrigin);
 
-            GameObject pObjectCopy = Object.Instantiate(listObject[i].gameObject);
+            GameObject pObjectCopy = GameObject.Instantiate(pObjectOrigin);
             pObjectCopy.SetActive(false);
             Class_Resource pResource = pObjectCopy.GetComponent<Class_Resource>();
             if (pResource == null)
@@ -323,8 +332,6 @@ public class CManagerPooling<ENUM_Resource_Name, Class_Resource> : CSingletonNot
                 _queuePoolingDisable.Add(eResourceName, new Queue<Class_Resource>());
                 _mapResourcePoolingCount.Add(eResourceName, 0);
             }
-
-            _mapResourceOrigin.Add(eResourceName, pResourceOrigin);
             _mapResourceOriginCopy.Add(eResourceName, pResource);
 
             pResource.name = string.Format("{0}(Origin)", eResourceName);
@@ -369,6 +376,9 @@ public class CManagerPooling<ENUM_Resource_Name, Class_Resource> : CSingletonNot
 
     private void ProcReturnResource(Class_Resource pResource, bool bSetPaents_ManagerObject)
     {
+        if (pResource == null)
+            return;
+
         if (pResource.gameObject.activeSelf)
             pResource.gameObject.SetActive(false);
 

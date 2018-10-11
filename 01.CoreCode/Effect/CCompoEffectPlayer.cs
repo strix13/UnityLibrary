@@ -17,7 +17,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEditor;
 
-public class CCompoEffectPlayer : CCompoEventTrigger
+public class CCompoEffectPlayer : CObjectBase
 {
     /* const & readonly declaration             */
 
@@ -49,9 +49,6 @@ public class CCompoEffectPlayer : CCompoEventTrigger
     [Header("이펙트 끝날때 이벤트")]
     public UnityEngine.Events.UnityEvent p_listEvent_FinishEffect = new UnityEngine.Events.UnityEvent();
 
-    [Header("플레이할 이펙트 -  다수일 경우 랜덤 재생")]
-	public CEffect[] _arrEffectPlay;
-
     [Rename_Inspector("플레이중인 이펙트가 활성중이면 끕니다")]
     public bool _bIsDisableEffectPlayed_When_EffectPlaying = true;
 
@@ -70,18 +67,6 @@ public class CCompoEffectPlayer : CCompoEventTrigger
     /* public - [Do] Function
      * 외부 객체가 호출(For External class call)*/
 
-    public void DoPlayEffect()
-    {
-        DoPlayEventTrigger();
-    }
-
-    public void DoPlayEffect(Vector3 vecPos)
-    {
-        DoPlayEventTrigger();
-        if (_pEffectPlaying != null)
-            _pEffectPlaying.transform.position = vecPos;
-    }
-
     public CEffect DoPlayEffect(string strEffectEvent)
     {
         if (_mapEffectPlayInfo.ContainsKey(strEffectEvent) == false)
@@ -98,6 +83,18 @@ public class CCompoEffectPlayer : CCompoEventTrigger
 
         SEffectPlayInfo pEffectPlayInfo = _mapEffectPlayInfo[strEffectEvent];
         return PlayEffect(pEffectPlayInfo.GetRandomEffect(), pTransform);
+    }
+
+    public CEffect DoPlayEffect(string strEffectEvent, Vector3 vecPos, Quaternion rotRotation)
+    {
+        CEffect pEffect = DoPlayEffect(strEffectEvent);
+        if(pEffect != null)
+        {
+            pEffect.transform.position = vecPos;
+            pEffect.transform.rotation = rotRotation;
+        }
+
+        return pEffect;
     }
 
     /* public - [Event] Function             
@@ -121,27 +118,6 @@ public class CCompoEffectPlayer : CCompoEventTrigger
         _mapEffectPlayInfo.DoAddItem(p_listEffectPlayInfo);
     }
 
-    protected override void OnPlayEvent()
-    {
-        base.OnPlayEvent();
-
-        if (_bIsQuitApplciation)
-            return;
-
-        if (_bIsDisableEffectPlayed_When_EffectPlaying && _pEffectPlaying)
-        {
-            _pEffectPlaying.gameObject.SetActive(false);
-        }
-
-        if (_arrEffectPlay == null || _arrEffectPlay.Length == 0)
-        {
-            Debug.LogError(name + "이펙트 플레이어인데 이펙트할게 없습니다.", this);
-            return;
-        }
-
-        PlayEffect(_arrEffectPlay.GetRandom());
-    }
-
     private CEffect PlayEffect(CEffect pEffectPlay)
     {
         if (pEffectPlay == null)
@@ -158,8 +134,9 @@ public class CCompoEffectPlayer : CCompoEventTrigger
         if (pEffectPlay == null)
             return null;
 
-        _pEffectPlaying = CManagerEffect.instance.DoPlayEffect(pEffectPlay.name, pTransform, transform.position);
+        _pEffectPlaying = CManagerEffect.instance.DoPlayEffect(pEffectPlay.name, pTransform.position, pTransform.rotation);
         _pEffectPlaying.p_Event_Effect_OnDisable += PEffectPlaying_p_Event_Effect_OnDisable;
+        _pEffectPlaying.transform.SetParent(pTransform);
 
         return _pEffectPlaying;
     }

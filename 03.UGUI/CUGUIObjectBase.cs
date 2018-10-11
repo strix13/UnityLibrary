@@ -46,16 +46,6 @@ public class CUGUIObjectBase : CUIObjectBase
 	/* public - [Do] Function
      * 외부 객체가 호출(For External class call)*/
 
-#if TMPro
-	public void DoEditTextMesh<T_TextMeshName>( T_TextMeshName tTextMeshProName, object strText )
-	{
-		if (strText == null)
-			FindUIElement( _mapTextMesh, tTextMeshProName.ToString() ).text = "";
-		else
-			FindUIElement( _mapTextMesh, tTextMeshProName.ToString() ).text = strText.ToString();
-	}
-#endif
-
 	public void DoEditText<T_TextName>( T_TextName tTextName, object strText, bool bIsPrintError = true )
 	{
 		if(strText == null)

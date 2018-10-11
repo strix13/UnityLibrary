@@ -150,12 +150,19 @@ static public class SCManagerGetComponent
 {
     static public Component GetComponentInChildren(this Component pTarget, string strObjectName, System.Type pComponentType, bool bInclude_DeActive)
     {
-        Component[] arrComponentFind = pTarget.transform.GetComponentsInChildren(pComponentType, bInclude_DeActive);
+        Component[] arrComponentFind = null;
+        if (pComponentType == typeof(GameObject))
+            arrComponentFind = pTarget.transform.GetComponentsInChildren(typeof(Transform), true);
+        else
+            arrComponentFind = pTarget.transform.GetComponentsInChildren(pComponentType, bInclude_DeActive);
+
+
         for (int i = 0; i < arrComponentFind.Length; i++)
         {
             if (arrComponentFind[i].name.Equals(strObjectName))
                 return arrComponentFind[i];
         }
+
         return null;
     }
 
@@ -200,7 +207,8 @@ static public class SCManagerGetComponent
             for (int j = 0; j < arrCustomAttributes.Length; j++)
             {
                 GetComponentAttributeBase pGetcomponentAttribute = arrCustomAttributes[j] as GetComponentAttributeBase;
-                if (pGetcomponentAttribute == null) continue;
+                if (pGetcomponentAttribute == null)
+                    continue;
 
                 System.Type pTypeField = pMemberInfo.MemberType();
                 object pComponent = null;
@@ -240,7 +248,12 @@ static public class SCManagerGetComponent
                 }
 
                 if (pTypeField.IsGenericType == false)
-                    pMemberInfo.SetValue_Extension(pTargetMono, pComponent);
+                {
+                    if(pTypeField == typeof(GameObject))
+                        pMemberInfo.SetValue_Extension(pTargetMono, ((Component)pComponent).gameObject);
+                    else
+                        pMemberInfo.SetValue_Extension(pTargetMono, pComponent);
+                }
             }
         }
     }

@@ -222,24 +222,43 @@ abstract public partial class CManagerUIBase<CLASS_Instance, ENUM_Panel_Name, CL
     }
 
     /// <summary>
-    /// 타겟 카메라의 좌표로 UI 오브젝트를 이동합니다. ( 타겟 카메라의 WorldToView -> UI 카메라의 WorldToView )
+    /// 타겟 카메라에서 UI 카메라의 위치를 리턴합니다. ( 타겟 카메라의 WorldToView -> UI 카메라의 ViewToWorld )
     /// </summary>
-    /// <param name="pCameraTarget">타겟 카메라</param>
-    /// <param name="pTransTarget">이동시킬 UI 오브젝트</param>
-    /// <param name="vecTargetPos">이동시킬 좌표</param>
+    /// <param name="pCameraWorld">타겟 카메라</param>
+    /// <param name="vecTargetPos">타겟카메라 기준 위치</param>
     /// <returns></returns>
-    public Vector3 DoSetUIToInGame3D(Camera pCameraTarget, Transform pTransTarget, Vector3 vecTargetPos)
+    public Vector3 DoSet_World_To_UI(Camera pCameraWorld, Vector3 vecTargetPos)
     {
-        Vector3 v3UIpos = p_pUICamera.ViewportToWorldPoint(pCameraTarget.WorldToViewportPoint(vecTargetPos));
-        pTransTarget.position = new Vector3(v3UIpos.x, v3UIpos.y, 0);
-        pTransTarget.localPosition = new Vector3(pTransTarget.localPosition.x, pTransTarget.localPosition.y, 0);
-
-        return pTransTarget.localPosition;
+        Vector3 v3UIpos = p_pUICamera.ViewportToWorldPoint(pCameraWorld.WorldToViewportPoint(vecTargetPos));
+        return new Vector3(v3UIpos.x, v3UIpos.y, 0);
     }
 
-	// ========================== [ Division ] ========================== //
+    /// <summary>
+    /// UI 카메라에서 타겟 카메라의 위치로 이동합니다. ( UI 카메라의 WorldToView -> 타겟 카메라의 ViewToWorld )
+    /// </summary>
+    /// <param name="pCameraWorld">타겟 카메라</param>
+    /// <param name="vecTargetPos">UI카메라 기준 위치</param>
+    /// <returns></returns>
+    public Vector3 DoSet_UI_To_World(Camera pCameraWorld, Vector3 vecTargetPos, float fViewPortZ)
+    {
+        Vector3 vecUIViewport = p_pUICamera.WorldToViewportPoint(vecTargetPos);
+        vecUIViewport.z = fViewPortZ;
 
-	public void IManagerUI_ShowHide_Panel( int iPanelHashCode, bool bShow, System.Action OnFinishAnimation = null )
+        return pCameraWorld.ViewportToWorldPoint(vecUIViewport);
+    }
+
+    //public Vector3 DoSet_Wrold_To_UI(Camera pCameraWorld, Transform pTransTarget, Vector3 vecTargetPos)
+    //{
+    //    Vector3 v3UIpos = p_pUICamera.ViewportToWorldPoint(pCameraWorld.WorldToViewportPoint(vecTargetPos));
+    //    pTransTarget.position = new Vector3(v3UIpos.x, v3UIpos.y, 0);
+    //    //pTransTarget.localPosition = new Vector3(pTransTarget.localPosition.x, pTransTarget.localPosition.y, 0);
+
+    //    return pTransTarget.localPosition;
+    //}
+
+    // ========================== [ Division ] ========================== //
+
+    public void IManagerUI_ShowHide_Panel( int iPanelHashCode, bool bShow, System.Action OnFinishAnimation = null )
 	{
 		ENUM_Panel_Name ePanelName = _mapPanelData.ConvertHashCodeToEnum( iPanelHashCode );
 		DoShowHide_Panel( ePanelName, bShow, OnFinishAnimation );

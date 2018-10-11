@@ -18,7 +18,8 @@ public class CEffect : CObjectBase
 	{
 		None,
 		Particle,
-		TwoD,
+		NGUI,
+        Sprite,
 		Spine,
 	}
 
@@ -41,10 +42,15 @@ public class CEffect : CObjectBase
 
     /* private - Variable declaration           */
 
-	private ParticleSystem _pParticleSystem;
-#if NGUI
-	private CUI2DSpriteAnimation _p2DSpriteAnimation;
-#endif
+    [GetComponentInChildren]
+	private ParticleSystem _pParticleSystem = null;
+
+    [GetComponentInChildren]
+	private CNGUI2DSpriteAnimation _pNGUISpriteAnimation = null;
+
+    [GetComponentInChildren]
+    C2DSpriteAnimation _pSpriteAnimation = null;
+
 	private System.Action _OnFinishEffect_OneShot;
     private bool _bIsStop = false;
 
@@ -120,11 +126,14 @@ public class CEffect : CObjectBase
 	virtual protected void OnDefineEffect()
 	{
 		_eEffectType = EEffectType.None;
-#if NGUI
-		if (_eEffectType == EEffectType.None && _p2DSpriteAnimation != null)
-			_eEffectType = EEffectType.TwoD;
-#endif
-		if (_eEffectType == EEffectType.None && _pParticleSystem != null)
+
+        if (_eEffectType == EEffectType.None && _pNGUISpriteAnimation != null)
+			_eEffectType = EEffectType.NGUI;
+
+        if(_eEffectType == EEffectType.None && _pSpriteAnimation != null)
+            _eEffectType = EEffectType.Sprite;
+
+        if (_eEffectType == EEffectType.None && _pParticleSystem != null)
 			_eEffectType = EEffectType.Particle;
 	}
 
@@ -135,15 +144,19 @@ public class CEffect : CObjectBase
 		switch (_eEffectType)
 		{
 			case EEffectType.Particle:
-				StartCoroutine( CoPlayParticleSystem() );
+				StartCoroutine( CoPlay_ParticleSystem() );
 				break;
 
-			case EEffectType.TwoD:
-				StartCoroutine( CoPlay2DSpriteAnimation() );
+			case EEffectType.NGUI:
+				StartCoroutine( CoPlay_SpriteAnimation() );
 				break;
-		}
 
-		if (p_Event_Effect_OnPlayStop != null)
+            case EEffectType.Sprite:
+                StartCoroutine(CoPlay_SpriteAnimation());
+                break;
+        }
+
+        if (p_Event_Effect_OnPlayStop != null)
 			p_Event_Effect_OnPlayStop( _strEffectName, this, true );
 	}
 
@@ -155,11 +168,6 @@ public class CEffect : CObjectBase
 	protected override void OnAwake()
 	{
 		base.OnAwake();
-
-		_pParticleSystem = GetComponentInChildren<ParticleSystem>();
-#if NGUI
-		_p2DSpriteAnimation = GetComponentInChildren<CUI2DSpriteAnimation>();
-#endif
 
 		OnDefineEffect();
 	}
@@ -189,7 +197,7 @@ public class CEffect : CObjectBase
     /* private - [Proc] Function             
        중요 로직을 처리                         */
 
-    private IEnumerator CoPlayParticleSystem()
+    private IEnumerator CoPlay_ParticleSystem()
 	{
 		if (_pParticleSystem.main.loop == false)
 		{
@@ -201,7 +209,24 @@ public class CEffect : CObjectBase
 		}
 	}
 
-	private IEnumerator CoPlay2DSpriteAnimation()
+    private IEnumerator CoPlay_SpriteAnimation()
+    {
+		if (_pSpriteAnimation.p_arrFrames.Length == 0)
+		{
+			Debug.LogWarning( "Effect Sprite Frame Length가 0입니다" );
+			ProcOnFinishEffect();
+			yield break;
+		}
+
+		if (_pSpriteAnimation.p_bIsLoop)
+            _pSpriteAnimation.DoPlayAnimation();
+		else
+            _pSpriteAnimation.DoPlayAnimation( ProcOnFinishEffect );
+
+        yield return null;
+    }
+
+    private IEnumerator CoPlay_NGUISpriteAnimation()
 	{
 #if NGUI
 		if (_p2DSpriteAnimation.frames.Length == 0)

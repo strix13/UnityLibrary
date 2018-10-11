@@ -1,9 +1,9 @@
-﻿#if NGUI
-using UnityEngine;
+﻿using UnityEngine;
 using System.Collections;
 
-public class CUI2DSpriteAnimation : CObjectBase
+public class CNGUI2DSpriteAnimation : CObjectBase
 {
+#if NGUI
     public event System.Action p_EVENT_OnEndAnim;
 
     private System.Action _OnMatchFrameIndex;
@@ -257,5 +257,5 @@ public class CUI2DSpriteAnimation : CObjectBase
 			pImage.sprite = frames[frameIndex];
 		}
 	}
-}
 #endif
+}

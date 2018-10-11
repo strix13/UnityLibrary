@@ -39,13 +39,14 @@ public class CManagerUpdateObject : CSingletonSOBase<CManagerUpdateObject>
 #endif
     public List<IUpdateAble> _listObject_ForDebug = new List<IUpdateAble>();
 
+    int _iPrevObjectCount;
+
 #endif
 
     static private LinkedList<IUpdateAble> g_listObject = new LinkedList<IUpdateAble>();
     static private HashSet<IUpdateAble> g_setUpdateObject = new HashSet<IUpdateAble>();
 
     GameObject _pObjectManager;
-    int _iPrevObjectCount;
 
     // ========================================================================== //
 

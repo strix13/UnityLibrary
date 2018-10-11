@@ -11,6 +11,10 @@ using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
 
+#if TMPro
+using TMPro;
+#endif
+
 #if Spine
 using Spine.Unity;
 #endif
@@ -32,6 +36,11 @@ public class CTweenColor : CTweenBase
     Renderer _pRenderer = null;
     Graphic _pUIElement = null;
     Light _pLight = null;
+
+#if TMPro
+    TextMeshPro _pTMPro = null;
+#endif
+
 #if Spine
     SkeletonAnimation _pSpineAnimation = null;
 
@@ -61,6 +70,10 @@ public class CTweenColor : CTweenBase
             }
 #endif
 
+#if TMPro
+            if (_pTMPro)
+                return _pTMPro.color;
+#endif
 
             if (_pSpriteRenderer)
                 return _pSpriteRenderer.color;
@@ -73,6 +86,7 @@ public class CTweenColor : CTweenBase
 
             if (_pLight)
                 return _pLight.color;
+
 
             return Color.white;
         }
@@ -96,6 +110,15 @@ public class CTweenColor : CTweenBase
                 }
             }
 #endif
+
+#if TMPro
+            if (_pTMPro)
+            {
+                _pTMPro.color = value;
+                return;
+            }
+#endif
+
             if (_pSpriteRenderer)
             {
                 _pSpriteRenderer.color = value;
@@ -119,6 +142,7 @@ public class CTweenColor : CTweenBase
                 _pLight.color = value;
                 return;
             }
+
         }
     }
 
@@ -166,6 +190,10 @@ public class CTweenColor : CTweenBase
 #if Spine
         _pSpineAnimation = pObjectNewTarget.GetComponent<SkeletonAnimation>();
 #endif
+
+#if TMPro
+        _pTMPro = pObjectNewTarget.GetComponent<TextMeshPro>();
+#endif
     }
 
     protected override void OnTween(float fProgress_0_1)
@@ -200,7 +228,7 @@ public class CTweenColor : CTweenBase
 
     // ========================================================================== //
 
-    #region Private
+#region Private
 
-    #endregion Private
+#endregion Private
 }

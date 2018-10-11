@@ -18,34 +18,6 @@ public class CCompoEventTrigger : CObjectBase, IPointerClickHandler, IPointerDow
 
     /* enum & struct declaration                */
 
-    public struct SColliderWrapper
-    {
-        public GameObject p_pGameObject { get; private set; }
-        public Rigidbody p_pRigidbody { get; private set; }
-        public Rigidbody2D p_pRigidbody2D { get; private set; }
-
-        public SColliderWrapper(GameObject pObject)
-        {
-            p_pGameObject = pObject;
-            p_pRigidbody = null;
-            p_pRigidbody2D = null;
-        }
-
-        public SColliderWrapper(GameObject pObject, Rigidbody pRigidbody)
-        {
-            p_pGameObject = pObject;
-            p_pRigidbody = pRigidbody;
-            p_pRigidbody2D = null;
-        }
-
-        public SColliderWrapper(GameObject pObject, Rigidbody2D pRigidbody)
-        {
-            p_pGameObject = pObject;
-            p_pRigidbody = null;
-            p_pRigidbody2D = pRigidbody;
-        }
-    }
-
     public class CYield_IsWaitingEventTrigger : CustomYieldInstruction
     {
         static System.Func<bool> g_OnCheckIsWaiting;
@@ -84,13 +56,7 @@ public class CCompoEventTrigger : CObjectBase, IPointerClickHandler, IPointerDow
         OnUIEvent_Show = 1 << 8,
 		OnUIEvent_Hide = 1 << 9,
 
-        OnTriggerEnter = 1 << 10,
-        OnTriggerStay = 1 << 11,
-        OnTriggerExit = 1 << 12,
-
-        OnCollisionEnter = 1 << 13,
-        OnCollisionStay = 1 << 14,
-        OnCollisionExit = 1 << 15,
+        OnUpdate = 1 << 10,
     }
 
     public enum EPhysicsEvent
@@ -107,8 +73,6 @@ public class CCompoEventTrigger : CObjectBase, IPointerClickHandler, IPointerDow
 
     /* public - Field declaration            */
 
-    public delegate void OnPhysicsEvent(SColliderWrapper pObjectEventer, EPhysicsEvent ePhysicsEvent);
-    public event OnPhysicsEvent p_Event_OnPhysicsEvent;
 	public event System.Action<bool> p_OnPress;
 
     [Rename_Inspector("디버그 모드")]
@@ -118,6 +82,9 @@ public class CCompoEventTrigger : CObjectBase, IPointerClickHandler, IPointerDow
 	public EConditionTypeFlags p_eConditionType = EConditionTypeFlags.None;
 	[Rename_Inspector("트리거 작동 시 처음 딜레이")]
 	public float p_fDelayTrigger = 0f;
+
+    [Rename_Inspector("업데이트 시 타임 델타")]
+    public float p_fUpdateTimeDelta = 0.02f;
 
 	public UnityEngine.Events.UnityEvent p_listEvent = new UnityEvent();
     public event System.Action<GameObject> p_Event_IncludeThisObject;
@@ -199,7 +166,20 @@ public class CCompoEventTrigger : CObjectBase, IPointerClickHandler, IPointerDow
 	        DoPlayEventTrigger();
     }
 
-	protected override void OnDisableObject()
+    protected override IEnumerator OnEnableObjectCoroutine()
+    {
+        if (p_eConditionType.ContainEnumFlag(EConditionTypeFlags.OnUpdate) == false)
+            yield break;
+
+        while (true)
+        {
+            DoPlayEventTrigger();
+
+            yield return new WaitForSeconds(p_fUpdateTimeDelta);
+        }
+    }
+
+    protected override void OnDisableObject()
 	{
 		base.OnDisableObject();
 
@@ -232,115 +212,7 @@ public class CCompoEventTrigger : CObjectBase, IPointerClickHandler, IPointerDow
 			}
 		}
 	}
-
-	private void OnTriggerEnter(Collider collision )
-	{
-        if (p_eConditionType.ContainEnumFlag(EConditionTypeFlags.OnTriggerEnter))
-		{
-			DoPlayEventTrigger();
-            p_Event_OnPhysicsEvent.Invoke(new SColliderWrapper(collision.gameObject, collision.attachedRigidbody), EPhysicsEvent.Trigger_Enter);
-		}
-	}
-
-    private void OnTriggerEnter2D( Collider2D collision )
-	{
-        if (p_eConditionType.ContainEnumFlag(EConditionTypeFlags.OnTriggerEnter))
-		{
-			DoPlayEventTrigger();
-            p_Event_OnPhysicsEvent.Invoke(new SColliderWrapper(collision.gameObject, collision.attachedRigidbody), EPhysicsEvent.Trigger_Enter);
-        }
-    }
-
-    private void OnTriggerStay(Collider collision)
-    {
-        if (p_eConditionType.ContainEnumFlag(EConditionTypeFlags.OnTriggerStay))
-        {
-            DoPlayEventTrigger();
-            p_Event_OnPhysicsEvent.Invoke(new SColliderWrapper(collision.gameObject, collision.attachedRigidbody), EPhysicsEvent.Trigger_Stay);
-        }
-    }
-
-    private void OnTriggerStay2D(Collider2D collision)
-    {
-        if (p_eConditionType.ContainEnumFlag(EConditionTypeFlags.OnTriggerStay))
-        {
-            DoPlayEventTrigger();
-            p_Event_OnPhysicsEvent.Invoke(new SColliderWrapper(collision.gameObject, collision.attachedRigidbody), EPhysicsEvent.Trigger_Stay);
-        }
-    }
-
-    private void OnTriggerExit(Collider collision)
-    {
-        if (p_eConditionType.ContainEnumFlag(EConditionTypeFlags.OnTriggerExit))
-        {
-            DoPlayEventTrigger();
-            p_Event_OnPhysicsEvent.Invoke(new SColliderWrapper(collision.gameObject, collision.attachedRigidbody), EPhysicsEvent.Trigger_Exit);
-        }
-    }
-
-    private void OnTriggerExit2D(Collider2D collision)
-    {
-        if (p_eConditionType.ContainEnumFlag(EConditionTypeFlags.OnTriggerExit))
-        {
-            DoPlayEventTrigger();
-            p_Event_OnPhysicsEvent.Invoke(new SColliderWrapper(collision.gameObject, collision.attachedRigidbody), EPhysicsEvent.Trigger_Exit);
-        }
-    }
-
-    private void OnCollisionEnter( Collision collision )
-	{
-        if (p_eConditionType.ContainEnumFlag(EConditionTypeFlags.OnCollisionEnter))
-		{
-			DoPlayEventTrigger();
-            p_Event_OnPhysicsEvent.Invoke(new SColliderWrapper(collision.gameObject, collision.rigidbody), EPhysicsEvent.Collision_Enter);
-        }
-    }
-
-    private void OnCollisionEnter2D( Collision2D collision )
-	{
-        if (p_eConditionType.ContainEnumFlag(EConditionTypeFlags.OnCollisionEnter))
-		{
-			DoPlayEventTrigger();
-            p_Event_OnPhysicsEvent.Invoke(new SColliderWrapper(collision.gameObject, collision.rigidbody), EPhysicsEvent.Collision_Enter);
-        }
-    }
-
-    private void OnCollisionStay(Collision collision)
-    {
-        if (p_eConditionType.ContainEnumFlag(EConditionTypeFlags.OnCollisionStay))
-        {
-            DoPlayEventTrigger();
-            p_Event_OnPhysicsEvent.Invoke(new SColliderWrapper(collision.gameObject, collision.rigidbody), EPhysicsEvent.Collision_Stay);
-        }
-    }
-
-    private void OnCollisionStay2D(Collision2D collision)
-    {
-        if (p_eConditionType.ContainEnumFlag(EConditionTypeFlags.OnCollisionStay))
-        {
-            DoPlayEventTrigger();
-            p_Event_OnPhysicsEvent.Invoke(new SColliderWrapper(collision.gameObject, collision.rigidbody), EPhysicsEvent.Collision_Stay);
-        }
-    }
-
-    private void OnCollisionExit(Collision collision)
-    {
-        if (p_eConditionType.ContainEnumFlag(EConditionTypeFlags.OnCollisionExit))
-        {
-            DoPlayEventTrigger();
-            p_Event_OnPhysicsEvent.Invoke(new SColliderWrapper(collision.gameObject, collision.rigidbody), EPhysicsEvent.Collision_Exit);
-        }
-    }
-
-    private void OnCollisionExit2D(Collision2D collision)
-    {
-        if (p_eConditionType.ContainEnumFlag(EConditionTypeFlags.OnCollisionExit))
-        {
-            DoPlayEventTrigger();
-            p_Event_OnPhysicsEvent.Invoke(new SColliderWrapper(collision.gameObject, collision.rigidbody), EPhysicsEvent.Collision_Exit);
-        }
-    }
-
+    
 
 
     private void OnDestroy()

@@ -38,7 +38,7 @@ public class CPathFindingAgent : CObjectBase
     //Ensures starting position is grounded at the correct location.
     private bool useStored = false;
     private Vector3 storePoint;
-    private GameObject storeObject;
+    // private GameObject storeObject;
 
     //Pathfinding
     public bool repathOnFail = true;

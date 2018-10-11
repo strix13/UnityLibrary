@@ -36,7 +36,10 @@ public class CShakeObject : CObjectBase
 		//_bMachineShaking = bEnable;
 	}
 
-	public void DoShakeObject(bool bBackToOriginPos = true)
+#if ODIN_INSPECTOR
+    [Sirenix.OdinInspector.Button("Test Shake")]
+#endif
+    public void DoShakeObject(bool bBackToOriginPos = true)
     {
         if (_bBackToOriginPos)
             transform.localPosition = _vecOriginPos;

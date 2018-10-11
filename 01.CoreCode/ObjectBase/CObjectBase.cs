@@ -42,12 +42,6 @@ public class CObjectBase : MonoBehaviour, IUpdateAble
     protected bool _bIsQuitApplciation = false;
     private Coroutine _pCoroutineOnEnable;
 
-    public Vector3 p_vecPosition
-	{
-		get { return transform.position; }
-		set { transform.position = value; }
-	}
-
     // ========================== [ Division ] ========================== //
 
     public void EventOnAwake()

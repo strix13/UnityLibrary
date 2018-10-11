@@ -131,7 +131,7 @@ public class CIndicator : CObjectBase
 		}
 
 #if TMPro
-		if (GetComponentInChildren( out _pUIText_TMPro ))
+		if (this.GetComponentInChildren( out _pUIText_TMPro ))
 		{
 			_eIndicatorType = EIndicatorType.TextMeshPro;
 			//_pRectTrans = _pUIText_TMPro.GetComponent<RectTransform>();
@@ -139,16 +139,16 @@ public class CIndicator : CObjectBase
 		}
 #endif
 #if NGUI
-		if (GetComponentInChildren( out _pUILabel ))
+		if (this.GetComponentInChildren( out _pUILabel ))
 		{
 			_eIndicatorType = EIndicatorType.NGUI;
 			return;
 		}
 #endif
-	}
+    }
 
 
-	protected override void OnEnableObject()
+    protected override void OnEnableObject()
 	{
 		base.OnEnableObject();
 

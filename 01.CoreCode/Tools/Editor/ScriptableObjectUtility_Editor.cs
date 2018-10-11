@@ -11,11 +11,13 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEditor;
 using System.IO;
+using System.Runtime.Serialization;
+using System.Runtime.Serialization.Formatters.Binary;
 
 /// <summary>
 /// 
 /// </summary>
-public static class ScriptableObjectUtility
+public static class ScriptableObjectUtility_Editor
 {
     /// <summary>
     //	This makes it easy to create, name and place unique new ScriptableObject asset files.

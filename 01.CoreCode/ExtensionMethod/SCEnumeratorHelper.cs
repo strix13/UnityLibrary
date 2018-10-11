@@ -220,8 +220,8 @@ public static class SCEnumeratorHelper
 
     static public string ToStringList<T>(this List<T> list)
     {
-        string strString = "Count {";
-        strString += list.Count + "} - ";
+        string strString = "Count [";
+        strString += list.Count + "] - ";
         for (int i = 0; i < list.Count; i++)
         {
             strString += list[i];

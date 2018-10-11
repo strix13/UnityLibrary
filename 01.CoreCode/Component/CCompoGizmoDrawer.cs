@@ -32,11 +32,11 @@ public class CCompoGizmoDrawer : CObjectBase
     /* public - Field declaration            */
 
     [Rename_Inspector("기즈모 모양")]
-    public EGizmoShape p_eGizmoShape;
+    public EGizmoShape p_eGizmoShape = EGizmoShape.WireSphere;
     [Rename_Inspector("기즈모 포지션 오프셋")]
     public Vector3 p_vecPositionOffset;
     [Rename_Inspector("기즈모 색상")]
-    Color p_pGizmoColor = Color.green;
+    public Color p_pGizmoColor = Color.red;
     [Rename_Inspector("기즈모 사이즈")]
     public float p_fGizmoSize = 1f;
 
@@ -45,9 +45,13 @@ public class CCompoGizmoDrawer : CObjectBase
     public string p_strGizmoName;
     [Rename_Inspector("기즈모 텍스트 포지션 오프셋")]
     public Vector3 p_vecPositionOffset_Name;
+    [Rename_Inspector("기즈모 텍스트 색상")]
+    public Color p_pGizmoTextColor = Color.green;
     [Rename_Inspector("기즈모 텍스트 사이즈")]
     public int p_iFontSize = 10;
-    
+    [Rename_Inspector("기즈모 텍스트를 게임 오브젝트 이름으로 출력")]
+    public bool p_bPrintObjectName = true;
+
     /* protected & private - Field declaration         */
 
 
@@ -83,10 +87,15 @@ public class CCompoGizmoDrawer : CObjectBase
                 Gizmos.DrawWireCube(transform.position, Vector3.one * p_fGizmoSize);
                 break;
         }
+
         GUIStyle pStyle = new GUIStyle();
-        pStyle.normal.textColor = p_pGizmoColor;
+        pStyle.normal.textColor = p_pGizmoTextColor;
         pStyle.fontSize = p_iFontSize;
-        UnityEditor.Handles.Label(transform.position + p_vecPositionOffset_Name, p_strGizmoName, pStyle);
+
+        if(p_bPrintObjectName)
+            UnityEditor.Handles.Label(transform.position + p_vecPositionOffset_Name, name, pStyle);
+        else
+            UnityEditor.Handles.Label(transform.position + p_vecPositionOffset_Name, p_strGizmoName, pStyle);
     }
 #endif
 

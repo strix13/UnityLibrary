@@ -118,7 +118,19 @@ public class CAnimatorController : CObjectBase, IAnimationController
         _OnFinishAnimation = OnFinishAnimation;
 		ProcPlayAnim( eAnimName, false );
 	}
-    
+
+    /// <summary>
+    /// 애니메이션을 실행합니다.
+    /// </summary>
+    /// <param name="eAnimName">플레이 할 애니메이션 이름의 Enum</param>
+    /// <param name="OnFinishAnimation">애니메이션이 종료될 때 호출할 함수</param>
+    public void DoPlayAnimation<ENUM_ANIMATION_NAME>(ENUM_ANIMATION_NAME eAnimName, int iAnimationLayer, OnFinishAnimation OnFinishAnimation = null)
+        where ENUM_ANIMATION_NAME : System.IConvertible, System.IComparable
+    {
+        _OnFinishAnimation = OnFinishAnimation;
+        ProcPlayAnim(eAnimName, false, iAnimationLayer);
+    }
+
     public void DoPlayAnimation_Default()
 	{
 		if (bDefaultIsLoop)
@@ -228,7 +240,9 @@ public class CAnimatorController : CObjectBase, IAnimationController
 	{
 		if (gameObject.activeInHierarchy == false)
 		{
-			Debug.LogWarning( name + " ProcPlayAnim - gameObject.activeInHierarchy == false", this );
+            if (p_eDebugFilter.ContainEnumFlag(EDebugFilter.Debug_Level_1) || p_eDebugFilter.ContainEnumFlag(EDebugFilter.Debug_Level_2))
+    			Debug.LogWarning( name + " ProcPlayAnim - gameObject.activeInHierarchy == false", this );
+
 			return;
 		}
 		if (_pAnimator.isInitialized == false) // Animator does not have an AnimatorController 관련 에러 잡기 위함
@@ -237,15 +251,6 @@ public class CAnimatorController : CObjectBase, IAnimationController
 			StartCoroutine( CoDelayPlayAnimation( eAnimName.ToString(), bIsLoop, iAnimationLayer ) );
 			return;
 		}
-
-		// for debug
-		//if(GetComponentInParent<SGEnemy>() != null)
-		//{
-		//	if(GetComponentInParent<CCompoStat>().p_bIsAlive == false)
-		//	{
-		//		Debug.Log( "Play Anim!!" + eAnimName );
-		//	}
-		//}
 		
 		_strCurrentAnimName = eAnimName.ToString();
         if (p_bIsDebuging)
